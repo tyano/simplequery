@@ -16,6 +16,7 @@
 
 package com.shelfmap.simplequery.jbehave.steps;
 
+import com.shelfmap.specsfinder.Steps;
 import java.util.Arrays;
 import org.jbehave.core.annotations.Then;
 import com.amazonaws.auth.AWSCredentials;
@@ -28,7 +29,6 @@ import com.amazonaws.services.simpledb.model.GetAttributesResult;
 import com.amazonaws.services.simpledb.model.ListDomainsResult;
 import com.amazonaws.services.simpledb.model.PutAttributesRequest;
 import com.amazonaws.services.simpledb.model.ReplaceableAttribute;
-import com.shelfmap.simplequery.Steps;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;

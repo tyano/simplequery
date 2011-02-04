@@ -41,11 +41,11 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.jbehave</groupId>
-            <artifactId>jbehave-core</artifactId>
-            <version>3.1.2</version>
+            <groupId>com.shelfmap</groupId>
+            <artifactId>jbehave-specsfinder</artifactId>
+            <version>3.1.2-SNAPSHOT</version>
             <scope>test</scope>
-        </dependency>     
+        </dependency>
     </dependencies>
     
     <build>

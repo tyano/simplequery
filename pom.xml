@@ -42,7 +42,7 @@
         </dependency>
         <dependency>
             <groupId>com.shelfmap</groupId>
-            <artifactId>jbehave-specsfinder</artifactId>
+            <artifactId>jbehave-stepsfinder</artifactId>
             <version>3.1.2-SNAPSHOT</version>
             <scope>test</scope>
         </dependency>

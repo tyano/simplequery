@@ -18,9 +18,6 @@ package com.shelfmap.simplequery.jbehave;
 import com.shelfmap.simplequery.FileClassLoader;
 import com.shelfmap.simplequery.Steps;
 import com.shelfmap.simplequery.jbehave.StoryRunnerTest.MyDateConverter;
-import com.shelfmap.simplequery.jbehave.StoryRunnerTest.MyReportBuilder;
-import com.shelfmap.simplequery.jbehave.StoryRunnerTest.MyStoryControls;
-import com.shelfmap.simplequery.jbehave.StoryRunnerTest.MyStoryLoader;
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -30,59 +27,65 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import org.apache.commons.io.FileUtils;
-import org.jbehave.core.InjectableEmbedder;
-import org.jbehave.core.annotations.Configure;
-import org.jbehave.core.annotations.UsingEmbedder;
-import org.jbehave.core.annotations.UsingSteps;
-import org.jbehave.core.embedder.Embedder;
-import org.jbehave.core.embedder.StoryControls;
+import org.apache.commons.lang.StringUtils;
+import org.jbehave.core.configuration.Configuration;
+import org.jbehave.core.configuration.MostUsefulConfiguration;
 import static org.jbehave.core.io.CodeLocations.*;
-import org.jbehave.core.io.LoadFromClasspath;
 import org.jbehave.core.io.StoryFinder;
-import org.jbehave.core.junit.AnnotatedEmbedderRunner;
-import org.jbehave.core.parsers.RegexPrefixCapturingPatternParser;
+import org.jbehave.core.junit.JUnitStories;
 import org.jbehave.core.reporters.StoryReporterBuilder;
 import org.jbehave.core.steps.CandidateSteps;
 import org.jbehave.core.steps.InstanceStepsFactory;
+import org.jbehave.core.steps.ParameterConverters;
 import static org.jbehave.core.reporters.StoryReporterBuilder.Format.*;
 import org.jbehave.core.steps.ParameterConverters.DateConverter;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 
 /**
  *
  * @author Tsutomu YANO
  */
-@RunWith(AnnotatedEmbedderRunner.class)
-@Configure(storyControls = MyStoryControls.class,
-                storyLoader = MyStoryLoader.class,
-                storyReporterBuilder = MyReportBuilder.class,
-                parameterConverters = {MyDateConverter.class})
-@UsingEmbedder(embedder = Embedder.class,
-                generateViewAfterStories = true,
-                ignoreFailureInStories = true,
-                ignoreFailureInView = true,
-                metaFilters = "-skip")
-@UsingSteps(instances = {})
-public class StoryRunnerTest extends InjectableEmbedder {
+public class StoryRunnerTest extends JUnitStories {
 
+    public StoryRunnerTest() throws IOException, URISyntaxException, InstantiationException, IllegalAccessException {
+        super();
+        Configuration configuration = new MostUsefulConfiguration()
+            .useStoryReporterBuilder(new StoryReporterBuilder()
+                .withFormats(CONSOLE, IDE_CONSOLE, HTML).withDefaultFormats())
+            .useParameterConverters(new ParameterConverters().addConverters(new MyDateConverter()));
+        
+        useConfiguration(configuration);
+        
+        
+        configuredEmbedder().embedderControls()
+                .doGenerateViewAfterStories(true)
+                .doIgnoreFailureInStories(true)
+                .doIgnoreFailureInView(false);
+    }
+    
     @Test
     @Override
     public void run() throws Throwable {
-        Embedder embedder = injectedEmbedder();
-        List<String> storyPaths = new StoryFinder().findPaths(codeLocationFromClass(this.getClass()), "**/*.story", "");
-        
+        addSteps(createSteps(configuration()));
+        super.run();
+    }
+
+    protected List<CandidateSteps> createSteps(Configuration configuration) throws IOException, URISyntaxException, InstantiationException, IllegalAccessException {
+        return new InstanceStepsFactory(configuration, createStepsInstances()).createCandidateSteps();
+    }
+    
+    protected List<Object> createStepsInstances() throws IOException, URISyntaxException, InstantiationException, IllegalAccessException {
         List<Object> instances = new ArrayList<Object>();
         for (Class<?> clazz : findStepsClasses()) {
             instances.add(clazz.newInstance());
         }
-        
-        List<CandidateSteps> candidateSteps = new ArrayList<CandidateSteps>();
-        candidateSteps.addAll(embedder.candidateSteps());
-        candidateSteps.addAll(new InstanceStepsFactory(embedder.configuration(), instances).createCandidateSteps());
-        embedder.useCandidateSteps(candidateSteps);
-        embedder.runStoriesAsPaths(storyPaths);
+        return instances;
     }
+    
+    private String fullPathForDirectoryOfClass(Class<?> clazz) throws URISyntaxException {
+        URL url = clazz.getResource("");
+        return new File(url.toURI()).getAbsolutePath();
+    }    
     
     private List<Class<?>> findStepsClasses() throws IOException, URISyntaxException {
         FileClassLoader loader = new FileClassLoader(getClass().getClassLoader());
@@ -102,32 +105,16 @@ public class StoryRunnerTest extends InjectableEmbedder {
         return stepClasses;
     }
 
-    public static class MyStoryControls extends StoryControls {
-
-        public MyStoryControls() {
-            doDryRun(false);
-            doSkipScenariosAfterFailure(false);
-        }
-    }
-
-    public static class MyStoryLoader extends LoadFromClasspath {
-
-        public MyStoryLoader() {
-            super(StoryRunnerTest.class.getClassLoader());
-        }
-    }
-
-    public static class MyReportBuilder extends StoryReporterBuilder {
-
-        public MyReportBuilder() {
-            this.withFormats(CONSOLE, IDE_CONSOLE, HTML).withDefaultFormats();
-        }
-    }
-
-    public static class MyRegexPrefixCapturingPatternParser extends RegexPrefixCapturingPatternParser {
-
-        public MyRegexPrefixCapturingPatternParser() {
-            super("%");
+    @Override
+    protected List<String> storyPaths() {
+        try {
+            URL search = codeLocationFromClass(this.getClass());
+            String searchPath = new File(search.toURI()).getAbsolutePath();
+            String include = StringUtils.removeStart(fullPathForDirectoryOfClass(this.getClass()) + "/**/*.story", searchPath + "/");
+            List<String> storyPaths = new StoryFinder().findPaths(search, include, "");
+            return storyPaths;
+        } catch (URISyntaxException ex) {
+            throw new IllegalStateException("the location where classes exist is not on a file system. This class is aplicable only for classes on any filesystem.");
         }
     }
 

@@ -14,15 +14,18 @@
  * limitations under the License.
  */
 
-package com.shelfmap.simplequery.expression;
+package com.shelfmap.simplequery.util;
 
 /**
  *
  * @author Tsutomu YANO
  */
-public interface Condition<T> {
-    Condition<T> and(Condition<T> other);
-    Condition<T> and(String attributeName, Matcher matcher);
-    Condition<T> or(Condition<T> other);
-    Condition<T> or(String attributeName, Matcher matcher);
+public class Assertion {
+    private Assertion() {
+        super();
+    }
+    
+    public static void isNull(String parameterName, Object value) {
+        if(value == null) throw new IllegalArgumentException("the parameter '" + parameterName + "' must not be null.");
+    }
 }

@@ -14,15 +14,21 @@
  * limitations under the License.
  */
 
-package com.shelfmap.simplequery.expression;
+package com.shelfmap.simplequery.expression.matcher;
 
 /**
  *
  * @author Tsutomu YANO
  */
-public interface Condition<T> {
-    Condition<T> and(Condition<T> other);
-    Condition<T> and(String attributeName, Matcher matcher);
-    Condition<T> or(Condition<T> other);
-    Condition<T> or(String attributeName, Matcher matcher);
+public class LesserEqualMatcher extends BaseMatcher {
+
+    public LesserEqualMatcher(String attribute, Class<?> type, Object value) {
+        super(attribute, type, value);
+    }
+
+    @Override
+    protected String expression() {
+        return "<=";
+    }
+
 }

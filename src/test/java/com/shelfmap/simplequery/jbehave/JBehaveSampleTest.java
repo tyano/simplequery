@@ -28,4 +28,9 @@ public class JBehaveSampleTest extends StoryRunner {
     public JBehaveSampleTest() throws IOException, URISyntaxException, InstantiationException, IllegalAccessException {
         super();
     }
+
+    @Override
+    protected String classpathForSearch() {
+        return "com.shelfmap.simplequery.jbehave";
+    }
 }

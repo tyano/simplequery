@@ -22,7 +22,7 @@ package com.shelfmap.simplequery.expression;
  */
 public interface Condition<T> {
     Condition<T> and(Condition<T> other);
-    Condition<T> and(String attributeName, Matcher<?> matcher);
+    Condition<T> and(String attributeName, Matcher matcher);
     Condition<T> or(Condition<T> other);
-    Condition<T> or(String attributeName, Matcher<?> matcher);
+    Condition<T> or(String attributeName, Matcher matcher);
 }

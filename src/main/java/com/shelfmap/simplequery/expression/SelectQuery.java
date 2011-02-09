@@ -22,8 +22,8 @@ package com.shelfmap.simplequery.expression;
  */
 public interface SelectQuery {
     /**
-     * create a Expression object which returns all items of the domain.
-     * the domain where queries will be send to will be detected from the target
+     * You can create a Expression object which returns all items of a domain.
+     * the domain will be detected from the target
      * object that is passed as a argument. the target object must have @Target(domainName)
      * annotation on the class definition. If the target don't have @Target 
      * annotation, InvalidTargetException will be throwed.

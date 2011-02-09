@@ -16,7 +16,7 @@
 
 package com.shelfmap.simplequery.expression.matcher;
 
-import static com.shelfmap.simplequery.util.Assertion.isNull;
+import static com.shelfmap.simplequery.util.Assertion.isNotNull;
 import com.shelfmap.simplequery.expression.Matcher;
 import com.shelfmap.simplequery.expression.ValueConverter;
 
@@ -30,8 +30,8 @@ public abstract class BaseMatcher implements Matcher{
     private Class<?> type;
 
     public BaseMatcher(String attribute, Class<?> type, Object value) {
-        isNull("attribute", attribute);
-        isNull("type", type);
+        isNotNull("attribute", attribute);
+        isNotNull("type", type);
         this.attribute = attribute;
         this.type = type;
         this.value = value;

@@ -20,5 +20,6 @@ package com.shelfmap.simplequery.expression;
  *
  * @author Tsutomu YANO
  */
-public interface Matcher extends Describable {
+public interface Operator extends Describable {
+
 }

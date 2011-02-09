@@ -21,9 +21,9 @@ package com.shelfmap.simplequery.expression;
  * @author Tsutomu YANO
  */
 public interface WhereExpression<T> extends Expression<T> {
-    WhereExpression<T> and(Condition<T> other);
+    WhereExpression<T> and(Condition other);
     WhereExpression<T> and(String attributeName, Matcher matcher);
-    WhereExpression<T> or(Condition<T> other);
+    WhereExpression<T> or(Condition other);
     WhereExpression<T> or(String attributeName, Matcher matcher);
     OrderByExpression<T> orderBy(String attributeName, SortOrder sortOrder);
 }

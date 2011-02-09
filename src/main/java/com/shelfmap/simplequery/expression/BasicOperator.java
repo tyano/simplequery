@@ -20,5 +20,17 @@ package com.shelfmap.simplequery.expression;
  *
  * @author Tsutomu YANO
  */
-public interface Matcher extends Describable {
+public enum BasicOperator implements Operator {
+    AND(" and "), OR(" or "); 
+    
+    private String operatorString;
+
+    private BasicOperator(String operatorString) {
+        this.operatorString = operatorString;
+    }
+    
+    @Override
+    public String describe() {
+        return operatorString;
+    }
 }

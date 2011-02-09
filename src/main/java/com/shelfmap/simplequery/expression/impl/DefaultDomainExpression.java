@@ -26,13 +26,13 @@ import com.shelfmap.simplequery.expression.WhereExpression;
  *
  * @author Tsutomu YANO
  */
-public class DomainExpressionImpl<T> extends BaseExpression<T> implements DomainExpression<T> {
+public class DefaultDomainExpression<T> extends BaseExpression<T> implements DomainExpression<T> {
     private AmazonSimpleDB simpleDB;
     private Select selectObject;
     private String domainName;
     private Class<T> typeToken;
 
-    public DomainExpressionImpl(AmazonSimpleDB simpleDB, Select selectObject, String domainName, Class<T> typeToken) {
+    public DefaultDomainExpression(AmazonSimpleDB simpleDB, Select selectObject, String domainName, Class<T> typeToken) {
         this.simpleDB = simpleDB;
         this.selectObject = selectObject;
         this.domainName = domainName;
@@ -40,7 +40,7 @@ public class DomainExpressionImpl<T> extends BaseExpression<T> implements Domain
     }
     
     @Override
-    public WhereExpression<T> where(Condition<T> expression) {
+    public WhereExpression<T> where(Condition expression) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 

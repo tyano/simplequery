@@ -37,7 +37,7 @@ public class Select implements SelectQuery {
         Domain annotation = target.getAnnotation(Domain.class);
         if(annotation == null) throw new IllegalArgumentException("the class object must have @Domain annotation.");
         String domainName = annotation.value();
-        return new DomainExpressionImpl<T>(sdb, this, domainName, target);
+        return new DefaultDomainExpression<T>(sdb, this, domainName, target);
     }
 
     public AmazonSimpleDB getSimpleDB() {

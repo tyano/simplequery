@@ -22,7 +22,7 @@ package com.shelfmap.simplequery.expression;
  * 
  * @author Tsutomu YANO
  */
-public interface Expression<T> {
+public interface Expression<T> extends Describable {
     /**
      * this method return a instance which is the result of 
      * evaluation of this expression object.

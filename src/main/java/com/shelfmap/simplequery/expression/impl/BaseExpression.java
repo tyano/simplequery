@@ -25,7 +25,7 @@ import com.shelfmap.simplequery.expression.SimpleQueryException;
  *
  * @author Tsutomu YANO
  */
-public class BaseExpression<T> implements Expression<T> {
+public abstract class BaseExpression<T> implements Expression<T> {
 
     @Override
     public T singleResult() throws SimpleQueryException, MultipleResultsExistException {

@@ -20,9 +20,10 @@ package com.shelfmap.simplequery.expression;
  *
  * @author Tsutomu YANO
  */
-public interface Condition<T> {
-    Condition<T> and(Condition<T> other);
-    Condition<T> and(String attributeName, Matcher matcher);
-    Condition<T> or(Condition<T> other);
-    Condition<T> or(String attributeName, Matcher matcher);
+public interface Condition extends Describable {
+    Condition and(Condition other);
+    Condition and(String attributeName, Matcher matcher);
+    Condition or(Condition other);
+    Condition or(String attributeName, Matcher matcher);
+    Condition group();
 }

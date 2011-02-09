@@ -20,5 +20,14 @@ package com.shelfmap.simplequery.expression;
  *
  * @author Tsutomu YANO
  */
-public interface Matcher extends Describable {
+public final class NullOperator implements Operator {
+    public static final Operator INSTANCE = new NullOperator();
+    
+    private NullOperator() {
+    }
+    
+    @Override
+    public String describe() {
+        return "";
+    }
 }

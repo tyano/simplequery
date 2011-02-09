@@ -25,7 +25,7 @@ public class Assertion {
         super();
     }
     
-    public static void isNull(String parameterName, Object value) {
+    public static void isNotNull(String parameterName, Object value) {
         if(value == null) throw new IllegalArgumentException("the parameter '" + parameterName + "' must not be null.");
     }
 }

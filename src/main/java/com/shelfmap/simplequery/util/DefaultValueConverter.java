@@ -16,10 +16,23 @@
 
 package com.shelfmap.simplequery.util;
 
+import com.shelfmap.simplequery.expression.ValueConverter;
+
 /**
  *
  * @author Tsutomu YANO
  */
-public class ValueConverter {
+public class DefaultValueConverter implements ValueConverter {
 
+    @Override
+    public String convertValue(Class<?> type, Object value) {
+        return null;
+    }
+
+    @Override
+    public String convertAttribute(String attributeName) {
+        return null;
+    }
+    
+    
 }

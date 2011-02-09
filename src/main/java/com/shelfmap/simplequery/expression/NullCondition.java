@@ -50,6 +50,11 @@ public final class NullCondition implements Condition {
     }
 
     @Override
+    public Condition group() {
+        return this;
+    }
+    
+    @Override
     public String describe() {
         return "";
     }

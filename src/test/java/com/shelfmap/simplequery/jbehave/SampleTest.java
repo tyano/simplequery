@@ -28,9 +28,4 @@ public class SampleTest extends StoryRunner {
     public SampleTest() throws IOException, URISyntaxException, InstantiationException, IllegalAccessException {
         super();
     }
-
-    @Override
-    protected String classpathForSearch() {
-        return "com.shelfmap.simplequery.jbehave";
-    }
 }

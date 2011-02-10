@@ -14,8 +14,10 @@
  * limitations under the License.
  */
 
-package com.shelfmap.simplequery.expression;
+package com.shelfmap.simplequery.expression.impl;
 
+import com.shelfmap.simplequery.expression.Condition;
+import com.shelfmap.simplequery.expression.Matcher;
 import com.shelfmap.simplequery.expression.impl.DefaultCondition;
 
 /**

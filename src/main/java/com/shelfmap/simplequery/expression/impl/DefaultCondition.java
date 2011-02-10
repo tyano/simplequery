@@ -17,11 +17,8 @@
 package com.shelfmap.simplequery.expression.impl;
 
 import static com.shelfmap.simplequery.util.Assertion.isNotNull;
-import com.shelfmap.simplequery.expression.BasicOperator;
 import com.shelfmap.simplequery.expression.Condition;
 import com.shelfmap.simplequery.expression.Matcher;
-import com.shelfmap.simplequery.expression.NullCondition;
-import com.shelfmap.simplequery.expression.NullOperator;
 import com.shelfmap.simplequery.expression.Operator;
 import com.shelfmap.simplequery.expression.ValueConverter;
 

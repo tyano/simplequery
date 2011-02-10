@@ -14,20 +14,25 @@
  * limitations under the License.
  */
 
-package com.shelfmap.simplequery.expression;
+package com.shelfmap.simplequery.expression.impl;
+
+import com.shelfmap.simplequery.expression.Operator;
 
 /**
  *
  * @author Tsutomu YANO
  */
-public final class NullOperator implements Operator {
-    public static final Operator INSTANCE = new NullOperator();
+public enum BasicOperator implements Operator {
+    AND(" and "), OR(" or "); 
     
-    private NullOperator() {
+    private String operatorString;
+
+    private BasicOperator(String operatorString) {
+        this.operatorString = operatorString;
     }
     
     @Override
     public String describe() {
-        return "";
+        return operatorString;
     }
 }

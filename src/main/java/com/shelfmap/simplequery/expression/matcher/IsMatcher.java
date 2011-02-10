@@ -20,10 +20,10 @@ package com.shelfmap.simplequery.expression.matcher;
  *
  * @author Tsutomu YANO
  */
-public class IsMatcher extends BaseMatcher {
+public class IsMatcher<T> extends BaseMatcher<T> {
 
-    public IsMatcher(String attribute, Class<?> type, Object value) {
-        super(attribute, type, value);
+    public IsMatcher(T value) {
+        super(value);
     }
 
     @Override

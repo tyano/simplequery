@@ -20,10 +20,10 @@ package com.shelfmap.simplequery.expression.matcher;
  *
  * @author Tsutomu YANO
  */
-public class GreaterThanMatcher extends BaseMatcher {
+public class GreaterThanMatcher<T> extends BaseMatcher<T> {
 
-    public GreaterThanMatcher(String attribute, Class<?> type, Object value) {
-        super(attribute, type, value);
+    public GreaterThanMatcher(T value) {
+        super(value);
     }
 
     @Override

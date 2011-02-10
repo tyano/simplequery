@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.shelfmap.simplequery.jbehave.steps;
+package com.shelfmap.simplequery.jbehave;
 
 import com.shelfmap.specsfinder.Steps;
 import java.util.Arrays;
@@ -42,7 +42,7 @@ import static org.hamcrest.Matchers.*;
  * @author Tsutomu YANO
  */
 @Steps
-public class SampleSteps {
+public class SampleTestSteps {
     private AmazonSimpleDB sdb;
     private List<String> domainNames;
     

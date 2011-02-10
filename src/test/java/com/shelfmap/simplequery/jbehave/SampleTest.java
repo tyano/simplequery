@@ -24,8 +24,8 @@ import java.net.URISyntaxException;
  *
  * @author Tsutomu YANO
  */
-public class JBehaveSampleTest extends StoryRunner {
-    public JBehaveSampleTest() throws IOException, URISyntaxException, InstantiationException, IllegalAccessException {
+public class SampleTest extends StoryRunner {
+    public SampleTest() throws IOException, URISyntaxException, InstantiationException, IllegalAccessException {
         super();
     }
 

@@ -14,21 +14,25 @@
  * limitations under the License.
  */
 
-package com.shelfmap.simplequery.expression.matcher;
+package com.shelfmap.simplequery.expression;
+
+import com.shelfmap.simplequery.expression.matcher.IsMatcher;
+import com.shelfmap.simplequery.expression.matcher.IsNotMatcher;
 
 /**
  *
  * @author Tsutomu YANO
  */
-public class LesserEqualMatcher<T> extends BaseMatcher<T> {
-
-    public LesserEqualMatcher(T value) {
-        super(value);
+public final class Matchers {
+    private Matchers() {
+        super();
+    }
+    
+    public static <T> Matcher<T> is(T value) {
+        return new IsMatcher<T>(value);
     }
 
-    @Override
-    protected String expression() {
-        return "<=";
+    public static <T> Matcher<T> isNot(T value) {
+        return new IsNotMatcher<T>(value);
     }
-
 }

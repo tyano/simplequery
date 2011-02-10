@@ -14,21 +14,22 @@
  * limitations under the License.
  */
 
-package com.shelfmap.simplequery.expression.matcher;
+package com.shelfmap.simplequery.expression.impl;
+
+import com.shelfmap.simplequery.expression.Operator;
 
 /**
  *
  * @author Tsutomu YANO
  */
-public class LesserEqualMatcher<T> extends BaseMatcher<T> {
-
-    public LesserEqualMatcher(T value) {
-        super(value);
+public final class NullOperator implements Operator {
+    public static final Operator INSTANCE = new NullOperator();
+    
+    private NullOperator() {
     }
-
+    
     @Override
-    protected String expression() {
-        return "<=";
+    public String describe() {
+        return "";
     }
-
 }

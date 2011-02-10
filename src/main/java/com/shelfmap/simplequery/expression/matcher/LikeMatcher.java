@@ -20,10 +20,10 @@ package com.shelfmap.simplequery.expression.matcher;
  *
  * @author Tsutomu YANO
  */
-public class LikeMatcher extends BaseMatcher {
+public class LikeMatcher<T> extends BaseMatcher<T> {
 
-    public LikeMatcher(String attribute, Class<?> type, Object value) {
-        super(attribute, type, value);
+    public LikeMatcher(T value) {
+        super(value);
     }
 
     @Override

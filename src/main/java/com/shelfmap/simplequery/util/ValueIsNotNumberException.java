@@ -14,20 +14,27 @@
  * limitations under the License.
  */
 
-package com.shelfmap.simplequery.expression;
+package com.shelfmap.simplequery.util;
 
 /**
  *
  * @author Tsutomu YANO
  */
-public final class NullOperator implements Operator {
-    public static final Operator INSTANCE = new NullOperator();
-    
-    private NullOperator() {
+public class ValueIsNotNumberException extends Exception {
+
+    public ValueIsNotNumberException(Throwable cause) {
+        super(cause);
     }
-    
-    @Override
-    public String describe() {
-        return "";
+
+    public ValueIsNotNumberException(String message, Throwable cause) {
+        super(message, cause);
     }
+
+    public ValueIsNotNumberException(String message) {
+        super(message);
+    }
+
+    public ValueIsNotNumberException() {
+    }
+
 }

@@ -14,23 +14,26 @@
  * limitations under the License.
  */
 
-package com.shelfmap.simplequery.expression;
+package com.shelfmap.simplequery.converter;
+
+import com.shelfmap.specsfinder.StoryRunner;
+import java.io.IOException;
+import java.net.URISyntaxException;
 
 /**
  *
  * @author Tsutomu YANO
  */
-public enum BasicOperator implements Operator {
-    AND(" and "), OR(" or "); 
-    
-    private String operatorString;
+public class ConverterTest extends StoryRunner{
 
-    private BasicOperator(String operatorString) {
-        this.operatorString = operatorString;
+    public ConverterTest() throws IOException, URISyntaxException, InstantiationException, IllegalAccessException {
+        super();
+        
+        regularExpression(".*Steps\\.class");
     }
-    
+
     @Override
-    public String describe() {
-        return operatorString;
+    protected String classpathForSearch() {
+        return getClass().getPackage().getName();
     }
 }

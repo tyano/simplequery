@@ -14,21 +14,27 @@
  * limitations under the License.
  */
 
-package com.shelfmap.simplequery.expression.matcher;
+package com.shelfmap.simplequery.util;
 
 /**
  *
  * @author Tsutomu YANO
  */
-public class LesserEqualMatcher<T> extends BaseMatcher<T> {
+public class ValueGreaterThanIntMaxException extends Exception {
 
-    public LesserEqualMatcher(T value) {
-        super(value);
+    public ValueGreaterThanIntMaxException(Throwable cause) {
+        super(cause);
     }
 
-    @Override
-    protected String expression() {
-        return "<=";
+    public ValueGreaterThanIntMaxException(String message, Throwable cause) {
+        super(message, cause);
+    }
+
+    public ValueGreaterThanIntMaxException(String message) {
+        super(message);
+    }
+
+    public ValueGreaterThanIntMaxException() {
     }
 
 }

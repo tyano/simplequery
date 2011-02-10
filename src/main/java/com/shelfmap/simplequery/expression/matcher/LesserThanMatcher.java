@@ -20,10 +20,10 @@ package com.shelfmap.simplequery.expression.matcher;
  *
  * @author Tsutomu YANO
  */
-public class LesserThanMatcher extends BaseMatcher {
+public class LesserThanMatcher<T> extends BaseMatcher<T> {
 
-    public LesserThanMatcher(String attribute, Class<?> type, Object value) {
-        super(attribute, type, value);
+    public LesserThanMatcher(T value) {
+        super(value);
     }
 
     @Override

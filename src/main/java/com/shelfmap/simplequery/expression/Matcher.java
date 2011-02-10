@@ -20,5 +20,8 @@ package com.shelfmap.simplequery.expression;
  *
  * @author Tsutomu YANO
  */
-public interface Matcher extends Describable {
+public interface Matcher<T> extends Describable {
+    Matcher<T> withAttributeInfo(int maxDigitLeft, int maxDigitRight, int offsetValue);
+    Matcher<T> withAttributeInfo(int maxNumDigits, int offsetValue);
+    Matcher<T> withAttributeInfo(int maxNumDigits, long offsetValue);
 }

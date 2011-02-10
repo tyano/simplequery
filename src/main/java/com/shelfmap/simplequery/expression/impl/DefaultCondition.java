@@ -17,11 +17,8 @@
 package com.shelfmap.simplequery.expression.impl;
 
 import static com.shelfmap.simplequery.util.Assertion.isNotNull;
-import com.shelfmap.simplequery.expression.BasicOperator;
 import com.shelfmap.simplequery.expression.Condition;
 import com.shelfmap.simplequery.expression.Matcher;
-import com.shelfmap.simplequery.expression.NullCondition;
-import com.shelfmap.simplequery.expression.NullOperator;
 import com.shelfmap.simplequery.expression.Operator;
 import com.shelfmap.simplequery.expression.ValueConverter;
 
@@ -34,52 +31,57 @@ public class DefaultCondition implements Condition {
     private Condition parent;
     private Operator operator;
     private String attributeName;
-    private Matcher matcher;
+    private Matcher<?> matcher;
     private boolean grouped = false;
 
-    public DefaultCondition(Condition parent, Operator operator, String attributeName, Matcher matcher) {
+    public DefaultCondition(String attributeName, Matcher<?> matcher) {
         isNotNull("parent", parent);
         isNotNull("operator", operator);
         isNotNull("attributeName", attributeName);
         isNotNull("matcher", matcher);
-        this.parent = parent;
-        this.operator = operator;
+        this.parent = NullCondition.INSTANCE;
+        this.operator = NullOperator.INSTANCE;
         this.attributeName = attributeName;
         this.matcher = matcher;
     }
-
-    public DefaultCondition(String attributeName, Matcher matcher) {
-        this(NullCondition.INSTANCE, NullOperator.INSTANCE, attributeName, matcher);
-    }
-
+    
     public String getAttributeName() {
         return attributeName;
     }
 
-    public Matcher getMatcher() {
+    public Matcher<?> getMatcher() {
         return matcher;
     }
     
     @Override
+    public Condition withParent(Condition parent, Operator operator) {
+        this.parent = parent;
+        this.operator = operator;
+        return this;
+    }
+    
+    @Override
     public Condition and(Condition other) {
-        return new DefaultCondition(this, BasicOperator.AND, attributeName, matcher);
+        return other.withParent(this, BasicOperator.AND);
     }
 
     @Override
-    public Condition and(String attributeName, Matcher matcher) {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public Condition and(String attributeName, Matcher<?> matcher) {
+        Condition other = new DefaultCondition(attributeName, matcher);
+        return this.and(other);
     }
 
     @Override
     public Condition or(Condition other) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return other.withParent(this, BasicOperator.OR);
     }
 
     @Override
-    public Condition or(String attributeName, Matcher matcher) {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public Condition or(String attributeName, Matcher<?> matcher) {
+        Condition other = new DefaultCondition(attributeName, matcher);
+        return this.or(other);
     }
-
+    
     @Override
     public Condition group() {
         this.grouped = true;
@@ -96,7 +98,7 @@ public class DefaultCondition implements Condition {
         sb.append(getOperator().describe());
         
         ValueConverter converter = converter();
-        sb.append(converter.convertAttribute(getAttributeName())).append(getMatcher().describe());
+        sb.append(converter.convertAttribute(getAttributeName())).append(" ").append(getMatcher().describe());
         
         if(grouped) sb.append(")");
         
@@ -114,4 +116,43 @@ public class DefaultCondition implements Condition {
     protected ValueConverter converter() {
         return null;
     }
+
+    @Override
+    public Condition and(String attributeName, Matcher<? extends Float> matcher, int maxDigitLeft, int maxDigitRight, int offsetValue) {
+        Condition other = new DefaultCondition(attributeName, matcher.withAttributeInfo(maxDigitLeft, maxDigitRight, offsetValue));
+        return this.and(other);
+    }
+
+    @Override
+    public Condition and(String attributeName, Matcher<? extends Integer> matcher, int maxNumDigits, int offsetValue) {
+        Condition other = new DefaultCondition(attributeName, matcher.withAttributeInfo(maxNumDigits, offsetValue));
+        return this.and(other);
+    }
+
+    @Override
+    public Condition and(String attributeName, Matcher<? extends Long> matcher, int maxNumDigits, long offsetValue) {
+        Condition other = new DefaultCondition(attributeName, matcher.withAttributeInfo(maxNumDigits, offsetValue));
+        return this.and(other);
+    }
+
+    @Override
+    public Condition or(String attributeName, Matcher<? extends Float> matcher, int maxDigitLeft, int maxDigitRight, int offsetValue) {
+        Condition other = new DefaultCondition(attributeName, matcher.withAttributeInfo(maxDigitLeft, maxDigitRight, offsetValue));
+        return this.or(other);
+    }
+
+    @Override
+    public Condition or(String attributeName, Matcher<? extends Integer> matcher, int maxNumDigits, int offsetValue) {
+        Condition other = new DefaultCondition(attributeName, matcher.withAttributeInfo(maxNumDigits, offsetValue));
+        return this.or(other);
+    }
+
+    @Override
+    public Condition or(String attributeName, Matcher<? extends Long> matcher, int maxNumDigits, long offsetValue) {
+        Condition other = new DefaultCondition(attributeName, matcher.withAttributeInfo(maxNumDigits, offsetValue));
+        return this.or(other);
+    }
+
+
+
 }

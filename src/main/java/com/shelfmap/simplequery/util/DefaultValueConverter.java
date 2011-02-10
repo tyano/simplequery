@@ -34,5 +34,35 @@ public class DefaultValueConverter implements ValueConverter {
         return null;
     }
     
+    protected IntConverter newIntConverter() {
+        return null;
+    }
     
+    protected ByteConverter newByteConveter() {
+        return null;
+    }
+    
+    protected ShortConverter newShortConveter() {
+        return null;
+    }
+    
+    protected LongConverter newLongConverter() {
+        return null;
+    }
+    
+    protected StringConverter newStringConverter() {
+        return null;
+    }
+    
+    protected FloatConverter newFloatConverter() {
+        return null;
+    }
+    
+    protected DoubleConverter newDoubleConverter() {
+        return null;
+    }
+    
+    protected ObjectConverter newObjectConverter() {
+        return null;
+    }
 }

@@ -14,21 +14,25 @@
  * limitations under the License.
  */
 
-package com.shelfmap.simplequery.expression.matcher;
+package com.shelfmap.simplequery.expression.impl;
+
+import com.shelfmap.simplequery.expression.Operator;
 
 /**
  *
  * @author Tsutomu YANO
  */
-public class LesserEqualMatcher<T> extends BaseMatcher<T> {
+public enum BasicOperator implements Operator {
+    AND(" and "), OR(" or "); 
+    
+    private String operatorString;
 
-    public LesserEqualMatcher(T value) {
-        super(value);
+    private BasicOperator(String operatorString) {
+        this.operatorString = operatorString;
     }
-
+    
     @Override
-    protected String expression() {
-        return "<=";
+    public String describe() {
+        return operatorString;
     }
-
 }

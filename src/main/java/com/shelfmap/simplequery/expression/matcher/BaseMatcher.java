@@ -21,7 +21,6 @@ import static com.amazonaws.services.simpledb.util.SimpleDBUtils.encodeRealNumbe
 import static com.amazonaws.services.simpledb.util.SimpleDBUtils.quoteValue;
 import static com.shelfmap.simplequery.util.Assertion.isNotNull;
 import com.shelfmap.simplequery.expression.Matcher;
-import com.shelfmap.simplequery.expression.ValueConverter;
 
 /**
  *
@@ -114,10 +113,6 @@ public abstract class BaseMatcher<T> implements Matcher<T> {
     }
     
     protected abstract String expression();
-
-    private ValueConverter getValueConverter() {
-        return null;
-    }
 
     public int getMaxDigitLeft() {
         return maxDigitLeft;

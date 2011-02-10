@@ -16,11 +16,11 @@
 
 package com.shelfmap.simplequery.expression.impl;
 
+import com.amazonaws.services.simpledb.util.SimpleDBUtils;
 import static com.shelfmap.simplequery.util.Assertion.isNotNull;
 import com.shelfmap.simplequery.expression.Condition;
 import com.shelfmap.simplequery.expression.Matcher;
 import com.shelfmap.simplequery.expression.Operator;
-import com.shelfmap.simplequery.expression.ValueConverter;
 
 /**
  *
@@ -97,8 +97,7 @@ public class DefaultCondition implements Condition {
         sb.append(getParent().describe());
         sb.append(getOperator().describe());
         
-        ValueConverter converter = converter();
-        sb.append(converter.convertAttribute(getAttributeName())).append(" ").append(getMatcher().describe());
+        sb.append(SimpleDBUtils.quoteName(getAttributeName())).append(" ").append(getMatcher().describe());
         
         if(grouped) sb.append(")");
         
@@ -111,10 +110,6 @@ public class DefaultCondition implements Condition {
 
     public Condition getParent() {
         return parent;
-    }
-
-    protected ValueConverter converter() {
-        return null;
     }
 
     @Override

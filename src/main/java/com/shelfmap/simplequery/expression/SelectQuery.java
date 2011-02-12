@@ -16,11 +16,18 @@
 
 package com.shelfmap.simplequery.expression;
 
+import java.util.Collection;
+
 /**
  *
  * @author Tsutomu YANO
  */
 public interface SelectQuery {
+    
+    void addAttributes(Attribute... attribute);
+    SelectQuery withAttribute(Attribute attribute);
+    Collection<Attribute> getAttributes();
+    
     /**
      * You can create a Expression object which returns all items of a domain.
      * the domain will be detected from the target

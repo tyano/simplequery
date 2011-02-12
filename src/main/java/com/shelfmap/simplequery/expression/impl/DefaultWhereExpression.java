@@ -16,6 +16,7 @@
 
 package com.shelfmap.simplequery.expression.impl;
 
+import static com.shelfmap.simplequery.util.Assertion.isNotNull;
 import com.shelfmap.simplequery.expression.Condition;
 import com.shelfmap.simplequery.expression.Matcher;
 import com.shelfmap.simplequery.expression.OrderByExpression;
@@ -30,6 +31,7 @@ public class DefaultWhereExpression<T> extends BaseExpression<T> implements Wher
     private DefaultDomainExpression<T> domainExpression;
 
     public DefaultWhereExpression(DefaultDomainExpression<T> domainExpression) {
+        isNotNull("domainExpression", domainExpression);
         this.domainExpression = domainExpression;
     }
     
@@ -39,7 +41,7 @@ public class DefaultWhereExpression<T> extends BaseExpression<T> implements Wher
     }
 
     @Override
-    public WhereExpression<T> and(String attributeName, Matcher matcher) {
+    public WhereExpression<T> and(String attributeName, Matcher<T> matcher) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
@@ -49,7 +51,7 @@ public class DefaultWhereExpression<T> extends BaseExpression<T> implements Wher
     }
 
     @Override
-    public WhereExpression<T> or(String attributeName, Matcher matcher) {
+    public WhereExpression<T> or(String attributeName, Matcher<T> matcher) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 

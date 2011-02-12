@@ -22,5 +22,5 @@ package com.shelfmap.simplequery.expression;
  */
 public interface DomainExpression<T> extends Expression<T>{
     WhereExpression<T> where(Condition expression);
-    WhereExpression<T> where(String attributeName, Matcher matcher);
+    WhereExpression<T> where(String attributeName, Matcher<T> matcher);
 }

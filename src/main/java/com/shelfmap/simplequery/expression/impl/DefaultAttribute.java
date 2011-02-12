@@ -16,6 +16,7 @@
 
 package com.shelfmap.simplequery.expression.impl;
 
+import static com.shelfmap.simplequery.util.Assertion.isNotNull;
 import com.shelfmap.simplequery.expression.Attribute;
 
 /**
@@ -26,6 +27,7 @@ public class DefaultAttribute implements Attribute {
     private String attributeName;
 
     public DefaultAttribute(String attributeName) {
+        isNotNull("attributeName", attributeName);
         this.attributeName = attributeName;
     }
 

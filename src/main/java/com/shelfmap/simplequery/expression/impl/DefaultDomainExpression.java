@@ -16,6 +16,7 @@
 
 package com.shelfmap.simplequery.expression.impl;
 
+import static com.shelfmap.simplequery.util.Assertion.isNotNull;
 import com.amazonaws.services.simpledb.AmazonSimpleDB;
 import com.shelfmap.simplequery.expression.Condition;
 import com.shelfmap.simplequery.expression.DomainExpression;
@@ -33,6 +34,10 @@ public class DefaultDomainExpression<T> extends BaseExpression<T> implements Dom
     private Class<T> typeToken;
 
     public DefaultDomainExpression(AmazonSimpleDB simpleDB, Select selectObject, String domainName, Class<T> typeToken) {
+        isNotNull("simpleDB", simpleDB);
+        isNotNull("selectObject", selectObject);
+        isNotNull("domainName", domainName);
+        isNotNull("typeToken", typeToken);
         this.simpleDB = simpleDB;
         this.selectObject = selectObject;
         this.domainName = domainName;
@@ -45,10 +50,11 @@ public class DefaultDomainExpression<T> extends BaseExpression<T> implements Dom
     }
 
     @Override
-    public WhereExpression<T> where(String attributeName, Matcher matcher) {
+    public WhereExpression<T> where(String attributeName, Matcher<T> matcher) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
+    @Override
     public String describe() {
         return selectObject.describe() + " from " + domainName;
     }

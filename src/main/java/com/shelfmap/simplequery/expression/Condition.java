@@ -24,6 +24,8 @@ package com.shelfmap.simplequery.expression;
  */
 public interface Condition extends Describable {
     Condition withParent(Condition parent, Operator operator);
+    void setParent(Condition parent, Operator operator);
+    Condition getParent();
     Condition and(Condition other);
     Condition and(String attributeName, Matcher<?> matcher);
     Condition and(String attributeName, Matcher<? extends Float> matcher, int maxDigitLeft, int maxDigitRight, int offsetValue);

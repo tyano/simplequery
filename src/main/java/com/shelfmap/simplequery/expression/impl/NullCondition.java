@@ -65,6 +65,15 @@ public final class NullCondition implements Condition {
     public Condition withParent(Condition parent, Operator operator) {
         return parent;
     }
+    
+    @Override
+    public void setParent(Condition parent, Operator operator) {
+    }
+
+    @Override
+    public Condition getParent() {
+        return null;
+    }
 
     @Override
     public Condition and(String attributeName, Matcher<? extends Float> matcher, int maxDigitLeft, int maxDigitRight, int offsetValue) {

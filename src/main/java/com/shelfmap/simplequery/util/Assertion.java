@@ -16,6 +16,8 @@
 
 package com.shelfmap.simplequery.util;
 
+import java.util.Collection;
+
 /**
  *
  * @author Tsutomu YANO
@@ -27,5 +29,13 @@ public class Assertion {
     
     public static void isNotNull(String parameterName, Object value) {
         if(value == null) throw new IllegalArgumentException("the parameter '" + parameterName + "' must not be null.");
+    }
+    
+    public static void isNotEmpty(String parameterName, Collection<?> values) {
+        if(values.isEmpty()) throw new IllegalArgumentException("the parameter '" + parameterName + "' must not be empty.");
+    }
+
+    public static void isNotEmpty(String parameterName, Object[] values) {
+        if(values.length == 0) throw new IllegalArgumentException("the parameter '" + parameterName + "' must not be empty.");
     }
 }

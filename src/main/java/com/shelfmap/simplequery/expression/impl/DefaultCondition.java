@@ -53,12 +53,6 @@ public class DefaultCondition implements Condition {
         return matcher;
     }
     
-    @Override
-    public Condition withParent(Condition parent, Operator operator) {
-        this.parent = parent;
-        this.operator = operator;
-        return this;
-    }
     
     @Override
     public Condition and(Condition other) {
@@ -108,8 +102,21 @@ public class DefaultCondition implements Condition {
         return operator;
     }
 
+    @Override
     public Condition getParent() {
         return parent;
+    }
+    
+    @Override
+    public void setParent(Condition parent, Operator operator) {
+        this.parent = parent;
+        this.operator = operator;
+    }
+
+    @Override
+    public Condition withParent(Condition parent, Operator operator) {
+        setParent(parent, operator);
+        return this;
     }
 
     @Override
@@ -147,7 +154,4 @@ public class DefaultCondition implements Condition {
         Condition other = new DefaultCondition(attributeName, matcher.withAttributeInfo(maxNumDigits, offsetValue));
         return this.or(other);
     }
-
-
-
 }

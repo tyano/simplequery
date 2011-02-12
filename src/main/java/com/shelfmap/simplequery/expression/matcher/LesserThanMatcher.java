@@ -22,6 +22,7 @@ package com.shelfmap.simplequery.expression.matcher;
  */
 public class LesserThanMatcher<T> extends BaseMatcher<T> {
 
+    @SuppressWarnings("unchecked")
     public LesserThanMatcher(T value) {
         super(value);
     }

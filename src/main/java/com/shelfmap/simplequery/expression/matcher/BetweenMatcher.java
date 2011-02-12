@@ -20,15 +20,27 @@ package com.shelfmap.simplequery.expression.matcher;
  *
  * @author Tsutomu YANO
  */
-public class IsMatcher<T> extends BaseMatcher<T> {
-
+public class BetweenMatcher<T> extends BaseMatcher<T> {
+    private T second;
+    
     @SuppressWarnings("unchecked")
-    public IsMatcher(T value) {
+    public BetweenMatcher(T value) {
         super(value);
+    }
+    
+    public BetweenMatcher<T> and(T value) {
+        this.second = value;
+        return this;
     }
 
     @Override
     protected String expression() {
-        return "=";
+        return "between";
+    }
+
+    @Override
+    public String describe() {
+        if(second == null) throw new IllegalStateException("the second argument not found. You need pass a second argument by the 'and()' method.");
+        return super.describe() + " and " + convertValue(second);
     }
 }

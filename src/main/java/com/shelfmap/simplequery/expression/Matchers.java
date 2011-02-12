@@ -16,8 +16,16 @@
 
 package com.shelfmap.simplequery.expression;
 
+import com.shelfmap.simplequery.expression.matcher.BetweenMatcher;
+import com.shelfmap.simplequery.expression.matcher.GreaterEqualMatcher;
+import com.shelfmap.simplequery.expression.matcher.GreaterThanMatcher;
+import com.shelfmap.simplequery.expression.matcher.InMatcher;
 import com.shelfmap.simplequery.expression.matcher.IsMatcher;
 import com.shelfmap.simplequery.expression.matcher.IsNotMatcher;
+import com.shelfmap.simplequery.expression.matcher.LesserEqualMatcher;
+import com.shelfmap.simplequery.expression.matcher.LesserThanMatcher;
+import com.shelfmap.simplequery.expression.matcher.LikeMatcher;
+import com.shelfmap.simplequery.expression.matcher.NotLikeMatcher;
 
 /**
  *
@@ -28,11 +36,43 @@ public final class Matchers {
         super();
     }
     
-    public static <T> Matcher<T> is(T value) {
+    public static <T> IsMatcher<T> is(T value) {
         return new IsMatcher<T>(value);
     }
 
-    public static <T> Matcher<T> isNot(T value) {
+    public static <T> IsNotMatcher<T> isNot(T value) {
         return new IsNotMatcher<T>(value);
+    }
+    
+    public static <T> GreaterEqualMatcher<T> greaterEqual(T value) {
+        return new GreaterEqualMatcher<T>(value);
+    }
+    
+    public static <T> GreaterThanMatcher<T> greaterThan(T value) {
+        return new GreaterThanMatcher<T>(value);
+    }
+    
+    public static <T> LesserEqualMatcher<T> lesserEqual(T value) {
+        return new LesserEqualMatcher<T>(value);
+    }
+    
+    public static <T> LesserThanMatcher<T> lesserThan(T value) {
+        return new LesserThanMatcher<T>(value);
+    }
+    
+    public static <T> LikeMatcher<T> like(T value) {
+        return new LikeMatcher<T>(value);
+    }
+    
+    public static <T> NotLikeMatcher<T> notLike(T value) {
+        return new NotLikeMatcher<T>(value);
+    }
+    
+    public static <T> BetweenMatcher<T> between(T value) {
+        return new BetweenMatcher<T>(value);
+    }
+    
+    public static <T> InMatcher<T> in(T... values) {
+        return new InMatcher<T>(values);
     }
 }

@@ -20,9 +20,10 @@ package com.shelfmap.simplequery.expression.matcher;
  *
  * @author Tsutomu YANO
  */
-public class LikeNotMatcher<T> extends BaseMatcher<T> {
+public class NotLikeMatcher<T> extends BaseMatcher<T> {
 
-    public LikeNotMatcher(T value) {
+    @SuppressWarnings("unchecked")
+    public NotLikeMatcher(T value) {
         super(value);
     }
 

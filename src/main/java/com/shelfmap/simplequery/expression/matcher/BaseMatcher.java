@@ -13,76 +13,86 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.shelfmap.simplequery.expression.matcher;
 
 import static com.amazonaws.services.simpledb.util.SimpleDBUtils.encodeZeroPadding;
 import static com.amazonaws.services.simpledb.util.SimpleDBUtils.encodeRealNumberRange;
 import static com.amazonaws.services.simpledb.util.SimpleDBUtils.quoteValue;
-import static com.shelfmap.simplequery.util.Assertion.isNotNull;
+import static com.shelfmap.simplequery.util.Assertion.*;
 import com.shelfmap.simplequery.expression.Matcher;
+import java.util.Arrays;
+import java.util.Collection;
 
 /**
  *
  * @author Tsutomu YANO
  */
 public abstract class BaseMatcher<T> implements Matcher<T> {
-    private T value;
+
+    private T[] values;
     private int maxDigitLeft;
     private int maxDigitRight;
     private int offsetInt;
     private long offsetLong;
     private NumberType numberType;
 
-    public BaseMatcher(T value) {
-        isNotNull("value", value);
-        this.value = value;
+    public BaseMatcher(T... values) {
+        isNotNull("values", values);
+        isNotEmpty("values", values);
+
+        this.values = values;
         this.maxDigitLeft = 0;
         this.maxDigitRight = 0;
         this.offsetInt = 0;
         this.offsetLong = 0L;
         this.numberType = NumberType.NOT_NUMBER;
     }
-    
-    @Override
-    public String describe() {
-        StringBuilder sb = new StringBuilder();
-        sb.append(expression()).append(" ");
-        
-        switch(numberType) {
+
+    protected String convertValue(T targetValue) {
+        String result;
+
+        switch (numberType) {
             case NOT_NUMBER:
-                sb.append(quoteValue(value.toString()));
+                result = quoteValue(targetValue.toString());
                 break;
             case FLOAT:
-                if(offsetInt > 0) {
-                   sb.append(quoteValue(encodeRealNumberRange(((Float)value).floatValue(), maxDigitLeft, maxDigitRight, offsetInt)));
-                } else if(maxDigitLeft > 0) {
-                   sb.append(quoteValue(encodeZeroPadding(((Float)value).floatValue(), maxDigitLeft)));
+                if (offsetInt > 0) {
+                    result = quoteValue(encodeRealNumberRange(((Float) targetValue).floatValue(), maxDigitLeft, maxDigitRight, offsetInt));
+                } else if (maxDigitLeft > 0) {
+                    result = quoteValue(encodeZeroPadding(((Float) targetValue).floatValue(), maxDigitLeft));
                 } else {
-                   sb.append(quoteValue(value.toString()));
+                    result = quoteValue(targetValue.toString());
                 }
                 break;
             case INTEGER:
-                if(offsetInt > 0) {
-                   sb.append(quoteValue(encodeRealNumberRange(((Integer)value).intValue(), maxDigitLeft, offsetInt)));
-                } else if(maxDigitLeft > 0) {
-                   sb.append(quoteValue(encodeZeroPadding(((Integer)value).intValue(), maxDigitLeft)));
+                if (offsetInt > 0) {
+                    result = quoteValue(encodeRealNumberRange(((Integer) targetValue).intValue(), maxDigitLeft, offsetInt));
+                } else if (maxDigitLeft > 0) {
+                    result = quoteValue(encodeZeroPadding(((Integer) targetValue).intValue(), maxDigitLeft));
                 } else {
-                   sb.append(quoteValue(value.toString()));
+                    result = quoteValue(targetValue.toString());
                 }
                 break;
             case LONG:
-                if(offsetInt > 0) {
-                   sb.append(quoteValue(encodeRealNumberRange(((Long)value).longValue(), maxDigitLeft, offsetLong)));
-                } else if(maxDigitLeft > 0) {
-                   sb.append(quoteValue(encodeZeroPadding(((Long)value).longValue(), maxDigitLeft)));
+                if (offsetInt > 0) {
+                    result = quoteValue(encodeRealNumberRange(((Long) targetValue).longValue(), maxDigitLeft, offsetLong));
+                } else if (maxDigitLeft > 0) {
+                    result = quoteValue(encodeZeroPadding(((Long) targetValue).longValue(), maxDigitLeft));
                 } else {
-                   sb.append(quoteValue(value.toString()));
+                    result = quoteValue(targetValue.toString());
                 }
                 break;
             default:
                 throw new IllegalStateException("No such NumberType: " + numberType);
         }
+        return result;
+    }
+
+    @Override
+    public String describe() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(expression()).append(" ");
+        sb.append(convertValue(values[0]));
         return sb.toString();
     }
 
@@ -111,7 +121,7 @@ public abstract class BaseMatcher<T> implements Matcher<T> {
         this.offsetLong = offsetValue;
         return this;
     }
-    
+
     protected abstract String expression();
 
     public int getMaxDigitLeft() {
@@ -134,7 +144,7 @@ public abstract class BaseMatcher<T> implements Matcher<T> {
         return offsetLong;
     }
 
-    public T getValue() {
-        return value;
+    public Collection<T> getValues() {
+        return Arrays.asList(values);
     }
 }

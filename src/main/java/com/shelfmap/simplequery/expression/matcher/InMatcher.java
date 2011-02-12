@@ -20,15 +20,29 @@ package com.shelfmap.simplequery.expression.matcher;
  *
  * @author Tsutomu YANO
  */
-public class IsMatcher<T> extends BaseMatcher<T> {
+public class InMatcher<T> extends BaseMatcher<T> {
 
-    @SuppressWarnings("unchecked")
-    public IsMatcher(T value) {
-        super(value);
+    public InMatcher(T... values) {
+        super(values);
     }
 
     @Override
     protected String expression() {
-        return "=";
+        return "in";
+    }
+
+    @Override
+    public String describe() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(expression()).append(" (");
+        
+        StringBuilder parameters = new StringBuilder();
+        for (T value : getValues()) {
+            if(parameters.length() > 0) parameters.append(", ");
+            parameters.append(convertValue(value));
+        }
+        sb.append(parameters.toString());
+        sb.append(")");
+        return sb.toString();
     }
 }

@@ -22,8 +22,8 @@ import com.shelfmap.simplequery.expression.matcher.GreaterThanMatcher;
 import com.shelfmap.simplequery.expression.matcher.InMatcher;
 import com.shelfmap.simplequery.expression.matcher.IsMatcher;
 import com.shelfmap.simplequery.expression.matcher.IsNotMatcher;
-import com.shelfmap.simplequery.expression.matcher.LesserEqualMatcher;
-import com.shelfmap.simplequery.expression.matcher.LesserThanMatcher;
+import com.shelfmap.simplequery.expression.matcher.LessEqualMatcher;
+import com.shelfmap.simplequery.expression.matcher.LessThanMatcher;
 import com.shelfmap.simplequery.expression.matcher.LikeMatcher;
 import com.shelfmap.simplequery.expression.matcher.NotLikeMatcher;
 
@@ -52,12 +52,12 @@ public final class Matchers {
         return new GreaterThanMatcher<T>(value);
     }
     
-    public static <T> LesserEqualMatcher<T> lesserEqual(T value) {
-        return new LesserEqualMatcher<T>(value);
+    public static <T> LessEqualMatcher<T> lessEqual(T value) {
+        return new LessEqualMatcher<T>(value);
     }
     
-    public static <T> LesserThanMatcher<T> lesserThan(T value) {
-        return new LesserThanMatcher<T>(value);
+    public static <T> LessThanMatcher<T> lessThan(T value) {
+        return new LessThanMatcher<T>(value);
     }
     
     public static <T> LikeMatcher<T> like(T value) {

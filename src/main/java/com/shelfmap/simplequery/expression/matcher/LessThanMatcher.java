@@ -20,16 +20,16 @@ package com.shelfmap.simplequery.expression.matcher;
  *
  * @author Tsutomu YANO
  */
-public class LesserEqualMatcher<T> extends BaseMatcher<T> {
+public class LessThanMatcher<T> extends BaseMatcher<T> {
 
     @SuppressWarnings("unchecked")
-    public LesserEqualMatcher(T value) {
+    public LessThanMatcher(T value) {
         super(value);
     }
 
     @Override
     protected String expression() {
-        return "<=";
+        return "<";
     }
 
 }

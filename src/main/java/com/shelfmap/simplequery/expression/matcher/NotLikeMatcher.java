@@ -29,7 +29,7 @@ public class NotLikeMatcher<T> extends BaseMatcher<T> {
 
     @Override
     protected String expression() {
-        return "likeNot";
+        return "not like";
     }
 
 }

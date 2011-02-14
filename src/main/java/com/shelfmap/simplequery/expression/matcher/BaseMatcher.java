@@ -74,7 +74,7 @@ public abstract class BaseMatcher<T> implements Matcher<T> {
                 }
                 break;
             case LONG:
-                if (offsetInt > 0) {
+                if (offsetLong > 0) {
                     result = quoteValue(encodeRealNumberRange(((Long) targetValue).longValue(), maxDigitLeft, offsetLong));
                 } else if (maxDigitLeft > 0) {
                     result = quoteValue(encodeZeroPadding(((Long) targetValue).longValue(), maxDigitLeft));

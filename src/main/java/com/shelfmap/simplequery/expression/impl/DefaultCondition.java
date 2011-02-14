@@ -35,8 +35,6 @@ public class DefaultCondition implements Condition {
     private boolean grouped = false;
 
     public DefaultCondition(String attributeName, Matcher<?> matcher) {
-        isNotNull("parent", parent);
-        isNotNull("operator", operator);
         isNotNull("attributeName", attributeName);
         isNotNull("matcher", matcher);
         this.parent = NullCondition.INSTANCE;

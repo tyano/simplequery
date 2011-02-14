@@ -31,8 +31,8 @@ import com.shelfmap.simplequery.expression.matcher.NotLikeMatcher;
  *
  * @author Tsutomu YANO
  */
-public final class Matchers {
-    private Matchers() {
+public final class MatcherFactory {
+    private MatcherFactory() {
         super();
     }
     

@@ -110,6 +110,7 @@ public abstract class BaseMatcher<T> implements Matcher<T> {
         this.maxDigitLeft = maxNumDigits;
         this.maxDigitRight = 0;
         this.offsetInt = offsetValue;
+        this.offsetLong = 0L;
         this.numberType = NumberType.INTEGER;
         return this;
     }
@@ -118,6 +119,7 @@ public abstract class BaseMatcher<T> implements Matcher<T> {
     public Matcher<T> withAttributeInfo(int maxNumDigits, long offsetValue) {
         this.maxDigitLeft = maxNumDigits;
         this.maxDigitRight = 0;
+        this.offsetInt = 0;
         this.offsetLong = offsetValue;
         this.numberType = NumberType.LONG;
         return this;

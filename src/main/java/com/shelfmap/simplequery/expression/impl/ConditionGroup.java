@@ -32,6 +32,8 @@ public class ConditionGroup implements Condition {
 
     public ConditionGroup(Condition condition) {
         this.condition = condition;
+        this.parent = NullCondition.INSTANCE;
+        this.operator = NullOperator.INSTANCE;
     }
 
     @Override
@@ -50,7 +52,7 @@ public class ConditionGroup implements Condition {
 
     @Override
     public Condition getParent() {
-        return this.condition;
+        return this.parent;
     }
 
     @Override
@@ -119,8 +121,14 @@ public class ConditionGroup implements Condition {
     @Override
     public String describe() {
         StringBuilder sb = new StringBuilder();
+
+        synchronized (parentLock) {
+            sb.append(getParent().describe());
+            sb.append(getOperator().describe());
+        }
+
         sb.append("(");
-        sb.append(this.condition.describe());
+        sb.append(getCondition().describe());
         sb.append(")");
         return sb.toString();
     }

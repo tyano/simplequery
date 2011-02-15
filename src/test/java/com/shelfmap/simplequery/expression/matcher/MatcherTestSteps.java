@@ -37,25 +37,43 @@ public class MatcherTestSteps {
         matcher = new IsMatcher<String>(value);
     }
 
-
     @Then("the converted value must be \"<resultValue>\".")
     public void assertConvertedValue(@Named("resultValue") String expected) {
         assertThat(matcher.describe(), is(expected));
     }
-       
-    
+
     @When("the int value is <targetValue>,")
     public void convertIntWithoutPaddingOffset(@Named("targetValue") int value) {
         matcher = new IsMatcher<Integer>(value);
     }
-    
+
     @When("the padding size is <paddingSize> and the int value is <targetValue>,")
     public void convertIntWithPadding(@Named("paddingSize") int padding, @Named("targetValue") int value) {
         matcher = new IsMatcher<Integer>(value).withAttributeInfo(padding, 0);
     }
-    
+
     @When("the padding size is <paddingSize>, the offset is <offset> and the int value is <targetValue>,")
     public void convertIntWithOffsetAndPadding(@Named("paddingSize") int padding, @Named("offset") int offset, @Named("targetValue") int value) {
         matcher = new IsMatcher<Integer>(value).withAttributeInfo(padding, offset);
+    }
+
+    @When("a IsNullMatcher is described")
+    public void createIsNullMatcher() {
+        matcher = new IsNullMatcher();
+    }
+
+    @Then("the result string must be 'is null'")
+    public void assertIsNull() {
+        assertThat(matcher.describe(), is("is null"));
+    }
+
+    @When("a IsNotNullMatcher is described")
+    public void createIsNotNullMatcher() {
+        matcher = new IsNotNullMatcher();
+    }
+
+    @Then("the result string must be 'is not null'")
+    public void assertIsNotNull() {
+        assertThat(matcher.describe(), is("is not null"));
     }
 }

@@ -42,3 +42,14 @@ Examples:
 |paddingSize|offset    |targetValue|resultValue    |
 |10         |300000000 |1          |= '0300000001' |
 |10         |300000000 |-1         |= '0299999999' |
+
+
+Scenario: IsNullMatcher always generate the expression 'is null'.
+
+When a IsNullMatcher is described
+Then the result string must be 'is null'
+
+Scenario: IsNotNullMatcher always generate the expression 'is not null'.
+
+When a IsNotNullMatcher is described
+Then the result string must be 'is not null'

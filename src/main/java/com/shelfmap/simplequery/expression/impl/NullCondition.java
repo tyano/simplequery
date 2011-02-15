@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.shelfmap.simplequery.expression.impl;
 
 import com.shelfmap.simplequery.expression.Condition;
@@ -25,12 +24,12 @@ import com.shelfmap.simplequery.expression.Operator;
  * @author Tsutomu YANO
  */
 public final class NullCondition implements Condition {
-    public static final Condition INSTANCE = new NullCondition();
+    public static final NullCondition INSTANCE = new NullCondition();
     
     private NullCondition() {
         super();
     }
-    
+
     @Override
     public Condition and(Condition other) {
         return other;
@@ -55,7 +54,7 @@ public final class NullCondition implements Condition {
     public Condition group() {
         return this;
     }
-    
+
     @Override
     public String describe() {
         return "";
@@ -63,9 +62,9 @@ public final class NullCondition implements Condition {
 
     @Override
     public Condition withParent(Condition parent, Operator operator) {
-        return parent;
+        return this;
     }
-    
+
     @Override
     public void setParent(Condition parent, Operator operator) {
     }
@@ -104,5 +103,4 @@ public final class NullCondition implements Condition {
     public Condition or(String attributeName, Matcher<? extends Long> matcher, int maxNumDigits, long offsetValue) {
         return new DefaultCondition(attributeName, matcher.withAttributeInfo(maxNumDigits, offsetValue));
     }
-
 }

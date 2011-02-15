@@ -14,22 +14,18 @@
  * limitations under the License.
  */
 
-package com.shelfmap.simplequery.expression.matcher;
+package com.shelfmap.simplequery.expression;
+
+import com.shelfmap.specsfinder.StoryRunner;
+import java.io.IOException;
+import java.net.URISyntaxException;
 
 /**
  *
  * @author Tsutomu YANO
  */
-public class NotLikeMatcher<T> extends BaseMatcher<T> {
-
-    @SuppressWarnings("unchecked")
-    public NotLikeMatcher(T value) {
-        super(value);
+public class ConditionTest extends StoryRunner{
+    public ConditionTest() throws IOException, URISyntaxException, InstantiationException, IllegalAccessException {
+        super();
     }
-
-    @Override
-    protected String expression() {
-        return "not like";
-    }
-
 }

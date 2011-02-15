@@ -32,7 +32,6 @@ public class DefaultCondition implements Condition {
     private Operator operator;
     private String attributeName;
     private Matcher<?> matcher;
-    private boolean grouped = false;
 
     public DefaultCondition(String attributeName, Matcher<?> matcher) {
         isNotNull("attributeName", attributeName);
@@ -76,22 +75,16 @@ public class DefaultCondition implements Condition {
     
     @Override
     public Condition group() {
-        this.grouped = true;
-        return this;
+        return new ConditionGroup(this);
     }
     
     @Override
     public String describe() {
         StringBuilder sb = new StringBuilder();
         
-        if(grouped) sb.append("(");
-        
         sb.append(getParent().describe());
         sb.append(getOperator().describe());
-        
         sb.append(SimpleDBUtils.quoteName(getAttributeName())).append(" ").append(getMatcher().describe());
-        
-        if(grouped) sb.append(")");
         
         return sb.toString();
     }
@@ -107,7 +100,8 @@ public class DefaultCondition implements Condition {
     
     @Override
     public void setParent(Condition parent, Operator operator) {
-        getParent().setParent(parent, operator);
+        this.parent = parent;
+        this.operator = operator;
     }
 
     @Override

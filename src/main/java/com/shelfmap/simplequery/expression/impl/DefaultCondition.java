@@ -37,7 +37,7 @@ public class DefaultCondition implements Condition {
     public DefaultCondition(String attributeName, Matcher<?> matcher) {
         isNotNull("attributeName", attributeName);
         isNotNull("matcher", matcher);
-        this.parent = new NullCondition();
+        this.parent = NullCondition.INSTANCE;
         this.operator = NullOperator.INSTANCE;
         this.attributeName = attributeName;
         this.matcher = matcher;
@@ -108,13 +108,6 @@ public class DefaultCondition implements Condition {
     @Override
     public void setParent(Condition parent, Operator operator) {
         getParent().setParent(parent, operator);
-//        Condition myParent = getParent();
-//        if(myParent == NullCondition.INSTANCE) {
-//            this.parent = parent;
-//            this.operator = operator;
-//        } else {
-//            myParent.setParent(parent,operator);
-//        }
     }
 
     @Override

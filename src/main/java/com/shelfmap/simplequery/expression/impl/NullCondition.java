@@ -24,10 +24,9 @@ import com.shelfmap.simplequery.expression.Operator;
  * @author Tsutomu YANO
  */
 public final class NullCondition implements Condition {
-    private Condition parent;
-    private Operator operator;
-
-    public NullCondition() {
+    public static final NullCondition INSTANCE = new NullCondition();
+    
+    private NullCondition() {
         super();
     }
 
@@ -58,60 +57,50 @@ public final class NullCondition implements Condition {
 
     @Override
     public String describe() {
-        if (parent != null) {
-            StringBuilder sb = new StringBuilder();
-            sb.append(parent.describe());
-            sb.append(operator.describe());
-            return sb.toString();
-        } else {
-            return "";
-        }
+        return "";
     }
 
     @Override
     public Condition withParent(Condition parent, Operator operator) {
-        setParent(parent, operator);
         return this;
     }
 
     @Override
     public void setParent(Condition parent, Operator operator) {
-        this.parent = parent;
-        this.operator = operator;
     }
 
     @Override
     public Condition getParent() {
-        return this.parent;
+        return null;
     }
 
     @Override
     public Condition and(String attributeName, Matcher<? extends Float> matcher, int maxDigitLeft, int maxDigitRight, int offsetValue) {
-        return new DefaultCondition(attributeName, matcher.withAttributeInfo(maxDigitLeft, maxDigitRight, offsetValue)).withParent(this, BasicOperator.AND);
+        return new DefaultCondition(attributeName, matcher.withAttributeInfo(maxDigitLeft, maxDigitRight, offsetValue));
     }
 
     @Override
     public Condition and(String attributeName, Matcher<? extends Integer> matcher, int maxNumDigits, int offsetValue) {
-        return new DefaultCondition(attributeName, matcher.withAttributeInfo(maxNumDigits, offsetValue)).withParent(this, BasicOperator.AND);
+        return new DefaultCondition(attributeName, matcher.withAttributeInfo(maxNumDigits, offsetValue));
     }
 
     @Override
     public Condition and(String attributeName, Matcher<? extends Long> matcher, int maxNumDigits, long offsetValue) {
-        return new DefaultCondition(attributeName, matcher.withAttributeInfo(maxNumDigits, offsetValue)).withParent(this, BasicOperator.AND);
+        return new DefaultCondition(attributeName, matcher.withAttributeInfo(maxNumDigits, offsetValue));
     }
 
     @Override
     public Condition or(String attributeName, Matcher<? extends Float> matcher, int maxDigitLeft, int maxDigitRight, int offsetValue) {
-        return new DefaultCondition(attributeName, matcher.withAttributeInfo(maxDigitLeft, maxDigitRight, offsetValue)).withParent(this, BasicOperator.OR);
+        return new DefaultCondition(attributeName, matcher.withAttributeInfo(maxDigitLeft, maxDigitRight, offsetValue));
     }
 
     @Override
     public Condition or(String attributeName, Matcher<? extends Integer> matcher, int maxNumDigits, int offsetValue) {
-        return new DefaultCondition(attributeName, matcher.withAttributeInfo(maxNumDigits, offsetValue)).withParent(this, BasicOperator.OR);
+        return new DefaultCondition(attributeName, matcher.withAttributeInfo(maxNumDigits, offsetValue));
     }
 
     @Override
     public Condition or(String attributeName, Matcher<? extends Long> matcher, int maxNumDigits, long offsetValue) {
-        return new DefaultCondition(attributeName, matcher.withAttributeInfo(maxNumDigits, offsetValue)).withParent(this, BasicOperator.OR);
+        return new DefaultCondition(attributeName, matcher.withAttributeInfo(maxNumDigits, offsetValue));
     }
 }

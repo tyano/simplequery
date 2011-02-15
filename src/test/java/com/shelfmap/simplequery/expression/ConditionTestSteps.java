@@ -77,6 +77,6 @@ public class ConditionTestSteps {
 
     @Then("the result must be grouped multiple times like ((first expression) or (second expression)).")
     public void assertGroupedCondition2() {
-        assertThat(condition.describe(), Matchers.is("((`first` = 1 and `second` != 2) or (`third` < 100 and `fourth` <= 200))"));
+        assertThat(condition.describe(), Matchers.is("((`first` = '1' and `second` != '2') or (`third` < '100' and `fourth` <= '200'))"));
     }
 }

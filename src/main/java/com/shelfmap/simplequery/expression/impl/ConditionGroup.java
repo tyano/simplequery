@@ -13,11 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.shelfmap.simplequery.expression.impl;
 
-import com.amazonaws.services.simpledb.util.SimpleDBUtils;
-import static com.shelfmap.simplequery.util.Assertion.isNotNull;
 import com.shelfmap.simplequery.expression.Condition;
 import com.shelfmap.simplequery.expression.Matcher;
 import com.shelfmap.simplequery.expression.Operator;
@@ -26,31 +23,38 @@ import com.shelfmap.simplequery.expression.Operator;
  *
  * @author Tsutomu YANO
  */
-public class DefaultCondition implements Condition {
+public class ConditionGroup implements Condition {
 
+    private final Condition condition;
     private Condition parent;
     private Operator operator;
-    private String attributeName;
-    private Matcher<?> matcher;
+    private final Object parentLock = new Object();
 
-    public DefaultCondition(String attributeName, Matcher<?> matcher) {
-        isNotNull("attributeName", attributeName);
-        isNotNull("matcher", matcher);
+    public ConditionGroup(Condition condition) {
+        this.condition = condition;
         this.parent = NullCondition.INSTANCE;
         this.operator = NullOperator.INSTANCE;
-        this.attributeName = attributeName;
-        this.matcher = matcher;
-    }
-    
-    public String getAttributeName() {
-        return attributeName;
     }
 
-    public Matcher<?> getMatcher() {
-        return matcher;
+    @Override
+    public Condition withParent(Condition parent, Operator operator) {
+        setParent(parent, operator);
+        return this;
     }
-    
-    
+
+    @Override
+    public void setParent(Condition parent, Operator operator) {
+        synchronized (parentLock) {
+            this.parent = parent;
+            this.operator = operator;
+        }
+    }
+
+    @Override
+    public Condition getParent() {
+        return this.parent;
+    }
+
     @Override
     public Condition and(Condition other) {
         return other.withParent(this, BasicOperator.AND);
@@ -60,54 +64,6 @@ public class DefaultCondition implements Condition {
     public Condition and(String attributeName, Matcher<?> matcher) {
         Condition other = new DefaultCondition(attributeName, matcher);
         return this.and(other);
-    }
-
-    @Override
-    public Condition or(Condition other) {
-        return other.withParent(this, BasicOperator.OR);
-    }
-
-    @Override
-    public Condition or(String attributeName, Matcher<?> matcher) {
-        Condition other = new DefaultCondition(attributeName, matcher);
-        return this.or(other);
-    }
-    
-    @Override
-    public Condition group() {
-        return new ConditionGroup(this);
-    }
-    
-    @Override
-    public String describe() {
-        StringBuilder sb = new StringBuilder();
-        
-        sb.append(getParent().describe());
-        sb.append(getOperator().describe());
-        sb.append(SimpleDBUtils.quoteName(getAttributeName())).append(" ").append(getMatcher().describe());
-        
-        return sb.toString();
-    }
-
-    public Operator getOperator() {
-        return operator;
-    }
-
-    @Override
-    public Condition getParent() {
-        return parent;
-    }
-    
-    @Override
-    public void setParent(Condition parent, Operator operator) {
-        this.parent = parent;
-        this.operator = operator;
-    }
-
-    @Override
-    public Condition withParent(Condition parent, Operator operator) {
-        setParent(parent, operator);
-        return this;
     }
 
     @Override
@@ -129,6 +85,17 @@ public class DefaultCondition implements Condition {
     }
 
     @Override
+    public Condition or(Condition other) {
+        return other.withParent(this, BasicOperator.OR);
+    }
+
+    @Override
+    public Condition or(String attributeName, Matcher<?> matcher) {
+        Condition other = new DefaultCondition(attributeName, matcher);
+        return this.or(other);
+    }
+
+    @Override
     public Condition or(String attributeName, Matcher<? extends Float> matcher, int maxDigitLeft, int maxDigitRight, int offsetValue) {
         Condition other = new DefaultCondition(attributeName, matcher.withAttributeInfo(maxDigitLeft, maxDigitRight, offsetValue));
         return this.or(other);
@@ -144,5 +111,33 @@ public class DefaultCondition implements Condition {
     public Condition or(String attributeName, Matcher<? extends Long> matcher, int maxNumDigits, long offsetValue) {
         Condition other = new DefaultCondition(attributeName, matcher.withAttributeInfo(maxNumDigits, offsetValue));
         return this.or(other);
+    }
+
+    @Override
+    public Condition group() {
+        return new ConditionGroup(this);
+    }
+
+    @Override
+    public String describe() {
+        StringBuilder sb = new StringBuilder();
+
+        synchronized (parentLock) {
+            sb.append(getParent().describe());
+            sb.append(getOperator().describe());
+        }
+
+        sb.append("(");
+        sb.append(getCondition().describe());
+        sb.append(")");
+        return sb.toString();
+    }
+
+    public Condition getCondition() {
+        return condition;
+    }
+
+    public Operator getOperator() {
+        return operator;
     }
 }

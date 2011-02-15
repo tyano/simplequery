@@ -76,4 +76,19 @@ public class MatcherTestSteps {
     public void assertIsNotNull() {
         assertThat(matcher.describe(), is("is not null"));
     }
+
+    @When("a InMatcher with parameters '$arg1' and '$arg2' is described")
+    public void createInMatcher(String arg1, String arg2) {
+        matcher = new InMatcher<String>(arg1, arg2);
+    }
+
+    @Then("the result string must be like '$result'")
+    public void assertInMatcherResult(String result) {
+        assertThat(matcher.describe(), is(result));
+    }
+
+    @When("a InMatcher's parameters are $arg1 and $arg2, and padding = $padding, offset = $offset")
+    public void createInMatcherWithPaddingOffset(int arg1, int arg2, int padding, int offset) {
+        matcher = new InMatcher<Integer>(arg1, arg2).withAttributeInfo(padding, offset);
+    }
 }

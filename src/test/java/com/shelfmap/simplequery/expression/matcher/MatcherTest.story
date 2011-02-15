@@ -53,3 +53,11 @@ Scenario: IsNotNullMatcher always generate the expression 'is not null'.
 
 When a IsNotNullMatcher is described
 Then the result string must be 'is not null'
+
+Scenario: A InMatcher with multiple parameters will generate a string like in ('value', 'value')
+
+When a InMatcher with parameters 'a' and 'b' is described
+Then the result string must be like 'in ('a', 'b')'
+
+When a InMatcher's parameters are 100 and -100, and padding = 4, offset = 200
+Then the result string must be like 'in ('0300', '0100')'

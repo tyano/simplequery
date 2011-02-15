@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.shelfmap.simplequery.expression.impl;
 
 import com.shelfmap.simplequery.expression.Condition;
@@ -25,12 +24,13 @@ import com.shelfmap.simplequery.expression.Operator;
  * @author Tsutomu YANO
  */
 public final class NullCondition implements Condition {
-    public static final Condition INSTANCE = new NullCondition();
-    
-    private NullCondition() {
+    private Condition parent;
+    private Operator operator;
+
+    public NullCondition() {
         super();
     }
-    
+
     @Override
     public Condition and(Condition other) {
         return other;
@@ -55,54 +55,63 @@ public final class NullCondition implements Condition {
     public Condition group() {
         return this;
     }
-    
+
     @Override
     public String describe() {
-        return "";
+        if (parent != null) {
+            StringBuilder sb = new StringBuilder();
+            sb.append(parent.describe());
+            sb.append(operator.describe());
+            return sb.toString();
+        } else {
+            return "";
+        }
     }
 
     @Override
     public Condition withParent(Condition parent, Operator operator) {
-        return parent;
+        setParent(parent, operator);
+        return this;
     }
-    
+
     @Override
     public void setParent(Condition parent, Operator operator) {
+        this.parent = parent;
+        this.operator = operator;
     }
 
     @Override
     public Condition getParent() {
-        return null;
+        return this.parent;
     }
 
     @Override
     public Condition and(String attributeName, Matcher<? extends Float> matcher, int maxDigitLeft, int maxDigitRight, int offsetValue) {
-        return new DefaultCondition(attributeName, matcher.withAttributeInfo(maxDigitLeft, maxDigitRight, offsetValue));
+        return new DefaultCondition(attributeName, matcher.withAttributeInfo(maxDigitLeft, maxDigitRight, offsetValue)).withParent(this, BasicOperator.AND);
     }
 
     @Override
     public Condition and(String attributeName, Matcher<? extends Integer> matcher, int maxNumDigits, int offsetValue) {
-        return new DefaultCondition(attributeName, matcher.withAttributeInfo(maxNumDigits, offsetValue));
+        return new DefaultCondition(attributeName, matcher.withAttributeInfo(maxNumDigits, offsetValue)).withParent(this, BasicOperator.AND);
     }
 
     @Override
     public Condition and(String attributeName, Matcher<? extends Long> matcher, int maxNumDigits, long offsetValue) {
-        return new DefaultCondition(attributeName, matcher.withAttributeInfo(maxNumDigits, offsetValue));
+        return new DefaultCondition(attributeName, matcher.withAttributeInfo(maxNumDigits, offsetValue)).withParent(this, BasicOperator.AND);
     }
 
     @Override
     public Condition or(String attributeName, Matcher<? extends Float> matcher, int maxDigitLeft, int maxDigitRight, int offsetValue) {
-        return new DefaultCondition(attributeName, matcher.withAttributeInfo(maxDigitLeft, maxDigitRight, offsetValue));
+        return new DefaultCondition(attributeName, matcher.withAttributeInfo(maxDigitLeft, maxDigitRight, offsetValue)).withParent(this, BasicOperator.OR);
     }
 
     @Override
     public Condition or(String attributeName, Matcher<? extends Integer> matcher, int maxNumDigits, int offsetValue) {
-        return new DefaultCondition(attributeName, matcher.withAttributeInfo(maxNumDigits, offsetValue));
+        return new DefaultCondition(attributeName, matcher.withAttributeInfo(maxNumDigits, offsetValue)).withParent(this, BasicOperator.OR);
     }
 
     @Override
     public Condition or(String attributeName, Matcher<? extends Long> matcher, int maxNumDigits, long offsetValue) {
-        return new DefaultCondition(attributeName, matcher.withAttributeInfo(maxNumDigits, offsetValue));
+        return new DefaultCondition(attributeName, matcher.withAttributeInfo(maxNumDigits, offsetValue)).withParent(this, BasicOperator.OR);
     }
-
 }

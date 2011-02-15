@@ -22,6 +22,8 @@ import com.shelfmap.simplequery.expression.matcher.GreaterThanMatcher;
 import com.shelfmap.simplequery.expression.matcher.InMatcher;
 import com.shelfmap.simplequery.expression.matcher.IsMatcher;
 import com.shelfmap.simplequery.expression.matcher.IsNotMatcher;
+import com.shelfmap.simplequery.expression.matcher.IsNotNullMatcher;
+import com.shelfmap.simplequery.expression.matcher.IsNullMatcher;
 import com.shelfmap.simplequery.expression.matcher.LessEqualMatcher;
 import com.shelfmap.simplequery.expression.matcher.LessThanMatcher;
 import com.shelfmap.simplequery.expression.matcher.LikeMatcher;
@@ -74,5 +76,13 @@ public final class MatcherFactory {
     
     public static <T> InMatcher<T> in(T... values) {
         return new InMatcher<T>(values);
+    }
+    
+    public static IsNullMatcher isNull() {
+        return new IsNullMatcher();
+    }
+    
+    public static IsNotNullMatcher isNotNull() {
+        return new IsNotNullMatcher();
     }
 }

@@ -37,6 +37,8 @@ public final class Conditions {
                 return first.group().and(second.group());
             case OR:
                 return first.group().or(second.group());
+            case INTERSECTION:
+                return first.group().intersection(second.group());
             default:
                 throw new IllegalArgumentException("Operator not supported: " + op);
         }

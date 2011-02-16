@@ -48,6 +48,17 @@ public abstract class BaseMatcher<T> implements Matcher<T> {
         this.numberType = NumberType.NOT_NUMBER;
     }
 
+    protected BaseMatcher(int maxDigitLeft, int maxDigitRight, int offsetInt, long offsetLong, NumberType numberType, T... values) {
+        this.values = values;
+        this.maxDigitLeft = maxDigitLeft;
+        this.maxDigitRight = maxDigitRight;
+        this.offsetInt = offsetInt;
+        this.offsetLong = offsetLong;
+        this.numberType = numberType;
+    }
+
+    protected abstract BaseMatcher<T> newMatcher(int maxDigitLeft, int maxDigitRight, int offsetInt, long offsetLong, NumberType numberType, T... values);
+    
     protected String convertValue(T targetValue) {
         String result;
 
@@ -98,31 +109,17 @@ public abstract class BaseMatcher<T> implements Matcher<T> {
 
     @Override
     public Matcher<T> withAttributeInfo(int maxDigitLeft, int maxDigitRight, int offsetValue) {
-        this.maxDigitLeft = maxDigitLeft;
-        this.maxDigitRight = maxDigitRight;
-        this.offsetInt = offsetValue;
-        this.numberType = NumberType.FLOAT;
-        return this;
+        return newMatcher(maxDigitLeft, maxDigitRight, offsetValue, 0L, NumberType.FLOAT, values);
     }
 
     @Override
     public Matcher<T> withAttributeInfo(int maxNumDigits, int offsetValue) {
-        this.maxDigitLeft = maxNumDigits;
-        this.maxDigitRight = 0;
-        this.offsetInt = offsetValue;
-        this.offsetLong = 0L;
-        this.numberType = NumberType.INTEGER;
-        return this;
+        return newMatcher(maxNumDigits, 0, offsetValue, 0L, NumberType.INTEGER, values);
     }
 
     @Override
     public Matcher<T> withAttributeInfo(int maxNumDigits, long offsetValue) {
-        this.maxDigitLeft = maxNumDigits;
-        this.maxDigitRight = 0;
-        this.offsetInt = 0;
-        this.offsetLong = offsetValue;
-        this.numberType = NumberType.LONG;
-        return this;
+        return newMatcher(maxNumDigits, 0, 0, offsetValue, NumberType.LONG, values);
     }
 
     protected abstract String expression();
@@ -146,8 +143,8 @@ public abstract class BaseMatcher<T> implements Matcher<T> {
     public long getOffsetLong() {
         return offsetLong;
     }
-
-    public Collection<T> getValues() {
-        return Arrays.asList(values);
+    
+    public T[] getValues() {
+        return values;
     }
 }

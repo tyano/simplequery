@@ -27,8 +27,17 @@ public class IsMatcher<T> extends BaseMatcher<T> {
         super(value);
     }
 
+    protected IsMatcher(int maxDigitLeft, int maxDigitRight, int offsetInt, long offsetLong, NumberType numberType, T[] values) {
+        super(maxDigitLeft, maxDigitRight, offsetInt, offsetLong, numberType, values);
+    }
+
     @Override
     protected String expression() {
         return "=";
+    }
+
+    @Override
+    protected IsMatcher<T> newMatcher(int maxDigitLeft, int maxDigitRight, int offsetInt, long offsetLong, NumberType numberType, T... values) {
+        return new IsMatcher<T>(maxDigitLeft, maxDigitRight, offsetInt, offsetLong, numberType, values);
     }
 }

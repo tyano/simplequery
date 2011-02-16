@@ -27,9 +27,17 @@ public class GreaterThanMatcher<T> extends BaseMatcher<T> {
         super(value);
     }
 
+    protected GreaterThanMatcher(int maxDigitLeft, int maxDigitRight, int offsetInt, long offsetLong, NumberType numberType, T[] values) {
+        super(maxDigitLeft, maxDigitRight, offsetInt, offsetLong, numberType, values);
+    }
+
     @Override
     protected String expression() {
         return ">";
     }
 
+    @Override
+    protected BaseMatcher<T> newMatcher(int maxDigitLeft, int maxDigitRight, int offsetInt, long offsetLong, NumberType numberType, T... values) {
+        return new GreaterThanMatcher<T>(maxDigitLeft, maxDigitRight, offsetInt, offsetLong, numberType, values);
+    }
 }

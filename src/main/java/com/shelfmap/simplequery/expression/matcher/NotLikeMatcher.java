@@ -27,9 +27,17 @@ public class NotLikeMatcher<T> extends BaseMatcher<T> {
         super(value);
     }
 
+    public NotLikeMatcher(int maxDigitLeft, int maxDigitRight, int offsetInt, long offsetLong, NumberType numberType, T[] values) {
+        super(maxDigitLeft, maxDigitRight, offsetInt, offsetLong, numberType, values);
+    }
+
     @Override
     protected String expression() {
         return "not like";
     }
 
+    @Override
+    protected NotLikeMatcher<T> newMatcher(int maxDigitLeft, int maxDigitRight, int offsetInt, long offsetLong, NumberType numberType, T... values) {
+        return new NotLikeMatcher<T>(maxDigitLeft, maxDigitRight, offsetInt, offsetLong, numberType, values);
+    }
 }

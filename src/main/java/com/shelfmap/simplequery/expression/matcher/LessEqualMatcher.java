@@ -27,9 +27,17 @@ public class LessEqualMatcher<T> extends BaseMatcher<T> {
         super(value);
     }
 
+    protected LessEqualMatcher(int maxDigitLeft, int maxDigitRight, int offsetInt, long offsetLong, NumberType numberType, T[] values) {
+        super(maxDigitLeft, maxDigitRight, offsetInt, offsetLong, numberType, values);
+    }
+
     @Override
     protected String expression() {
         return "<=";
     }
 
+    @Override
+    protected LessEqualMatcher<T> newMatcher(int maxDigitLeft, int maxDigitRight, int offsetInt, long offsetLong, NumberType numberType, T... values) {
+        return new LessEqualMatcher<T>(maxDigitLeft, maxDigitRight, offsetInt, offsetLong, numberType, values);
+    }
 }

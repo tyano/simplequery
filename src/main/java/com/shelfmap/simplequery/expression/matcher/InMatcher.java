@@ -26,6 +26,10 @@ public class InMatcher<T> extends BaseMatcher<T> {
         super(values);
     }
 
+    protected InMatcher(int maxDigitLeft, int maxDigitRight, int offsetInt, long offsetLong, NumberType numberType, T[] values) {
+        super(maxDigitLeft, maxDigitRight, offsetInt, offsetLong, numberType, values);
+    }
+
     @Override
     protected String expression() {
         return "in";
@@ -44,5 +48,10 @@ public class InMatcher<T> extends BaseMatcher<T> {
         sb.append(parameters.toString());
         sb.append(")");
         return sb.toString();
+    }
+
+    @Override
+    protected InMatcher<T> newMatcher(int maxDigitLeft, int maxDigitRight, int offsetInt, long offsetLong, NumberType numberType, T... values) {
+        return new InMatcher<T>(maxDigitLeft, maxDigitRight, offsetInt, offsetLong, numberType, values);
     }
 }

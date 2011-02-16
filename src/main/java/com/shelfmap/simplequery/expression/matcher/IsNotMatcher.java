@@ -27,8 +27,17 @@ public class IsNotMatcher<T> extends BaseMatcher<T> {
         super(value);
     }
 
+    protected IsNotMatcher(int maxDigitLeft, int maxDigitRight, int offsetInt, long offsetLong, NumberType numberType, T[] values) {
+        super(maxDigitLeft, maxDigitRight, offsetInt, offsetLong, numberType, values);
+    }
+
     @Override
     protected String expression() {
         return "!=";
+    }
+
+    @Override
+    protected IsNotMatcher<T> newMatcher(int maxDigitLeft, int maxDigitRight, int offsetInt, long offsetLong, NumberType numberType, T... values) {
+        return new IsNotMatcher<T>(maxDigitLeft, maxDigitRight, offsetInt, offsetLong, numberType, values);
     }
 }

@@ -27,9 +27,17 @@ public class GreaterEqualMatcher<T> extends BaseMatcher<T> {
         super(value);
     }
 
+    protected GreaterEqualMatcher(int maxDigitLeft, int maxDigitRight, int offsetInt, long offsetLong, NumberType numberType, T[] values) {
+        super(maxDigitLeft, maxDigitRight, offsetInt, offsetLong, numberType, values);
+    }
+
     @Override
     protected String expression() {
         return ">=";
     }
 
+    @Override
+    protected GreaterEqualMatcher<T> newMatcher(int maxDigitLeft, int maxDigitRight, int offsetInt, long offsetLong, NumberType numberType, T... values) {
+        return new GreaterEqualMatcher<T>(maxDigitLeft, maxDigitRight, offsetInt, offsetLong, numberType, values);
+    }
 }

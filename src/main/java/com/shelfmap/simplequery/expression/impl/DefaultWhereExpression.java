@@ -30,31 +30,36 @@ import com.shelfmap.simplequery.expression.WhereExpression;
  * @author Tsutomu YANO
  */
 public class DefaultWhereExpression<T> extends BaseExpression<T> implements WhereExpression<T> {
-    private DefaultDomainExpression<T> domainExpression;
+    private DomainExpression<T> domainExpression;
+    private Condition condition;
 
-    public DefaultWhereExpression(DefaultDomainExpression<T> domainExpression) {
+    public DefaultWhereExpression(DomainExpression<T> domainExpression, Condition condition) {
         isNotNull("domainExpression", domainExpression);
+        isNotNull("condition", condition);
         this.domainExpression = domainExpression;
+        this.condition = condition;
     }
     
     @Override
     public WhereExpression<T> and(Condition other) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return new DefaultWhereExpression<T>(this.domainExpression, condition.and(other));
     }
 
     @Override
     public WhereExpression<T> and(String attributeName, Matcher<T> matcher) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        Condition other = new DefaultCondition(attributeName, matcher);
+        return this.and(other);
     }
 
     @Override
     public WhereExpression<T> or(Condition other) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return new DefaultWhereExpression<T>(this.domainExpression, condition.or(other));
     }
 
     @Override
     public WhereExpression<T> or(String attributeName, Matcher<T> matcher) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        Condition other = new DefaultCondition(attributeName, matcher);
+        return this.or(other);
     }
 
     @Override
@@ -64,17 +69,21 @@ public class DefaultWhereExpression<T> extends BaseExpression<T> implements Wher
 
     @Override
     public String describe() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        StringBuilder sb = new StringBuilder();
+        sb.append(getDomainExpression().describe());
+        sb.append(" where ");
+        sb.append(condition.describe());
+        return sb.toString();
     }
 
     @Override
     public DomainExpression<T> getDomainExpression() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return this.domainExpression;
     }
 
     @Override
     public Condition getCondition() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return this.condition;
     }
 
     @Override

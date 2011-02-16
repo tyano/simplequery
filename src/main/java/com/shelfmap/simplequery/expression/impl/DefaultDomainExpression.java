@@ -31,11 +31,11 @@ import com.shelfmap.simplequery.expression.WhereExpression;
  */
 public class DefaultDomainExpression<T> extends BaseExpression<T> implements DomainExpression<T> {
     private AmazonSimpleDB simpleDB;
-    private Select selectObject;
+    private SelectQuery selectObject;
     private String domainName;
     private Class<T> typeToken;
 
-    public DefaultDomainExpression(AmazonSimpleDB simpleDB, Select selectObject, String domainName, Class<T> typeToken) {
+    public DefaultDomainExpression(AmazonSimpleDB simpleDB, SelectQuery selectObject, String domainName, Class<T> typeToken) {
         isNotNull("simpleDB", simpleDB);
         isNotNull("selectObject", selectObject);
         isNotNull("domainName", domainName);
@@ -48,12 +48,13 @@ public class DefaultDomainExpression<T> extends BaseExpression<T> implements Dom
     
     @Override
     public WhereExpression<T> where(Condition expression) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return new DefaultWhereExpression<T>(this, expression);
     }
 
     @Override
     public WhereExpression<T> where(String attributeName, Matcher<T> matcher) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        Condition condition = new DefaultCondition(attributeName, matcher);
+        return this.where(condition);
     }
 
     @Override
@@ -75,7 +76,7 @@ public class DefaultDomainExpression<T> extends BaseExpression<T> implements Dom
 
     @Override
     public SelectQuery getSelectQuery() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return this.selectObject;
     }
 
     @Override

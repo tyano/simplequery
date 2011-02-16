@@ -53,6 +53,7 @@ public class Select implements SelectQuery {
         return sdb;
     }
 
+    @Override
     public String describe() {
         StringBuilder sb = new StringBuilder();
         sb.append("select ");

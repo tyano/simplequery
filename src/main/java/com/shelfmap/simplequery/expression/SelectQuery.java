@@ -22,7 +22,7 @@ import java.util.Collection;
  *
  * @author Tsutomu YANO
  */
-public interface SelectQuery {
+public interface SelectQuery extends Describable {
     
     void addAttributes(Attribute... attribute);
     SelectQuery withAttribute(Attribute attribute);

@@ -66,10 +66,6 @@ public final class NullCondition implements Condition {
     }
 
     @Override
-    public void setParent(Condition parent, Operator operator) {
-    }
-
-    @Override
     public Condition getParent() {
         return null;
     }
@@ -127,5 +123,10 @@ public final class NullCondition implements Condition {
     @Override
     public Condition intersection(String attributeName, Matcher<? extends Long> matcher, int maxNumDigits, long offsetValue) {
         return new DefaultCondition(attributeName, matcher.withAttributeInfo(maxNumDigits, offsetValue));
+    }
+
+    @Override
+    public Operator getOperator() {
+        return null;
     }
 }

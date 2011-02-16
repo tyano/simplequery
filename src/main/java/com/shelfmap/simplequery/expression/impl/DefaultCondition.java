@@ -41,6 +41,13 @@ public class DefaultCondition implements Condition {
         this.attributeName = attributeName;
         this.matcher = matcher;
     }
+
+    protected DefaultCondition(Condition parent, Operator operator, String attributeName, Matcher<?> matcher) {
+        this.parent = parent;
+        this.operator = operator;
+        this.attributeName = attributeName;
+        this.matcher = matcher;
+    }
     
     public String getAttributeName() {
         return attributeName;
@@ -89,6 +96,7 @@ public class DefaultCondition implements Condition {
         return sb.toString();
     }
 
+    @Override
     public Operator getOperator() {
         return operator;
     }
@@ -99,15 +107,8 @@ public class DefaultCondition implements Condition {
     }
     
     @Override
-    public void setParent(Condition parent, Operator operator) {
-        this.parent = parent;
-        this.operator = operator;
-    }
-
-    @Override
     public Condition withParent(Condition parent, Operator operator) {
-        setParent(parent, operator);
-        return this;
+        return new DefaultCondition(parent, operator, attributeName, matcher);
     }
 
     @Override

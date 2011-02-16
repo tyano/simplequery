@@ -28,7 +28,6 @@ public class ConditionGroup implements Condition {
     private final Condition condition;
     private Condition parent;
     private Operator operator;
-    private final Object parentLock = new Object();
 
     public ConditionGroup(Condition condition) {
         this.condition = condition;
@@ -36,18 +35,15 @@ public class ConditionGroup implements Condition {
         this.operator = NullOperator.INSTANCE;
     }
 
-    @Override
-    public Condition withParent(Condition parent, Operator operator) {
-        setParent(parent, operator);
-        return this;
+    protected ConditionGroup(Condition condition, Condition parent, Operator operator) {
+        this.condition = condition;
+        this.parent = parent;
+        this.operator = operator;
     }
 
     @Override
-    public void setParent(Condition parent, Operator operator) {
-        synchronized (parentLock) {
-            this.parent = parent;
-            this.operator = operator;
-        }
+    public Condition withParent(Condition parent, Operator operator) {
+        return new ConditionGroup(getCondition(), parent, operator);
     }
 
     @Override
@@ -121,12 +117,8 @@ public class ConditionGroup implements Condition {
     @Override
     public String describe() {
         StringBuilder sb = new StringBuilder();
-
-        synchronized (parentLock) {
-            sb.append(getParent().describe());
-            sb.append(getOperator().describe());
-        }
-
+        sb.append(getParent().describe());
+        sb.append(getOperator().describe());
         sb.append("(");
         sb.append(getCondition().describe());
         sb.append(")");
@@ -137,6 +129,7 @@ public class ConditionGroup implements Condition {
         return condition;
     }
 
+    @Override
     public Operator getOperator() {
         return operator;
     }

@@ -16,6 +16,8 @@
 
 package com.shelfmap.simplequery.expression.impl;
 
+import com.shelfmap.simplequery.expression.DomainExpression;
+import com.shelfmap.simplequery.expression.LimitExpression;
 import static com.shelfmap.simplequery.util.Assertion.isNotNull;
 import com.shelfmap.simplequery.expression.Condition;
 import com.shelfmap.simplequery.expression.Matcher;
@@ -62,6 +64,21 @@ public class DefaultWhereExpression<T> extends BaseExpression<T> implements Wher
 
     @Override
     public String describe() {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public DomainExpression<T> getDomainExpression() {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public Condition getCondition() {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public LimitExpression<T> limit(int limitCount) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 

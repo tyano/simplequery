@@ -16,6 +16,8 @@
 
 package com.shelfmap.simplequery.expression.impl;
 
+import com.shelfmap.simplequery.expression.LimitExpression;
+import com.shelfmap.simplequery.expression.SelectQuery;
 import static com.shelfmap.simplequery.util.Assertion.isNotNull;
 import com.amazonaws.services.simpledb.AmazonSimpleDB;
 import com.shelfmap.simplequery.expression.Condition;
@@ -63,15 +65,21 @@ public class DefaultDomainExpression<T> extends BaseExpression<T> implements Dom
         return domainName;
     }
 
-    public Select getSelectObject() {
-        return selectObject;
-    }
-
     public AmazonSimpleDB getSimpleDB() {
         return simpleDB;
     }
 
     public Class<T> getTypeToken() {
         return typeToken;
+    }
+
+    @Override
+    public SelectQuery getSelectQuery() {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public LimitExpression<T> limit(int limitCount) {
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 }

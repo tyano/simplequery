@@ -103,4 +103,29 @@ public final class NullCondition implements Condition {
     public Condition or(String attributeName, Matcher<? extends Long> matcher, int maxNumDigits, long offsetValue) {
         return new DefaultCondition(attributeName, matcher.withAttributeInfo(maxNumDigits, offsetValue));
     }
+
+    @Override
+    public Condition intersection(Condition other) {
+        return other;
+    }
+
+    @Override
+    public Condition intersection(String attributeName, Matcher<?> matcher) {
+        return new DefaultCondition(attributeName, matcher);
+    }
+
+    @Override
+    public Condition intersection(String attributeName, Matcher<? extends Float> matcher, int maxDigitLeft, int maxDigitRight, int offsetValue) {
+        return new DefaultCondition(attributeName, matcher.withAttributeInfo(maxDigitLeft, maxDigitRight, offsetValue));
+    }
+
+    @Override
+    public Condition intersection(String attributeName, Matcher<? extends Integer> matcher, int maxNumDigits, int offsetValue) {
+        return new DefaultCondition(attributeName, matcher.withAttributeInfo(maxNumDigits, offsetValue));
+    }
+
+    @Override
+    public Condition intersection(String attributeName, Matcher<? extends Long> matcher, int maxNumDigits, long offsetValue) {
+        return new DefaultCondition(attributeName, matcher.withAttributeInfo(maxNumDigits, offsetValue));
+    }
 }

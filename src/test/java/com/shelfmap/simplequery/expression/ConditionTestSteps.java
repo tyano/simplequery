@@ -15,6 +15,7 @@
  */
 package com.shelfmap.simplequery.expression;
 
+import static com.shelfmap.simplequery.expression.Conditions.group;
 import static com.shelfmap.simplequery.expression.Conditions.condition;
 import static org.junit.Assert.assertThat;
 import static com.shelfmap.simplequery.expression.MatcherFactory.*;
@@ -69,14 +70,45 @@ public class ConditionTestSteps {
 
     @When("multiple grouped conditions are used and collected conditions have been grouped at last")
     public void createGroupedCondition2() {
-        condition = condition("first", is(1)).and("second", isNot(2)).group()
-                .or(
-                    condition("third", lessThan(100)).and("fourth", lessEqual(200)).group()
-                 ).group();
+        condition = condition("first", is(1)).and("second", isNot(2)).group().or(
+                condition("third", lessThan(100)).and("fourth", lessEqual(200)).group()).group();
     }
 
     @Then("the result must be grouped multiple times like ((first expression) or (second expression)).")
     public void assertGroupedCondition2() {
         assertThat(condition.describe(), Matchers.is("((`first` = '1' and `second` != '2') or (`third` < '100' and `fourth` <= '200'))"));
+    }
+
+    @When("a intersection method is called")
+    public void createIntersectionCondition() {
+        condition = condition("first", is(1));
+    }
+
+    @Then("two conditions will be joined with a intersection operator.")
+    public void assertIntersection() {
+        Condition intersection = condition.intersection("second", greaterEqual(30));
+        assertThat(intersection.describe(), Matchers.is("`first` = '1' intersection `second` >= '30'"));
+    }
+
+    @When("another condition has been joined after using intersection")
+    public void join3Conditions() {
+        condition = condition("first", is(1)).intersection("second", lessThan(0).withAttributeInfo(5, 90000)).or("third", is("name"));
+    }
+
+    @Then("three conditions will be joined as a series of conditions. Don't grouped automatically.")
+    public void assert3conditions() {
+        assertThat(condition.describe(), Matchers.is("`first` = '1' intersection `second` < '90000' or `third` = 'name'"));
+    }
+
+    @When("two grouped condition has been joined with a intersection operator")
+    public void join2groupedConditions() {
+        Condition c1 = group(condition("first", is(1)).and("second", is("name")));
+        Condition c2 = group(condition("third", is(2)).or("fourth", is("age")));
+        condition = c1.intersection(c2);
+    }
+
+    @Then("the grouping will be keeped.")
+    public void assert2GroupedConditions() {
+        assertThat(condition.describe(), Matchers.is("(`first` = '1' and `second` = 'name') intersection (`third` = '2' or `fourth` = 'age')"));
     }
 }

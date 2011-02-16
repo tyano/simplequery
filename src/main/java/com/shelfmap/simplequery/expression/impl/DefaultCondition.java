@@ -145,4 +145,33 @@ public class DefaultCondition implements Condition {
         Condition other = new DefaultCondition(attributeName, matcher.withAttributeInfo(maxNumDigits, offsetValue));
         return this.or(other);
     }
+
+    @Override
+    public Condition intersection(Condition other) {
+        return other.withParent(this, BasicOperator.INTERSECTION);
+    }
+
+    @Override
+    public Condition intersection(String attributeName, Matcher<?> matcher) {
+        Condition other = new DefaultCondition(attributeName, matcher);
+        return this.intersection(other);
+    }
+
+    @Override
+    public Condition intersection(String attributeName, Matcher<? extends Float> matcher, int maxDigitLeft, int maxDigitRight, int offsetValue) {
+        Condition other = new DefaultCondition(attributeName, matcher.withAttributeInfo(maxDigitLeft, maxDigitRight, offsetValue));
+        return this.intersection(other);
+    }
+
+    @Override
+    public Condition intersection(String attributeName, Matcher<? extends Integer> matcher, int maxNumDigits, int offsetValue) {
+        Condition other = new DefaultCondition(attributeName, matcher.withAttributeInfo(maxNumDigits, offsetValue));
+        return this.intersection(other);
+    }
+
+    @Override
+    public Condition intersection(String attributeName, Matcher<? extends Long> matcher, int maxNumDigits, long offsetValue) {
+        Condition other = new DefaultCondition(attributeName, matcher.withAttributeInfo(maxNumDigits, offsetValue));
+        return this.intersection(other);
+    }
 }

@@ -17,3 +17,12 @@ Then the result must be like (first condition) and normal-condition
 
 When multiple grouped conditions are used and collected conditions have been grouped at last
 Then the result must be grouped multiple times like ((first expression) or (second expression)).
+
+When a intersection method is called
+Then two conditions will be joined with a intersection operator.
+
+When another condition has been joined after using intersection
+Then three conditions will be joined as a series of conditions. Don't grouped automatically.
+
+When two grouped condition has been joined with a intersection operator
+Then the grouping will be keeped.

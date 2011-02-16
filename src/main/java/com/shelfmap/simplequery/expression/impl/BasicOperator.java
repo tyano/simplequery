@@ -23,7 +23,7 @@ import com.shelfmap.simplequery.expression.Operator;
  * @author Tsutomu YANO
  */
 public enum BasicOperator implements Operator {
-    AND(" and "), OR(" or "); 
+    AND(" and "), OR(" or "), INTERSECTION(" intersection "); 
     
     private String operatorString;
 

@@ -36,5 +36,11 @@ public interface Condition extends Describable {
     Condition or(String attributeName, Matcher<? extends Float> matcher, int maxDigitLeft, int maxDigitRight, int offsetValue);
     Condition or(String attributeName, Matcher<? extends Integer> matcher, int maxNumDigits, int offsetValue);
     Condition or(String attributeName, Matcher<? extends Long> matcher, int maxNumDigits, long offsetValue);
+    Condition intersection(Condition other);
+    Condition intersection(String attributeName, Matcher<?> matcher);
+    Condition intersection(String attributeName, Matcher<? extends Float> matcher, int maxDigitLeft, int maxDigitRight, int offsetValue);
+    Condition intersection(String attributeName, Matcher<? extends Integer> matcher, int maxNumDigits, int offsetValue);
+    Condition intersection(String attributeName, Matcher<? extends Long> matcher, int maxNumDigits, long offsetValue);
+    
     Condition group();
 }

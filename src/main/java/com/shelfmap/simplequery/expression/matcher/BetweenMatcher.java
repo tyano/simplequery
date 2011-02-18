@@ -58,21 +58,21 @@ public class BetweenMatcher<T> extends BaseMatcher<T> {
 
     @Override
     public Matcher<T> withAttributeInfo(int maxDigitLeft, int maxDigitRight, int offsetValue) {
-        BetweenMatcher<T> newMatcher = newMatcher(maxDigitLeft, maxDigitRight, offsetValue, 0L, NumberType.FLOAT, getValues());
+        BetweenMatcher<T> newMatcher = newMatcher(maxDigitLeft, maxDigitRight, offsetValue, 0L, NumberType.FLOAT, values());
         newMatcher.second = this.second;
         return newMatcher;
     }
 
     @Override
     public Matcher<T> withAttributeInfo(int maxNumDigits, int offsetValue) {
-        BetweenMatcher<T> newMatcher = newMatcher(maxNumDigits, 0, offsetValue, 0L, NumberType.INTEGER, getValues());
+        BetweenMatcher<T> newMatcher = newMatcher(maxNumDigits, 0, offsetValue, 0L, NumberType.INTEGER, values());
         newMatcher.second = this.second;
         return newMatcher;
     }
 
     @Override
     public Matcher<T> withAttributeInfo(int maxNumDigits, long offsetValue) {
-        BetweenMatcher<T> newMatcher = newMatcher(maxNumDigits, 0, 0, offsetValue, NumberType.LONG, getValues());
+        BetweenMatcher<T> newMatcher = newMatcher(maxNumDigits, 0, 0, offsetValue, NumberType.LONG, values());
         newMatcher.second = this.second;
         return newMatcher;
     }

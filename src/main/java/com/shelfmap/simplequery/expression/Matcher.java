@@ -16,12 +16,28 @@
 
 package com.shelfmap.simplequery.expression;
 
+import java.util.Collection;
+
 /**
  *
  * @author Tsutomu YANO
  */
 public interface Matcher<T> extends Describable {
+    /* properties */
+    int getMaxDigitLeft();
+    int getMaxDigitRight();
+    int getOffsetInt();
+    long getOffsetLong();
+    Collection<T> getValues();
+    boolean isAttributeInfoApplied();
+    
+    /* methods for building new instance with new property value. */
     Matcher<T> withAttributeInfo(int maxDigitLeft, int maxDigitRight, int offsetValue);
     Matcher<T> withAttributeInfo(int maxNumDigits, int offsetValue);
     Matcher<T> withAttributeInfo(int maxNumDigits, long offsetValue);
+    
+    /* mutation-methods for attribute-related properties */
+    void setAttributeInfo(int maxDigitLeft, int maxDigitRight, int offsetValue);
+    void setAttributeInfo(int maxNumDigits, int offsetValue);
+    void setAttributeInfo(int maxNumDigits, long offsetValue);
 }

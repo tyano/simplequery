@@ -35,6 +35,7 @@ public abstract class BaseMatcher<T> implements Matcher<T> {
     private int offsetInt;
     private long offsetLong;
     private NumberType numberType;
+    private final Object attributeInfoLock = new Object();
 
     public BaseMatcher(T... values) {
         isNotNull("values", values);
@@ -58,7 +59,7 @@ public abstract class BaseMatcher<T> implements Matcher<T> {
     }
 
     protected abstract BaseMatcher<T> newMatcher(int maxDigitLeft, int maxDigitRight, int offsetInt, long offsetLong, NumberType numberType, T... values);
-    
+
     protected String convertValue(T targetValue) {
         String result;
 
@@ -124,27 +125,84 @@ public abstract class BaseMatcher<T> implements Matcher<T> {
 
     protected abstract String expression();
 
+    @Override
     public int getMaxDigitLeft() {
-        return maxDigitLeft;
+        synchronized (attributeInfoLock) {
+            return maxDigitLeft;
+        }
     }
 
+    @Override
     public int getMaxDigitRight() {
-        return maxDigitRight;
+        synchronized (attributeInfoLock) {
+            return maxDigitRight;
+        }
     }
 
     public NumberType getNumberType() {
-        return numberType;
+        synchronized (attributeInfoLock) {
+            return numberType;
+        }
     }
 
+    @Override
     public int getOffsetInt() {
-        return offsetInt;
+        synchronized (attributeInfoLock) {
+            return offsetInt;
+        }
     }
 
+    @Override
     public long getOffsetLong() {
-        return offsetLong;
+        synchronized (attributeInfoLock) {
+            return offsetLong;
+        }
     }
-    
-    public T[] getValues() {
+
+    protected T[] values() {
         return values;
+    }
+
+    @Override
+    public Collection<T> getValues() {
+        return Arrays.asList(values);
+    }
+
+    @Override
+    public boolean isAttributeInfoApplied() {
+        return getNumberType() != NumberType.NOT_NUMBER;
+    }
+
+    @Override
+    public void setAttributeInfo(int maxDigitLeft, int maxDigitRight, int offsetValue) {
+        synchronized (attributeInfoLock) {
+            this.maxDigitLeft = maxDigitLeft;
+            this.maxDigitRight = maxDigitRight;
+            this.offsetInt = offsetValue;
+            this.offsetLong = 0L;
+            this.numberType = NumberType.FLOAT;
+        }
+    }
+
+    @Override
+    public void setAttributeInfo(int maxNumDigits, int offsetValue) {
+        synchronized (attributeInfoLock) {
+            this.maxDigitLeft = maxNumDigits;
+            this.maxDigitRight = 0;
+            this.offsetInt = offsetValue;
+            this.offsetLong = 0L;
+            this.numberType = NumberType.INTEGER;
+        }
+    }
+
+    @Override
+    public void setAttributeInfo(int maxNumDigits, long offsetValue) {
+        synchronized (attributeInfoLock) {
+            this.maxDigitLeft = maxNumDigits;
+            this.maxDigitRight = 0;
+            this.offsetInt = 0;
+            this.offsetLong = offsetValue;
+            this.numberType = NumberType.LONG;
+        }
     }
 }

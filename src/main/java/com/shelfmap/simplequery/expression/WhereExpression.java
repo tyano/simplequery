@@ -20,13 +20,9 @@ package com.shelfmap.simplequery.expression;
  *
  * @author Tsutomu YANO
  */
-public interface WhereExpression<T> extends Expression<T> {
+public interface WhereExpression<T> extends Expression<T>, Conjunctive<WhereExpression<T>> {
     DomainExpression<T> getDomainExpression();
     Condition getCondition();
-    WhereExpression<T> and(Condition other);
-    WhereExpression<T> and(String attributeName, Matcher<T> matcher);
-    WhereExpression<T> or(Condition other);
-    WhereExpression<T> or(String attributeName, Matcher<T> matcher);
     OrderByExpression<T> orderBy(String attributeName, SortOrder sortOrder);
     LimitExpression<T> limit(int limitCount);
 }

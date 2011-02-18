@@ -22,7 +22,7 @@ package com.shelfmap.simplequery.expression;
     Matcher<T> withAttributeInfo(int maxNumDigits, long offsetValue);
  * @author Tsutomu YANO
  */
-public interface Condition extends Describable {
+public interface Condition extends Describable, Conjunctive<Condition> {
     /* properties (read only) */
     Condition getParent();
     Operator getOperator();
@@ -33,22 +33,4 @@ public interface Condition extends Describable {
     Condition withParent(Condition parent, Operator operator);
     Condition withAttributeName(String attributeName);
     Condition withMatcher(Matcher<?> matcher);
-    
-    /* join methods */
-    Condition and(Condition other);
-    Condition and(String attributeName, Matcher<?> matcher);
-    Condition and(String attributeName, Matcher<? extends Float> matcher, int maxDigitLeft, int maxDigitRight, int offsetValue);
-    Condition and(String attributeName, Matcher<? extends Integer> matcher, int maxNumDigits, int offsetValue);
-    Condition and(String attributeName, Matcher<? extends Long> matcher, int maxNumDigits, long offsetValue);
-    Condition or(Condition other);
-    Condition or(String attributeName, Matcher<?> matcher);
-    Condition or(String attributeName, Matcher<? extends Float> matcher, int maxDigitLeft, int maxDigitRight, int offsetValue);
-    Condition or(String attributeName, Matcher<? extends Integer> matcher, int maxNumDigits, int offsetValue);
-    Condition or(String attributeName, Matcher<? extends Long> matcher, int maxNumDigits, long offsetValue);
-    Condition intersection(Condition other);
-    Condition intersection(String attributeName, Matcher<?> matcher);
-    Condition intersection(String attributeName, Matcher<? extends Float> matcher, int maxDigitLeft, int maxDigitRight, int offsetValue);
-    Condition intersection(String attributeName, Matcher<? extends Integer> matcher, int maxNumDigits, int offsetValue);
-    Condition intersection(String attributeName, Matcher<? extends Long> matcher, int maxNumDigits, long offsetValue);
-    Condition group();
 }

@@ -71,32 +71,32 @@ public final class NullCondition implements Condition {
     }
 
     @Override
-    public Condition and(String attributeName, Matcher<? extends Float> matcher, int maxDigitLeft, int maxDigitRight, int offsetValue) {
+    public Condition and(String attributeName, Matcher<Float> matcher, int maxDigitLeft, int maxDigitRight, int offsetValue) {
         return new DefaultCondition(attributeName, matcher.withAttributeInfo(maxDigitLeft, maxDigitRight, offsetValue));
     }
 
     @Override
-    public Condition and(String attributeName, Matcher<? extends Integer> matcher, int maxNumDigits, int offsetValue) {
+    public Condition and(String attributeName, Matcher<Integer> matcher, int maxNumDigits, int offsetValue) {
         return new DefaultCondition(attributeName, matcher.withAttributeInfo(maxNumDigits, offsetValue));
     }
 
     @Override
-    public Condition and(String attributeName, Matcher<? extends Long> matcher, int maxNumDigits, long offsetValue) {
+    public Condition and(String attributeName, Matcher<Long> matcher, int maxNumDigits, long offsetValue) {
         return new DefaultCondition(attributeName, matcher.withAttributeInfo(maxNumDigits, offsetValue));
     }
 
     @Override
-    public Condition or(String attributeName, Matcher<? extends Float> matcher, int maxDigitLeft, int maxDigitRight, int offsetValue) {
+    public Condition or(String attributeName, Matcher<Float> matcher, int maxDigitLeft, int maxDigitRight, int offsetValue) {
         return new DefaultCondition(attributeName, matcher.withAttributeInfo(maxDigitLeft, maxDigitRight, offsetValue));
     }
 
     @Override
-    public Condition or(String attributeName, Matcher<? extends Integer> matcher, int maxNumDigits, int offsetValue) {
+    public Condition or(String attributeName, Matcher<Integer> matcher, int maxNumDigits, int offsetValue) {
         return new DefaultCondition(attributeName, matcher.withAttributeInfo(maxNumDigits, offsetValue));
     }
 
     @Override
-    public Condition or(String attributeName, Matcher<? extends Long> matcher, int maxNumDigits, long offsetValue) {
+    public Condition or(String attributeName, Matcher<Long> matcher, int maxNumDigits, long offsetValue) {
         return new DefaultCondition(attributeName, matcher.withAttributeInfo(maxNumDigits, offsetValue));
     }
 
@@ -111,17 +111,17 @@ public final class NullCondition implements Condition {
     }
 
     @Override
-    public Condition intersection(String attributeName, Matcher<? extends Float> matcher, int maxDigitLeft, int maxDigitRight, int offsetValue) {
+    public Condition intersection(String attributeName, Matcher<Float> matcher, int maxDigitLeft, int maxDigitRight, int offsetValue) {
         return new DefaultCondition(attributeName, matcher.withAttributeInfo(maxDigitLeft, maxDigitRight, offsetValue));
     }
 
     @Override
-    public Condition intersection(String attributeName, Matcher<? extends Integer> matcher, int maxNumDigits, int offsetValue) {
+    public Condition intersection(String attributeName, Matcher<Integer> matcher, int maxNumDigits, int offsetValue) {
         return new DefaultCondition(attributeName, matcher.withAttributeInfo(maxNumDigits, offsetValue));
     }
 
     @Override
-    public Condition intersection(String attributeName, Matcher<? extends Long> matcher, int maxNumDigits, long offsetValue) {
+    public Condition intersection(String attributeName, Matcher<Long> matcher, int maxNumDigits, long offsetValue) {
         return new DefaultCondition(attributeName, matcher.withAttributeInfo(maxNumDigits, offsetValue));
     }
 

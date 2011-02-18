@@ -41,28 +41,6 @@ public class DefaultWhereExpression<T> extends BaseExpression<T> implements Wher
     }
     
     @Override
-    public WhereExpression<T> and(Condition other) {
-        return new DefaultWhereExpression<T>(this.domainExpression, condition.and(other));
-    }
-
-    @Override
-    public WhereExpression<T> and(String attributeName, Matcher<T> matcher) {
-        Condition other = new DefaultCondition(attributeName, matcher);
-        return this.and(other);
-    }
-
-    @Override
-    public WhereExpression<T> or(Condition other) {
-        return new DefaultWhereExpression<T>(this.domainExpression, condition.or(other));
-    }
-
-    @Override
-    public WhereExpression<T> or(String attributeName, Matcher<T> matcher) {
-        Condition other = new DefaultCondition(attributeName, matcher);
-        return this.or(other);
-    }
-
-    @Override
     public OrderByExpression<T> orderBy(String attributeName, SortOrder sortOrder) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
@@ -89,6 +67,98 @@ public class DefaultWhereExpression<T> extends BaseExpression<T> implements Wher
     @Override
     public LimitExpression<T> limit(int limitCount) {
         throw new UnsupportedOperationException("Not supported yet.");
+    }
+    
+    @Override
+    public WhereExpression<T> and(Condition other) {
+        return new DefaultWhereExpression<T>(this.domainExpression, condition.and(other));
+    }
+
+    @Override
+    public WhereExpression<T> and(String attributeName, Matcher<?> matcher) {
+        Condition other = new DefaultCondition(attributeName, matcher);
+        return this.and(other);
+    }
+
+    @Override
+    public WhereExpression<T> and(String attributeName, Matcher<Float> matcher, int maxDigitLeft, int maxDigitRight, int offsetValue) {
+        Condition other = new DefaultCondition(attributeName, matcher.withAttributeInfo(maxDigitLeft, maxDigitRight, offsetValue));
+        return this.and(other);
+    }
+
+    @Override
+    public WhereExpression<T> and(String attributeName, Matcher<Integer> matcher, int maxNumDigits, int offsetValue) {
+        Condition other = new DefaultCondition(attributeName, matcher.withAttributeInfo(maxNumDigits, offsetValue));
+        return this.and(other);
+    }
+
+    @Override
+    public WhereExpression<T> and(String attributeName, Matcher<Long> matcher, int maxNumDigits, long offsetValue) {
+        Condition other = new DefaultCondition(attributeName, matcher.withAttributeInfo(maxNumDigits, offsetValue));
+        return this.and(other);
+    }
+
+    @Override
+    public WhereExpression<T> or(Condition other) {
+        return new DefaultWhereExpression<T>(this.domainExpression, condition.or(other));
+    }
+
+    @Override
+    public WhereExpression<T> or(String attributeName, Matcher<?> matcher) {
+        Condition other = new DefaultCondition(attributeName, matcher);
+        return this.or(other);
+    }
+
+    @Override
+    public WhereExpression<T> or(String attributeName, Matcher<Float> matcher, int maxDigitLeft, int maxDigitRight, int offsetValue) {
+        Condition other = new DefaultCondition(attributeName, matcher.withAttributeInfo(maxDigitLeft, maxDigitRight, offsetValue));
+        return this.or(other);
+    }
+
+    @Override
+    public WhereExpression<T> or(String attributeName, Matcher<Integer> matcher, int maxNumDigits, int offsetValue) {
+        Condition other = new DefaultCondition(attributeName, matcher.withAttributeInfo(maxNumDigits, offsetValue));
+        return this.or(other);
+    }
+
+    @Override
+    public WhereExpression<T> or(String attributeName, Matcher<Long> matcher, int maxNumDigits, long offsetValue) {
+        Condition other = new DefaultCondition(attributeName, matcher.withAttributeInfo(maxNumDigits, offsetValue));
+        return this.or(other);
+    }
+
+    @Override
+    public WhereExpression<T> intersection(Condition other) {
+        return new DefaultWhereExpression<T>(this.domainExpression, condition.intersection(other));
+    }
+
+    @Override
+    public WhereExpression<T> intersection(String attributeName, Matcher<?> matcher) {
+        Condition other = new DefaultCondition(attributeName, matcher);
+        return this.intersection(other);
+    }
+
+    @Override
+    public WhereExpression<T> intersection(String attributeName, Matcher<Float> matcher, int maxDigitLeft, int maxDigitRight, int offsetValue) {
+        Condition other = new DefaultCondition(attributeName, matcher.withAttributeInfo(maxDigitLeft, maxDigitRight, offsetValue));
+        return this.intersection(other);
+    }
+
+    @Override
+    public WhereExpression<T> intersection(String attributeName, Matcher<Integer> matcher, int maxNumDigits, int offsetValue) {
+        Condition other = new DefaultCondition(attributeName, matcher.withAttributeInfo(maxNumDigits, offsetValue));
+        return this.intersection(other);
+    }
+
+    @Override
+    public WhereExpression<T> intersection(String attributeName, Matcher<Long> matcher, int maxNumDigits, long offsetValue) {
+        Condition other = new DefaultCondition(attributeName, matcher.withAttributeInfo(maxNumDigits, offsetValue));
+        return this.intersection(other);
+    }
+
+    @Override
+    public WhereExpression<T> group() {
+        return new DefaultWhereExpression<T>(this.domainExpression, new ConditionGroup(this.condition));
     }
 
 }

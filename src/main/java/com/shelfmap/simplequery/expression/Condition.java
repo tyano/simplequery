@@ -23,9 +23,18 @@ package com.shelfmap.simplequery.expression;
  * @author Tsutomu YANO
  */
 public interface Condition extends Describable {
-    Condition withParent(Condition parent, Operator operator);
+    /* properties (read only) */
     Condition getParent();
     Operator getOperator();
+    String getAttributeName();
+    Matcher<?> getMatcher();
+
+    /* methods for building new instance with new property value. */
+    Condition withParent(Condition parent, Operator operator);
+    Condition withAttributeName(String attributeName);
+    Condition withMatcher(Matcher<?> matcher);
+    
+    /* join methods */
     Condition and(Condition other);
     Condition and(String attributeName, Matcher<?> matcher);
     Condition and(String attributeName, Matcher<? extends Float> matcher, int maxDigitLeft, int maxDigitRight, int offsetValue);
@@ -41,6 +50,5 @@ public interface Condition extends Describable {
     Condition intersection(String attributeName, Matcher<? extends Float> matcher, int maxDigitLeft, int maxDigitRight, int offsetValue);
     Condition intersection(String attributeName, Matcher<? extends Integer> matcher, int maxNumDigits, int offsetValue);
     Condition intersection(String attributeName, Matcher<? extends Long> matcher, int maxNumDigits, long offsetValue);
-    
     Condition group();
 }

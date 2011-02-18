@@ -129,4 +129,24 @@ public final class NullCondition implements Condition {
     public Operator getOperator() {
         return null;
     }
+
+    @Override
+    public String getAttributeName() {
+        return "";
+    }
+
+    @Override
+    public Matcher<?> getMatcher() {
+        return null;
+    }
+
+    @Override
+    public Condition withAttributeName(String attributeName) {
+        return this;
+    }
+
+    @Override
+    public Condition withMatcher(Matcher<?> matcher) {
+        return this;
+    }
 }

@@ -162,4 +162,24 @@ public class ConditionGroup implements Condition {
         Condition other = new DefaultCondition(attributeName, matcher.withAttributeInfo(maxNumDigits, offsetValue));
         return this.intersection(other);
     }
+
+    @Override
+    public String getAttributeName() {
+        return "";
+    }
+
+    @Override
+    public Matcher<?> getMatcher() {
+        return null;
+    }
+
+    @Override
+    public Condition withAttributeName(String attributeName) {
+        return this;
+    }
+
+    @Override
+    public Condition withMatcher(Matcher<?> matcher) {
+        return this;
+    }
 }

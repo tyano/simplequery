@@ -49,10 +49,12 @@ public class DefaultCondition implements Condition {
         this.matcher = matcher;
     }
     
+    @Override
     public String getAttributeName() {
         return attributeName;
     }
 
+    @Override
     public Matcher<?> getMatcher() {
         return matcher;
     }
@@ -108,7 +110,7 @@ public class DefaultCondition implements Condition {
     
     @Override
     public Condition withParent(Condition parent, Operator operator) {
-        return new DefaultCondition(parent, operator, attributeName, matcher);
+        return new DefaultCondition(parent, operator, getAttributeName(), getMatcher());
     }
 
     @Override
@@ -174,5 +176,15 @@ public class DefaultCondition implements Condition {
     public Condition intersection(String attributeName, Matcher<? extends Long> matcher, int maxNumDigits, long offsetValue) {
         Condition other = new DefaultCondition(attributeName, matcher.withAttributeInfo(maxNumDigits, offsetValue));
         return this.intersection(other);
+    }
+
+    @Override
+    public Condition withAttributeName(String attributeName) {
+        return new DefaultCondition(getParent(), getOperator(), attributeName, getMatcher());
+    }
+
+    @Override
+    public Condition withMatcher(Matcher<?> matcher) {
+        return new DefaultCondition(getParent(), getOperator(), getAttributeName(), matcher);
     }
 }

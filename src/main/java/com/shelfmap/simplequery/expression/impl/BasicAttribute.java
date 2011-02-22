@@ -33,7 +33,26 @@ public enum BasicAttribute implements Attribute {
     
     @Override
     public String getName() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return this.attributeName;
     }
 
+    @Override
+    public Class<?> getType() {
+        return Integer.class;
+    }
+
+    @Override
+    public int getMaxDigitLeft() {
+        return 0;
+    }
+
+    @Override
+    public int getMaxDigitRight() {
+        return 0;
+    }
+
+    @Override
+    public long getOffset() {
+        return 0;
+    }
 }

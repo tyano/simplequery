@@ -25,14 +25,60 @@ import com.shelfmap.simplequery.expression.Attribute;
  */
 public class DefaultAttribute implements Attribute {
     private String attributeName;
+    private Class<?> type;
+    private int maxDigitLeft;
+    private int maxDigitRight;
+    private long offset;
 
-    public DefaultAttribute(String attributeName) {
+    protected DefaultAttribute(String attributeName, Class<?> type, int maxDigitLeft, int maxDigitRight, long offset) {
         isNotNull("attributeName", attributeName);
+        isNotNull("type", type);
         this.attributeName = attributeName;
+        this.type = type;
+        this.maxDigitLeft = maxDigitLeft;
+        this.maxDigitRight = maxDigitRight;
+        this.offset = offset;
     }
+    
+    public DefaultAttribute(String attributeName, Class<?> type) {
+        this(attributeName, type, 0, 0, 0L);
+    }
+    
+    public DefaultAttribute(String attributeName, Class<Integer> type, int maxNumDigits, int offset) {
+        this(attributeName, type, maxNumDigits, 0, (long)offset);
+    }
+
+    public DefaultAttribute(String attributeName, Class<Long> type, int maxNumDigits, long offset) {
+        this(attributeName, type, maxNumDigits, 0, offset);
+    }
+    
+    public DefaultAttribute(String attributeName, Class<Float> type, int maxDigitLeft, int maxDigitRight, int offset) {
+        this(attributeName, type, maxDigitLeft, maxDigitRight, (long)offset);
+    }
+    
 
     @Override
     public String getName() {
         return attributeName;
+    }
+
+    @Override
+    public Class<?> getType() {
+        return type;
+    }
+
+    @Override
+    public int getMaxDigitLeft() {
+        return maxDigitLeft;
+    }
+
+    @Override
+    public int getMaxDigitRight() {
+        return maxDigitRight;
+    }
+
+    @Override
+    public long getOffset() {
+        return offset;
     }
 }

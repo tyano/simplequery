@@ -25,9 +25,11 @@ import java.lang.annotation.Target;
  *
  * @author Tsutomu YANO
  */
-@Target(ElementType.TYPE)
+@Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface Domain {
-    String value();
-    AttributeType attributeType() default AttributeType.PROPERTY;
+public @interface SimpleDBAttribute {
+    String attributeName() default "";
+    int maxDigitLeft() default 0;
+    int maxDigitRight() default 0;
+    long offset() default 0;
 }

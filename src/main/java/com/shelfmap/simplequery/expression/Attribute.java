@@ -22,4 +22,8 @@ package com.shelfmap.simplequery.expression;
  */
 public interface Attribute {
     String getName();
+    Class<?> getType();
+    int getMaxDigitLeft();
+    int getMaxDigitRight();
+    long getOffset();
 }

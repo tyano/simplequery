@@ -14,20 +14,14 @@
  * limitations under the License.
  */
 
-package com.shelfmap.simplequery;
-
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+package com.shelfmap.simplequery.expression;
 
 /**
  *
  * @author Tsutomu YANO
  */
-@Target(ElementType.TYPE)
-@Retention(RetentionPolicy.RUNTIME)
-public @interface Domain {
-    String value();
-    AttributeType attributeType() default AttributeType.PROPERTY;
+public interface DomainAttribute extends Iterable<Attribute> {
+    boolean isAttributeDefined(String attributeName);
+    Attribute getAttribute(String attributeName);
+    Class<?> getDomainClass();
 }

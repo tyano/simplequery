@@ -70,7 +70,8 @@ public class DefaultDomainExpression<T> extends BaseExpression<T> implements Dom
         return simpleDB;
     }
 
-    public Class<T> getTypeToken() {
+    @Override
+    public Class<T> getDomainClass() {
         return typeToken;
     }
 

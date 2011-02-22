@@ -16,10 +16,12 @@
 
 package com.shelfmap.simplequery.expression.impl;
 
+import com.shelfmap.simplequery.expression.Attribute;
 import com.shelfmap.simplequery.expression.DomainExpression;
 import com.shelfmap.simplequery.expression.LimitExpression;
 import static com.shelfmap.simplequery.util.Assertion.isNotNull;
 import com.shelfmap.simplequery.expression.Condition;
+import com.shelfmap.simplequery.expression.DomainAttribute;
 import com.shelfmap.simplequery.expression.Matcher;
 import com.shelfmap.simplequery.expression.OrderByExpression;
 import com.shelfmap.simplequery.expression.SortOrder;
@@ -48,7 +50,32 @@ public class DefaultWhereExpression<T> extends BaseExpression<T> implements Wher
     @Override
     public String describe() {
         StringBuilder sb = new StringBuilder();
-        sb.append(getDomainExpression().describe());
+        Class<T> domainClass = getDomainExpression().getDomainClass();
+        DomainAttribute domainAttribute = new BeanDomainAttribute(domainClass);
+        
+        Condition current = condition;
+        while(current.getParent() != null) {
+            String attributeName = current.getAttributeName();
+            Matcher<?> matcher = current.getMatcher();
+            if(matcher != null && !matcher.isAttributeInfoApplied()) {
+                if(domainAttribute.isAttributeDefined(attributeName)) {
+                    Attribute attribute = domainAttribute.getAttribute(attributeName);
+                    if(attribute.getMaxDigitLeft() > 0 || attribute.getMaxDigitRight() > 0 || attribute.getOffset() > 0L) {
+                        Class<?> type = attribute.getType();
+                        if(type == Float.class) {
+                            matcher.setAttributeInfo(attribute.getMaxDigitLeft(), attribute.getMaxDigitRight(), (int)attribute.getOffset());
+                        } else if(type == Integer.class) {
+                            matcher.setAttributeInfo(attribute.getMaxDigitLeft(), (int)attribute.getOffset());
+                        } else if(type == Long.class) {
+                            matcher.setAttributeInfo(attribute.getMaxDigitLeft(), attribute.getOffset());
+                        }
+                    }
+                }
+            }
+            current = current.getParent();
+        }
+        
+        sb.append(domainExpression.describe());
         sb.append(" where ");
         sb.append(condition.describe());
         return sb.toString();

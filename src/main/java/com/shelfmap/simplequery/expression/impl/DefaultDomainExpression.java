@@ -52,7 +52,7 @@ public class DefaultDomainExpression<T> extends BaseExpression<T> implements Dom
     }
 
     @Override
-    public WhereExpression<T> where(String attributeName, Matcher<T> matcher) {
+    public WhereExpression<T> where(String attributeName, Matcher<?> matcher) {
         Condition condition = new DefaultCondition(attributeName, matcher);
         return this.where(condition);
     }

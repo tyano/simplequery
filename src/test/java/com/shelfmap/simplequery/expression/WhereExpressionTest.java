@@ -16,14 +16,17 @@
 
 package com.shelfmap.simplequery.expression;
 
+import com.shelfmap.specsfinder.StoryRunner;
+import java.io.IOException;
+import java.net.URISyntaxException;
+
 /**
  *
  * @author Tsutomu YANO
  */
-public interface DomainExpression<T> extends Expression<T>{
-    SelectQuery getSelectQuery();
-    Class<T> getDomainClass();
-    WhereExpression<T> where(Condition expression);
-    WhereExpression<T> where(String attributeName, Matcher<?> matcher);
-    LimitExpression<T> limit(int limitCount);
+public class WhereExpressionTest extends StoryRunner {
+
+    public WhereExpressionTest() throws IOException, URISyntaxException, InstantiationException, IllegalAccessException {
+    }
+
 }

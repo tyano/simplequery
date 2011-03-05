@@ -77,7 +77,7 @@ public class WhereExpressionTestSteps {
         expression = new Select(client).from(DomainWithoutAttributeName.class).where("saving", greaterThan(500));
     }
 
-    @Then("this library will find the annotation through the name of property instead of attributeName, and uses values of the annotation.")
+    @Then("this library will find the annotation through the name of property instead of the attributeName, and uses values of the annotation.")
     public void assertExpressionWithoutAttributeName() {
         assertThat(expression.describe(), Matchers.is("select * from without-attributename where `saving` > '0200500'"));
     }

@@ -16,6 +16,8 @@
 
 package com.shelfmap.simplequery.expression.matcher;
 
+import com.shelfmap.simplequery.expression.AttributeInfo;
+
 /**
  *
  * @author Tsutomu YANO
@@ -27,8 +29,8 @@ public class LessThanMatcher<T> extends BaseMatcher<T> {
         super(value);
     }
 
-    protected LessThanMatcher(int maxDigitLeft, int maxDigitRight, int offsetInt, long offsetLong, NumberType numberType, T[] values) {
-        super(maxDigitLeft, maxDigitRight, offsetInt, offsetLong, numberType, values);
+    protected LessThanMatcher(AttributeInfo<T> attributeInfo, T[] values) {
+        super(attributeInfo, values);
     }
 
     @Override
@@ -37,7 +39,7 @@ public class LessThanMatcher<T> extends BaseMatcher<T> {
     }
 
     @Override
-    protected LessThanMatcher<T> newMatcher(int maxDigitLeft, int maxDigitRight, int offsetInt, long offsetLong, NumberType numberType, T... values) {
-        return new LessThanMatcher<T>(maxDigitLeft, maxDigitRight, offsetInt, offsetLong, numberType, values);
+    protected LessThanMatcher<T> newMatcher(AttributeInfo<T> attributeInfo, T... values) {
+        return new LessThanMatcher<T>(attributeInfo, values);
     }
 }

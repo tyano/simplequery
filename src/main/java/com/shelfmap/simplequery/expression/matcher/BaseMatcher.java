@@ -15,11 +15,10 @@
  */
 package com.shelfmap.simplequery.expression.matcher;
 
-import static com.amazonaws.services.simpledb.util.SimpleDBUtils.encodeZeroPadding;
-import static com.amazonaws.services.simpledb.util.SimpleDBUtils.encodeRealNumberRange;
-import static com.amazonaws.services.simpledb.util.SimpleDBUtils.quoteValue;
+import com.shelfmap.simplequery.expression.AttributeInfo;
 import static com.shelfmap.simplequery.util.Assertion.*;
 import com.shelfmap.simplequery.expression.Matcher;
+import com.shelfmap.simplequery.expression.impl.NullAttributeInfo;
 import java.util.Arrays;
 import java.util.Collection;
 
@@ -30,134 +29,47 @@ import java.util.Collection;
 public abstract class BaseMatcher<T> implements Matcher<T> {
 
     private T[] values;
-    private int maxDigitLeft;
-    private int maxDigitRight;
-    private int offsetInt;
-    private long offsetLong;
-    private NumberType numberType;
-    private final Object attributeInfoLock = new Object();
+    private AttributeInfo<T> attributeInfo;
 
     public BaseMatcher(T... values) {
+        this(new NullAttributeInfo<T>(), values);
+    }
+
+    protected BaseMatcher(AttributeInfo<T> attributeInfo, T... values) {
+        isNotNull("attributeInfo", attributeInfo);
         isNotNull("values", values);
         isNotEmpty("values", values);
-
+        
+        this.attributeInfo = attributeInfo;
         this.values = values;
-        this.maxDigitLeft = 0;
-        this.maxDigitRight = 0;
-        this.offsetInt = 0;
-        this.offsetLong = 0L;
-        this.numberType = NumberType.NOT_NUMBER;
     }
 
-    protected BaseMatcher(int maxDigitLeft, int maxDigitRight, int offsetInt, long offsetLong, NumberType numberType, T... values) {
-        this.values = values;
-        this.maxDigitLeft = maxDigitLeft;
-        this.maxDigitRight = maxDigitRight;
-        this.offsetInt = offsetInt;
-        this.offsetLong = offsetLong;
-        this.numberType = numberType;
-    }
-
-    protected abstract BaseMatcher<T> newMatcher(int maxDigitLeft, int maxDigitRight, int offsetInt, long offsetLong, NumberType numberType, T... values);
-
-    protected String convertValue(T targetValue) {
-        String result;
-
-        switch (numberType) {
-            case NOT_NUMBER:
-                result = quoteValue(targetValue.toString());
-                break;
-            case FLOAT:
-                if (offsetInt > 0) {
-                    result = quoteValue(encodeRealNumberRange(((Float) targetValue).floatValue(), maxDigitLeft, maxDigitRight, offsetInt));
-                } else if (maxDigitLeft > 0) {
-                    result = quoteValue(encodeZeroPadding(((Float) targetValue).floatValue(), maxDigitLeft));
-                } else {
-                    result = quoteValue(targetValue.toString());
-                }
-                break;
-            case INTEGER:
-                if (offsetInt > 0) {
-                    result = quoteValue(encodeRealNumberRange(((Integer) targetValue).intValue(), maxDigitLeft, offsetInt));
-                } else if (maxDigitLeft > 0) {
-                    result = quoteValue(encodeZeroPadding(((Integer) targetValue).intValue(), maxDigitLeft));
-                } else {
-                    result = quoteValue(targetValue.toString());
-                }
-                break;
-            case LONG:
-                if (offsetLong > 0) {
-                    result = quoteValue(encodeRealNumberRange(((Long) targetValue).longValue(), maxDigitLeft, offsetLong));
-                } else if (maxDigitLeft > 0) {
-                    result = quoteValue(encodeZeroPadding(((Long) targetValue).longValue(), maxDigitLeft));
-                } else {
-                    result = quoteValue(targetValue.toString());
-                }
-                break;
-            default:
-                throw new IllegalStateException("No such NumberType: " + numberType);
-        }
-        return result;
-    }
+    protected abstract BaseMatcher<T> newMatcher(AttributeInfo<T> attributeInfo, T... values);
 
     @Override
     public String describe() {
         StringBuilder sb = new StringBuilder();
         sb.append(expression()).append(" ");
-        sb.append(convertValue(values[0]));
+        sb.append(attributeInfo.convertValue(values[0]));
         return sb.toString();
     }
 
     @Override
-    public Matcher<T> withAttributeInfo(int maxDigitLeft, int maxDigitRight, int offsetValue) {
-        return newMatcher(maxDigitLeft, maxDigitRight, offsetValue, 0L, NumberType.FLOAT, values);
+    public Matcher<T> withAttributeInfo(AttributeInfo<T> attributeInfo) {
+        return newMatcher(attributeInfo, values);
     }
-
+    
     @Override
-    public Matcher<T> withAttributeInfo(int maxNumDigits, int offsetValue) {
-        return newMatcher(maxNumDigits, 0, offsetValue, 0L, NumberType.INTEGER, values);
+    public AttributeInfo<T> getAttributeInfo() {
+        return this.attributeInfo;
     }
-
-    @Override
-    public Matcher<T> withAttributeInfo(int maxNumDigits, long offsetValue) {
-        return newMatcher(maxNumDigits, 0, 0, offsetValue, NumberType.LONG, values);
+    
+    @Override 
+    public void setAttributeInfo(AttributeInfo<T> attributeInfo) {
+        this.attributeInfo = attributeInfo;
     }
 
     protected abstract String expression();
-
-    @Override
-    public int getMaxDigitLeft() {
-        synchronized (attributeInfoLock) {
-            return maxDigitLeft;
-        }
-    }
-
-    @Override
-    public int getMaxDigitRight() {
-        synchronized (attributeInfoLock) {
-            return maxDigitRight;
-        }
-    }
-
-    public NumberType getNumberType() {
-        synchronized (attributeInfoLock) {
-            return numberType;
-        }
-    }
-
-    @Override
-    public int getOffsetInt() {
-        synchronized (attributeInfoLock) {
-            return offsetInt;
-        }
-    }
-
-    @Override
-    public long getOffsetLong() {
-        synchronized (attributeInfoLock) {
-            return offsetLong;
-        }
-    }
 
     protected T[] values() {
         return values;
@@ -170,39 +82,6 @@ public abstract class BaseMatcher<T> implements Matcher<T> {
 
     @Override
     public boolean isAttributeInfoApplied() {
-        return getNumberType() != NumberType.NOT_NUMBER;
-    }
-
-    @Override
-    public void setAttributeInfo(int maxDigitLeft, int maxDigitRight, int offsetValue) {
-        synchronized (attributeInfoLock) {
-            this.maxDigitLeft = maxDigitLeft;
-            this.maxDigitRight = maxDigitRight;
-            this.offsetInt = offsetValue;
-            this.offsetLong = 0L;
-            this.numberType = NumberType.FLOAT;
-        }
-    }
-
-    @Override
-    public void setAttributeInfo(int maxNumDigits, int offsetValue) {
-        synchronized (attributeInfoLock) {
-            this.maxDigitLeft = maxNumDigits;
-            this.maxDigitRight = 0;
-            this.offsetInt = offsetValue;
-            this.offsetLong = 0L;
-            this.numberType = NumberType.INTEGER;
-        }
-    }
-
-    @Override
-    public void setAttributeInfo(int maxNumDigits, long offsetValue) {
-        synchronized (attributeInfoLock) {
-            this.maxDigitLeft = maxNumDigits;
-            this.maxDigitRight = 0;
-            this.offsetInt = 0;
-            this.offsetLong = offsetValue;
-            this.numberType = NumberType.LONG;
-        }
+        return (this.attributeInfo instanceof NullAttributeInfo);
     }
 }

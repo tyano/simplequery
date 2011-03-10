@@ -16,6 +16,7 @@
 
 package com.shelfmap.simplequery.expression.matcher;
 
+import com.shelfmap.simplequery.expression.AttributeInfo;
 import com.shelfmap.simplequery.expression.Matcher;
 
 /**
@@ -31,8 +32,8 @@ public class BetweenMatcher<T> extends BaseMatcher<T> {
     }
 
     @SuppressWarnings("unchecked")
-    protected BetweenMatcher(int maxDigitLeft, int maxDigitRight, int offsetInt, long offsetLong, NumberType numberType, T... value) {
-        super(maxDigitLeft, maxDigitRight, offsetInt, offsetLong, numberType, value);
+    protected BetweenMatcher(AttributeInfo<T> attributeInfo, T... value) {
+        super(attributeInfo, value);
     }
     
     public BetweenMatcher<T> and(T value) {
@@ -48,31 +49,17 @@ public class BetweenMatcher<T> extends BaseMatcher<T> {
     @Override
     public String describe() {
         if(second == null) throw new IllegalStateException("the second argument not found. You need pass a second argument by the 'and()' method.");
-        return super.describe() + " and " + convertValue(second);
+        return super.describe() + " and " + getAttributeInfo().convertValue(second);
     }
 
     @Override
-    protected BetweenMatcher<T> newMatcher(int maxDigitLeft, int maxDigitRight, int offsetInt, long offsetLong, NumberType numberType, T... values) {
-        return new BetweenMatcher<T>(maxDigitLeft, maxDigitRight, offsetInt, offsetLong, numberType, values);
+    protected BetweenMatcher<T> newMatcher(AttributeInfo<T> attributeInfo, T... values) {
+        return new BetweenMatcher<T>(attributeInfo, values);
     }
 
     @Override
-    public Matcher<T> withAttributeInfo(int maxDigitLeft, int maxDigitRight, int offsetValue) {
-        BetweenMatcher<T> newMatcher = newMatcher(maxDigitLeft, maxDigitRight, offsetValue, 0L, NumberType.FLOAT, values());
-        newMatcher.second = this.second;
-        return newMatcher;
-    }
-
-    @Override
-    public Matcher<T> withAttributeInfo(int maxNumDigits, int offsetValue) {
-        BetweenMatcher<T> newMatcher = newMatcher(maxNumDigits, 0, offsetValue, 0L, NumberType.INTEGER, values());
-        newMatcher.second = this.second;
-        return newMatcher;
-    }
-
-    @Override
-    public Matcher<T> withAttributeInfo(int maxNumDigits, long offsetValue) {
-        BetweenMatcher<T> newMatcher = newMatcher(maxNumDigits, 0, 0, offsetValue, NumberType.LONG, values());
+    public Matcher<T> withAttributeInfo(AttributeInfo<T> attributeInfo) {
+        BetweenMatcher<T> newMatcher = newMatcher(attributeInfo, values());
         newMatcher.second = this.second;
         return newMatcher;
     }

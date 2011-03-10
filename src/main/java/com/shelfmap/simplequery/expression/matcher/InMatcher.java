@@ -16,6 +16,8 @@
 
 package com.shelfmap.simplequery.expression.matcher;
 
+import com.shelfmap.simplequery.expression.AttributeInfo;
+
 /**
  *
  * @author Tsutomu YANO
@@ -26,8 +28,8 @@ public class InMatcher<T> extends BaseMatcher<T> {
         super(values);
     }
 
-    protected InMatcher(int maxDigitLeft, int maxDigitRight, int offsetInt, long offsetLong, NumberType numberType, T[] values) {
-        super(maxDigitLeft, maxDigitRight, offsetInt, offsetLong, numberType, values);
+    protected InMatcher(AttributeInfo<T> attributeInfo, T[] values) {
+        super(attributeInfo, values);
     }
 
     @Override
@@ -43,7 +45,7 @@ public class InMatcher<T> extends BaseMatcher<T> {
         StringBuilder parameters = new StringBuilder();
         for (T value : getValues()) {
             if(parameters.length() > 0) parameters.append(", ");
-            parameters.append(convertValue(value));
+            parameters.append(getAttributeInfo().convertValue(value));
         }
         sb.append(parameters.toString());
         sb.append(")");
@@ -51,7 +53,7 @@ public class InMatcher<T> extends BaseMatcher<T> {
     }
 
     @Override
-    protected InMatcher<T> newMatcher(int maxDigitLeft, int maxDigitRight, int offsetInt, long offsetLong, NumberType numberType, T... values) {
-        return new InMatcher<T>(maxDigitLeft, maxDigitRight, offsetInt, offsetLong, numberType, values);
+    protected InMatcher<T> newMatcher(AttributeInfo<T> attributeInfo, T... values) {
+        return new InMatcher<T>(attributeInfo, values);
     }
 }

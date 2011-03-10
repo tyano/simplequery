@@ -16,7 +16,9 @@
 
 package com.shelfmap.simplequery.expression.matcher;
 
+import com.shelfmap.simplequery.expression.AttributeInfo;
 import com.shelfmap.simplequery.expression.Matcher;
+import com.shelfmap.simplequery.expression.impl.NullAttributeInfo;
 import java.util.Collection;
 import java.util.Collections;
 
@@ -25,48 +27,20 @@ import java.util.Collections;
  * @author Tsutomu YANO
  */
 public class IsNotNullMatcher implements Matcher<Void> {
-
+    private final AttributeInfo<Void> attributeInfo = new NullAttributeInfo<Void>();
+    
     public IsNotNullMatcher() {
     }
 
     @Override
-    public Matcher<Void> withAttributeInfo(int maxDigitLeft, int maxDigitRight, int offsetValue) {
+    public Matcher<Void> withAttributeInfo(AttributeInfo<Void> attributeInfo) {
         return this;
     }
 
-    @Override
-    public Matcher<Void> withAttributeInfo(int maxNumDigits, int offsetValue) {
-        return this;
-    }
-
-    @Override
-    public Matcher<Void> withAttributeInfo(int maxNumDigits, long offsetValue) {
-        return this;
-    }
 
     @Override
     public String describe() {
         return "is not null";
-    }
-
-    @Override
-    public int getMaxDigitLeft() {
-        return 0;
-    }
-
-    @Override
-    public int getMaxDigitRight() {
-        return 0;
-    }
-
-    @Override
-    public int getOffsetInt() {
-        return 0;
-    }
-
-    @Override
-    public long getOffsetLong() {
-        return 0L;
     }
 
     @Override
@@ -80,14 +54,11 @@ public class IsNotNullMatcher implements Matcher<Void> {
     }
 
     @Override
-    public void setAttributeInfo(int maxDigitLeft, int maxDigitRight, int offsetValue) {
+    public void setAttributeInfo(AttributeInfo<Void> attributeInfo) {
     }
 
     @Override
-    public void setAttributeInfo(int maxNumDigits, int offsetValue) {
-    }
-
-    @Override
-    public void setAttributeInfo(int maxNumDigits, long offsetValue) {
+    public AttributeInfo<Void> getAttributeInfo() {
+        return this.attributeInfo;
     }
 }

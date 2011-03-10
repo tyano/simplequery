@@ -1,7 +1,5 @@
 Scenario: Select().from(TestDomain.class).where("name", is("yano"))
 
-Given A SimpleDB Client
-
 When TestDomain don't have any @SimpleDBAttribute annotation on it's properties,
 Then WhereExpression will generate a simple expression with no padding and no offset.
 

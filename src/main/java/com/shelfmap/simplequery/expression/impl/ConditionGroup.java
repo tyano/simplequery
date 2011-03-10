@@ -15,6 +15,7 @@
  */
 package com.shelfmap.simplequery.expression.impl;
 
+import com.shelfmap.simplequery.expression.AttributeInfo;
 import com.shelfmap.simplequery.expression.Condition;
 import com.shelfmap.simplequery.expression.Matcher;
 import com.shelfmap.simplequery.expression.Operator;
@@ -63,20 +64,8 @@ public class ConditionGroup implements Condition {
     }
 
     @Override
-    public Condition and(String attributeName, Matcher<Float> matcher, int maxDigitLeft, int maxDigitRight, int offsetValue) {
-        Condition other = new DefaultCondition(attributeName, matcher.withAttributeInfo(maxDigitLeft, maxDigitRight, offsetValue));
-        return this.and(other);
-    }
-
-    @Override
-    public Condition and(String attributeName, Matcher<Integer> matcher, int maxNumDigits, int offsetValue) {
-        Condition other = new DefaultCondition(attributeName, matcher.withAttributeInfo(maxNumDigits, offsetValue));
-        return this.and(other);
-    }
-
-    @Override
-    public Condition and(String attributeName, Matcher<Long> matcher, int maxNumDigits, long offsetValue) {
-        Condition other = new DefaultCondition(attributeName, matcher.withAttributeInfo(maxNumDigits, offsetValue));
+    public <E> Condition and(String attributeName, Matcher<E> matcher, AttributeInfo<E> attributeInfo) {
+        Condition other = new DefaultCondition(attributeName, matcher.withAttributeInfo(attributeInfo));
         return this.and(other);
     }
 
@@ -92,20 +81,8 @@ public class ConditionGroup implements Condition {
     }
 
     @Override
-    public Condition or(String attributeName, Matcher<Float> matcher, int maxDigitLeft, int maxDigitRight, int offsetValue) {
-        Condition other = new DefaultCondition(attributeName, matcher.withAttributeInfo(maxDigitLeft, maxDigitRight, offsetValue));
-        return this.or(other);
-    }
-
-    @Override
-    public Condition or(String attributeName, Matcher<Integer> matcher, int maxNumDigits, int offsetValue) {
-        Condition other = new DefaultCondition(attributeName, matcher.withAttributeInfo(maxNumDigits, offsetValue));
-        return this.or(other);
-    }
-
-    @Override
-    public Condition or(String attributeName, Matcher<Long> matcher, int maxNumDigits, long offsetValue) {
-        Condition other = new DefaultCondition(attributeName, matcher.withAttributeInfo(maxNumDigits, offsetValue));
+    public <E> Condition or(String attributeName, Matcher<E> matcher, AttributeInfo<E> attributeInfo) {
+        Condition other = new DefaultCondition(attributeName, matcher.withAttributeInfo(attributeInfo));
         return this.or(other);
     }
 
@@ -146,20 +123,8 @@ public class ConditionGroup implements Condition {
     }
 
     @Override
-    public Condition intersection(String attributeName, Matcher<Float> matcher, int maxDigitLeft, int maxDigitRight, int offsetValue) {
-        Condition other = new DefaultCondition(attributeName, matcher.withAttributeInfo(maxDigitLeft, maxDigitRight, offsetValue));
-        return this.intersection(other);
-    }
-
-    @Override
-    public Condition intersection(String attributeName, Matcher<Integer> matcher, int maxNumDigits, int offsetValue) {
-        Condition other = new DefaultCondition(attributeName, matcher.withAttributeInfo(maxNumDigits, offsetValue));
-        return this.intersection(other);
-    }
-
-    @Override
-    public Condition intersection(String attributeName, Matcher<Long> matcher, int maxNumDigits, long offsetValue) {
-        Condition other = new DefaultCondition(attributeName, matcher.withAttributeInfo(maxNumDigits, offsetValue));
+    public <E> Condition intersection(String attributeName, Matcher<E> matcher, AttributeInfo<E> attributeInfo) {
+        Condition other = new DefaultCondition(attributeName, matcher.withAttributeInfo(attributeInfo));
         return this.intersection(other);
     }
 

@@ -23,18 +23,12 @@ package com.shelfmap.simplequery.expression;
 public interface Conjunctive<T> {
     T and(Condition other);
     T and(String attributeName, Matcher<?> matcher);
-    T and(String attributeName, Matcher<Float> matcher, int maxDigitLeft, int maxDigitRight, int offsetValue);
-    T and(String attributeName, Matcher<Integer> matcher, int maxNumDigits, int offsetValue);
-    T and(String attributeName, Matcher<Long> matcher, int maxNumDigits, long offsetValue);
+    <E> T and(String attributeName, Matcher<E> matcher, AttributeInfo<E> attributeInfo);
     T or(Condition other);
     T or(String attributeName, Matcher<?> matcher);
-    T or(String attributeName, Matcher<Float> matcher, int maxDigitLeft, int maxDigitRight, int offsetValue);
-    T or(String attributeName, Matcher<Integer> matcher, int maxNumDigits, int offsetValue);
-    T or(String attributeName, Matcher<Long> matcher, int maxNumDigits, long offsetValue);
+    <E> T or(String attributeName, Matcher<E> matcher, AttributeInfo<E> attributeInfo);
     T intersection(Condition other);
     T intersection(String attributeName, Matcher<?> matcher);
-    T intersection(String attributeName, Matcher<Float> matcher, int maxDigitLeft, int maxDigitRight, int offsetValue);
-    T intersection(String attributeName, Matcher<Integer> matcher, int maxNumDigits, int offsetValue);
-    T intersection(String attributeName, Matcher<Long> matcher, int maxNumDigits, long offsetValue);
+    <E> T intersection(String attributeName, Matcher<E> matcher, AttributeInfo<E> attributeInfo);
     T group();
 }

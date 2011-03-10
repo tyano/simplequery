@@ -17,6 +17,7 @@
 package com.shelfmap.simplequery.expression.impl;
 
 import com.shelfmap.simplequery.expression.Attribute;
+import com.shelfmap.simplequery.expression.AttributeInfo;
 import com.shelfmap.simplequery.expression.DomainExpression;
 import com.shelfmap.simplequery.expression.LimitExpression;
 import static com.shelfmap.simplequery.util.Assertion.isNotNull;
@@ -48,6 +49,7 @@ public class DefaultWhereExpression<T> extends BaseExpression<T> implements Wher
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public String describe() {
         StringBuilder sb = new StringBuilder();
         Class<T> domainClass = getDomainExpression().getDomainClass();
@@ -57,17 +59,17 @@ public class DefaultWhereExpression<T> extends BaseExpression<T> implements Wher
         while(current.getParent() != null) {
             String attributeName = current.getAttributeName();
             Matcher<?> matcher = current.getMatcher();
-            if(matcher != null && !matcher.isAttributeInfoApplied()) {
+            if(matcher != null) {
                 if(domainAttribute.isAttributeDefined(attributeName)) {
                     Attribute attribute = domainAttribute.getAttribute(attributeName);
                     if(attribute.getMaxDigitLeft() > 0 || attribute.getMaxDigitRight() > 0 || attribute.getOffset() > 0L) {
                         Class<?> type = attribute.getType();
                         if(type == Float.class) {
-                            matcher.setAttributeInfo(attribute.getMaxDigitLeft(), attribute.getMaxDigitRight(), (int)attribute.getOffset());
+                            ((Matcher<Float>)matcher).setAttributeInfo(new FloatAttributeInfo(attribute.getMaxDigitLeft(), attribute.getMaxDigitRight(), (int)attribute.getOffset()));
                         } else if(type == Integer.class) {
-                            matcher.setAttributeInfo(attribute.getMaxDigitLeft(), (int)attribute.getOffset());
+                            ((Matcher<Integer>)matcher).setAttributeInfo(new IntAttributeInfo(attribute.getMaxDigitLeft(), (int)attribute.getOffset()));
                         } else if(type == Long.class) {
-                            matcher.setAttributeInfo(attribute.getMaxDigitLeft(), attribute.getOffset());
+                            ((Matcher<Long>)matcher).setAttributeInfo(new LongAttributeInfo(attribute.getMaxDigitLeft(), attribute.getOffset()));
                         }
                     }
                 }
@@ -108,20 +110,8 @@ public class DefaultWhereExpression<T> extends BaseExpression<T> implements Wher
     }
 
     @Override
-    public WhereExpression<T> and(String attributeName, Matcher<Float> matcher, int maxDigitLeft, int maxDigitRight, int offsetValue) {
-        Condition other = new DefaultCondition(attributeName, matcher.withAttributeInfo(maxDigitLeft, maxDigitRight, offsetValue));
-        return this.and(other);
-    }
-
-    @Override
-    public WhereExpression<T> and(String attributeName, Matcher<Integer> matcher, int maxNumDigits, int offsetValue) {
-        Condition other = new DefaultCondition(attributeName, matcher.withAttributeInfo(maxNumDigits, offsetValue));
-        return this.and(other);
-    }
-
-    @Override
-    public WhereExpression<T> and(String attributeName, Matcher<Long> matcher, int maxNumDigits, long offsetValue) {
-        Condition other = new DefaultCondition(attributeName, matcher.withAttributeInfo(maxNumDigits, offsetValue));
+    public <E> WhereExpression<T> and(String attributeName, Matcher<E> matcher, AttributeInfo<E> attributeInfo) {
+        Condition other = new DefaultCondition(attributeName, matcher.withAttributeInfo(attributeInfo));
         return this.and(other);
     }
 
@@ -137,20 +127,8 @@ public class DefaultWhereExpression<T> extends BaseExpression<T> implements Wher
     }
 
     @Override
-    public WhereExpression<T> or(String attributeName, Matcher<Float> matcher, int maxDigitLeft, int maxDigitRight, int offsetValue) {
-        Condition other = new DefaultCondition(attributeName, matcher.withAttributeInfo(maxDigitLeft, maxDigitRight, offsetValue));
-        return this.or(other);
-    }
-
-    @Override
-    public WhereExpression<T> or(String attributeName, Matcher<Integer> matcher, int maxNumDigits, int offsetValue) {
-        Condition other = new DefaultCondition(attributeName, matcher.withAttributeInfo(maxNumDigits, offsetValue));
-        return this.or(other);
-    }
-
-    @Override
-    public WhereExpression<T> or(String attributeName, Matcher<Long> matcher, int maxNumDigits, long offsetValue) {
-        Condition other = new DefaultCondition(attributeName, matcher.withAttributeInfo(maxNumDigits, offsetValue));
+    public <E> WhereExpression<T> or(String attributeName, Matcher<E> matcher, AttributeInfo<E> attributeInfo) {
+        Condition other = new DefaultCondition(attributeName, matcher.withAttributeInfo(attributeInfo));
         return this.or(other);
     }
 
@@ -166,20 +144,8 @@ public class DefaultWhereExpression<T> extends BaseExpression<T> implements Wher
     }
 
     @Override
-    public WhereExpression<T> intersection(String attributeName, Matcher<Float> matcher, int maxDigitLeft, int maxDigitRight, int offsetValue) {
-        Condition other = new DefaultCondition(attributeName, matcher.withAttributeInfo(maxDigitLeft, maxDigitRight, offsetValue));
-        return this.intersection(other);
-    }
-
-    @Override
-    public WhereExpression<T> intersection(String attributeName, Matcher<Integer> matcher, int maxNumDigits, int offsetValue) {
-        Condition other = new DefaultCondition(attributeName, matcher.withAttributeInfo(maxNumDigits, offsetValue));
-        return this.intersection(other);
-    }
-
-    @Override
-    public WhereExpression<T> intersection(String attributeName, Matcher<Long> matcher, int maxNumDigits, long offsetValue) {
-        Condition other = new DefaultCondition(attributeName, matcher.withAttributeInfo(maxNumDigits, offsetValue));
+    public <E> WhereExpression<T> intersection(String attributeName, Matcher<E> matcher, AttributeInfo<E> attributeInfo) {
+        Condition other = new DefaultCondition(attributeName, matcher.withAttributeInfo(attributeInfo));
         return this.intersection(other);
     }
 

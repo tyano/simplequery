@@ -15,6 +15,7 @@
  */
 package com.shelfmap.simplequery.expression;
 
+import com.shelfmap.simplequery.expression.impl.IntAttributeInfo;
 import static com.shelfmap.simplequery.expression.Conditions.group;
 import static com.shelfmap.simplequery.expression.Conditions.condition;
 import static org.junit.Assert.assertThat;
@@ -45,12 +46,12 @@ public class ConditionTestSteps {
 
     @When("a condition is initialized with a attribute name '$attributeName' and a matcher 'greaterEqual($value)', and the matcher has a padding of $padding")
     public void createPaddingCondition(String attributeName, int value, int padding) {
-        condition = condition(attributeName, greaterEqual(value).withAttributeInfo(padding, 0));
+        condition = condition(attributeName, greaterEqual(value).withAttributeInfo(new IntAttributeInfo(padding, 0)));
     }
 
     @When("a condition is initialized with a attribute name '$attributeName' and a matcher 'greaterThan($value)', and the matcher has a padding of $padding and a offset of $offsetValue,")
     public void createOffsetCondition(String attributeName, int value, int padding, int offsetValue) {
-        condition = condition(attributeName, greaterThan(value).withAttributeInfo(padding, offsetValue));
+        condition = condition(attributeName, greaterThan(value).withAttributeInfo(new IntAttributeInfo(padding, offsetValue)));
     }
 
     @When("a condition with a expression like $attributeName = '$value', and group() method has been called to the condition")
@@ -92,7 +93,7 @@ public class ConditionTestSteps {
 
     @When("another condition has been joined after using intersection")
     public void join3Conditions() {
-        condition = condition("first", is(1)).intersection("second", lessThan(0).withAttributeInfo(5, 90000)).or("third", is("name"));
+        condition = condition("first", is(1)).intersection("second", lessThan(0).withAttributeInfo(new IntAttributeInfo(5, 90000))).or("third", is("name"));
     }
 
     @Then("three conditions will be joined as a series of conditions. Don't grouped automatically.")

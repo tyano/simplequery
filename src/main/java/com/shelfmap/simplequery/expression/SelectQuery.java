@@ -24,9 +24,9 @@ import java.util.Collection;
  */
 public interface SelectQuery extends Describable {
     
-    void addAttributes(Attribute... attribute);
-    SelectQuery withAttribute(Attribute attribute);
-    Collection<Attribute> getAttributes();
+    void addAttributes(String... attribute);
+    SelectQuery withAttributes(String... attribute);
+    Collection<String> getAttributes();
     
     /**
      * You can create a Expression object which returns all items of a domain.

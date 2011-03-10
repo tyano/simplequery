@@ -19,7 +19,6 @@ package com.shelfmap.simplequery.expression.impl;
 import com.shelfmap.simplequery.expression.LimitExpression;
 import com.shelfmap.simplequery.expression.SelectQuery;
 import static com.shelfmap.simplequery.util.Assertion.isNotNull;
-import com.amazonaws.services.simpledb.AmazonSimpleDB;
 import com.shelfmap.simplequery.expression.Condition;
 import com.shelfmap.simplequery.expression.DomainExpression;
 import com.shelfmap.simplequery.expression.Matcher;
@@ -30,17 +29,14 @@ import com.shelfmap.simplequery.expression.WhereExpression;
  * @author Tsutomu YANO
  */
 public class DefaultDomainExpression<T> extends BaseExpression<T> implements DomainExpression<T> {
-    private AmazonSimpleDB simpleDB;
     private SelectQuery selectObject;
     private String domainName;
     private Class<T> typeToken;
 
-    public DefaultDomainExpression(AmazonSimpleDB simpleDB, SelectQuery selectObject, String domainName, Class<T> typeToken) {
-        isNotNull("simpleDB", simpleDB);
+    public DefaultDomainExpression(SelectQuery selectObject, String domainName, Class<T> typeToken) {
         isNotNull("selectObject", selectObject);
         isNotNull("domainName", domainName);
         isNotNull("typeToken", typeToken);
-        this.simpleDB = simpleDB;
         this.selectObject = selectObject;
         this.domainName = domainName;
         this.typeToken = typeToken;
@@ -64,10 +60,6 @@ public class DefaultDomainExpression<T> extends BaseExpression<T> implements Dom
 
     public String getDomainName() {
         return domainName;
-    }
-
-    public AmazonSimpleDB getSimpleDB() {
-        return simpleDB;
     }
 
     @Override

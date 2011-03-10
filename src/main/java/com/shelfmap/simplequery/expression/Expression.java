@@ -33,7 +33,7 @@ public interface Expression<T> extends Describable {
      *         The result of getCause() is the original exception object that explain about the reason of error occured.
      * @throws MultipleResultsExistException the number of result instances is more than one.
      */
-    T singleResult() throws SimpleQueryException, MultipleResultsExistException;
+    T getSingleResult() throws SimpleQueryException, MultipleResultsExistException;
     
     /**
      * You can get the result of this expression.
@@ -44,5 +44,5 @@ public interface Expression<T> extends Describable {
      * @throws SimpleQueryException SimpleQueryException something bad occurs. 
      *         The result of getCause() is the original exception object that explain about the reason of error occured.
      */
-    QueryResults<T> results() throws SimpleQueryException;
+    QueryResults<T> getResults() throws SimpleQueryException;
 }

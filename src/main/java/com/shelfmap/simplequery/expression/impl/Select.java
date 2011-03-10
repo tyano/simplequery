@@ -15,9 +15,7 @@
  */
 package com.shelfmap.simplequery.expression.impl;
 
-import com.amazonaws.services.simpledb.AmazonSimpleDB;
 import com.shelfmap.simplequery.Domain;
-import com.shelfmap.simplequery.expression.Attribute;
 import com.shelfmap.simplequery.expression.DomainExpression;
 import com.shelfmap.simplequery.expression.SelectQuery;
 import java.util.ArrayList;
@@ -31,11 +29,9 @@ import java.util.List;
  */
 public class Select implements SelectQuery {
 
-    private final AmazonSimpleDB sdb;
-    private final List<Attribute> attributes = new ArrayList<Attribute>();
+    private final List<String> attributes = new ArrayList<String>();
 
-    public Select(AmazonSimpleDB client, Attribute... attribute) {
-        this.sdb = client;
+    public Select(String... attribute) {
         innerAddAttribute(attribute);
     }
 
@@ -46,11 +42,7 @@ public class Select implements SelectQuery {
             throw new IllegalArgumentException("the class object must have @Domain annotation.");
         }
         String domainName = annotation.value();
-        return new DefaultDomainExpression<T>(sdb, this, domainName, target);
-    }
-
-    public AmazonSimpleDB getSimpleDB() {
-        return sdb;
+        return new DefaultDomainExpression<T>(this, domainName, target);
     }
 
     @Override
@@ -63,11 +55,11 @@ public class Select implements SelectQuery {
                 sb.append("*");
             } else {
                 StringBuilder attrs = new StringBuilder();
-                for (Attribute attribute : attributes) {
+                for (String attribute : attributes) {
                     if (attrs.length() > 0) {
                         attrs.append(", ");
                     }
-                    attrs.append(attribute.getName());
+                    attrs.append(attribute);
                 }
                 sb.append(attrs);
             }
@@ -77,26 +69,30 @@ public class Select implements SelectQuery {
     }
 
     @Override
-    public SelectQuery withAttribute(Attribute attribute) {
-        addAttributes(attribute);
-        return this;
+    public SelectQuery withAttributes(String... attributeArray) {
+        List<String> newAttributes = null;
+        synchronized (this.attributes) {
+            newAttributes = new ArrayList<String>(this.attributes);
+        }
+        newAttributes.addAll(Arrays.asList(attributeArray));
+        return new Select(newAttributes.toArray(new String[newAttributes.size()]));
     }
 
     @Override
-    public Collection<Attribute> getAttributes() {
-        Collection<Attribute> result = null;
-        synchronized(this.attributes) {
-            result = new ArrayList<Attribute>(this.attributes);
+    public Collection<String> getAttributes() {
+        Collection<String> result = null;
+        synchronized (this.attributes) {
+            result = new ArrayList<String>(this.attributes);
         }
         return result;
     }
 
     @Override
-    public void addAttributes(Attribute... attributes) {
+    public void addAttributes(String... attributes) {
         innerAddAttribute(attributes);
     }
-    
-    private void innerAddAttribute(Attribute... attributes) {
+
+    private void innerAddAttribute(String... attributes) {
         if (attributes != null && attributes.length > 0) {
             synchronized (this.attributes) {
                 this.attributes.addAll(Arrays.asList(attributes));

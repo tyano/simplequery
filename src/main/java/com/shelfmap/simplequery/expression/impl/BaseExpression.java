@@ -28,12 +28,12 @@ import com.shelfmap.simplequery.expression.SimpleQueryException;
 public abstract class BaseExpression<T> implements Expression<T> {
 
     @Override
-    public T singleResult() throws SimpleQueryException, MultipleResultsExistException {
+    public T getSingleResult() throws SimpleQueryException, MultipleResultsExistException {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
-    public QueryResults<T> results() throws SimpleQueryException {
+    public QueryResults<T> getResults() throws SimpleQueryException {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 }

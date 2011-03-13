@@ -20,6 +20,17 @@ package com.shelfmap.simplequery.expression;
  *
  * @author Tsutomu YANO
  */
-public enum SortOrder {
-    Asc, Desc;
+public enum SortOrder implements Describable {
+    Asc("asc"), Desc("desc");
+
+    private final String exp;
+
+    SortOrder(String exp) {
+        this.exp = exp;
+    }
+    
+    @Override
+    public String describe() {
+        return exp;
+    }
 }

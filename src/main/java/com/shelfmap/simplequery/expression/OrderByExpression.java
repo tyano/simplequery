@@ -21,6 +21,9 @@ package com.shelfmap.simplequery.expression;
  * @author Tsutomu YANO
  */
 public interface OrderByExpression<T> extends Expression<T> {
+    DomainExpression<T> getDomainExpression();
     WhereExpression<T> getWhereExpression();
     LimitExpression<T> limit(int limitCount);
+    String getAttributeName();
+    SortOrder getSortOrder();
 }

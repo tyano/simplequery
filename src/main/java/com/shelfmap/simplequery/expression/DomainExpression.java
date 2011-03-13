@@ -25,5 +25,6 @@ public interface DomainExpression<T> extends Expression<T>{
     Class<T> getDomainClass();
     WhereExpression<T> where(Condition expression);
     WhereExpression<T> where(String attributeName, Matcher<?> matcher);
+    OrderByExpression<T> orderBy(String attributeName, SortOrder sortOrder);
     LimitExpression<T> limit(int limitCount);
 }

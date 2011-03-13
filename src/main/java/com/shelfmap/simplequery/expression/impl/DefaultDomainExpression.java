@@ -17,7 +17,9 @@
 package com.shelfmap.simplequery.expression.impl;
 
 import com.shelfmap.simplequery.expression.LimitExpression;
+import com.shelfmap.simplequery.expression.OrderByExpression;
 import com.shelfmap.simplequery.expression.SelectQuery;
+import com.shelfmap.simplequery.expression.SortOrder;
 import static com.shelfmap.simplequery.util.Assertion.isNotNull;
 import com.shelfmap.simplequery.expression.Condition;
 import com.shelfmap.simplequery.expression.DomainExpression;
@@ -74,6 +76,11 @@ public class DefaultDomainExpression<T> extends BaseExpression<T> implements Dom
 
     @Override
     public LimitExpression<T> limit(int limitCount) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public OrderByExpression<T> orderBy(String attributeName, SortOrder sortOrder) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 }

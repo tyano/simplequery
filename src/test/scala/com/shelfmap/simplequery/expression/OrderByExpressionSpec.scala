@@ -19,16 +19,14 @@ package com.shelfmap.simplequery.expression
 import org.junit.runner.RunWith
 import com.shelfmap.simplequery.expression.impl.Select
 import org.scalatest.FlatSpec
-import org.scalatest.matchers.ShouldMatchers
 import org.scalatest.junit.JUnitRunner
-import org.slf4j.LoggerFactory
+import org.scalatest.matchers.ShouldMatchers
 
 @RunWith(classOf[JUnitRunner])
 class OrderByExpressionSpec extends FlatSpec with ShouldMatchers {
-  val orderByExp = new Select("*").from(classOf[TestDomain]).orderBy("name", SortOrder.Asc);
-  val logger = LoggerFactory.getLogger(classOf[OrderByExpressionSpec])
-  logger.info("scalatest")
-  "orderByExpression" should "generate encoded attribute's name" in {
-    throw new IllegalStateException()
+  val orderByExp = new Select("*") from (classOf[TestDomain]) orderBy ("name", SortOrder.Asc);
+  
+  "describe() method of OrderByExpression" should "generate encoded attribute's name" in {
+    orderByExp.describe should be === "select * from test-domain order by `name` asc"
   }
 }

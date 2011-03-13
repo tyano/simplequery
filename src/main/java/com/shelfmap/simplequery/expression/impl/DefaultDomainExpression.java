@@ -81,6 +81,6 @@ public class DefaultDomainExpression<T> extends BaseExpression<T> implements Dom
 
     @Override
     public OrderByExpression<T> orderBy(String attributeName, SortOrder sortOrder) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return new DefaultOrderByExpression<T>(this, attributeName, sortOrder);
     }
 }

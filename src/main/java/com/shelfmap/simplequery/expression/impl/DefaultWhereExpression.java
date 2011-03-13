@@ -45,7 +45,7 @@ public class DefaultWhereExpression<T> extends BaseExpression<T> implements Wher
     
     @Override
     public OrderByExpression<T> orderBy(String attributeName, SortOrder sortOrder) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return new DefaultOrderByExpression<T>(this, attributeName, sortOrder);
     }
 
     @Override

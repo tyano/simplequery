@@ -95,7 +95,7 @@ public class DefaultWhereExpression<T> extends BaseExpression<T> implements Wher
 
     @Override
     public LimitExpression<T> limit(int limitCount) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return new DefaultLimitExpression<T>(this, limitCount);
     }
     
     @Override

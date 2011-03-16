@@ -21,4 +21,8 @@ package com.shelfmap.simplequery.expression;
  * @author Tsutomu YANO
  */
 public interface LimitExpression<T> extends Expression<T> {
+    DomainExpression<T> getDomainExpression();
+    WhereExpression<T> getWhereExpression();
+    OrderByExpression<T> getOrderByExpression();
+    int getLimitCount();
 }

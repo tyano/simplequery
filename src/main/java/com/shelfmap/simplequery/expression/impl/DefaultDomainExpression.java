@@ -76,7 +76,7 @@ public class DefaultDomainExpression<T> extends BaseExpression<T> implements Dom
 
     @Override
     public LimitExpression<T> limit(int limitCount) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return new DefaultLimitExpression<T>(this, limitCount);
     }
 
     @Override

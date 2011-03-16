@@ -107,6 +107,6 @@ public class DefaultOrderByExpression<T> extends BaseExpression<T> implements Or
     
     @Override
     public LimitExpression<T> limit(int limitCount) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return new DefaultLimitExpression<T>(this, limitCount);
     }
 }

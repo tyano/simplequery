@@ -23,6 +23,7 @@ package com.shelfmap.simplequery.expression;
 public interface DomainExpression<T> extends Expression<T>{
     SelectQuery getSelectQuery();
     Class<T> getDomainClass();
+    String getDomainName();
     WhereExpression<T> where(Condition expression);
     WhereExpression<T> where(String attributeName, Matcher<?> matcher);
     OrderByExpression<T> orderBy(String attributeName, SortOrder sortOrder);

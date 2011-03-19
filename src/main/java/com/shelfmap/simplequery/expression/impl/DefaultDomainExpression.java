@@ -60,6 +60,7 @@ public class DefaultDomainExpression<T> extends BaseExpression<T> implements Dom
         return selectObject.describe() + " from " + domainName;
     }
 
+    @Override
     public String getDomainName() {
         return domainName;
     }

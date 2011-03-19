@@ -18,12 +18,30 @@ package com.shelfmap.simplequery;
 
 import com.amazonaws.services.simpledb.AmazonSimpleDB;
 import com.shelfmap.simplequery.expression.SelectQuery;
+import com.shelfmap.simplequery.expression.impl.Select;
 
 /**
  *
  * @author Tsutomu YANO
  */
-public interface Client {
-    AmazonSimpleDB getSimpleDB();
-    SelectQuery select(String... attribute);
+public class SimpleQueryClient implements Client {
+    private final AmazonSimpleDB simpleDb;
+
+    public SimpleQueryClient(AmazonSimpleDB simpleDb) {
+        this.simpleDb = simpleDb;
+    }
+    
+    @Override
+    public AmazonSimpleDB getSimpleDB() {
+        return this.simpleDb;
+    }
+
+    @Override
+    public SelectQuery select(String... attribute) {
+        return newSelectQuery(attribute);
+    }
+    
+    protected SelectQuery newSelectQuery(String... attribute) {
+        return new Select(attribute);
+    }
 }

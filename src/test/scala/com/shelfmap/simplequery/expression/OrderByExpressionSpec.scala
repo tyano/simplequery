@@ -23,8 +23,9 @@ import org.scalatest.junit.JUnitRunner
 import org.scalatest.matchers.ShouldMatchers
 
 @RunWith(classOf[JUnitRunner])
-class OrderByExpressionSpec extends FlatSpec with ShouldMatchers {
-  val orderByExp = new Select(null, "*") from (classOf[TestDomain]) orderBy ("name", SortOrder.Asc);
+class OrderByExpressionSpec extends FlatSpec with ShouldMatchers with AWSSecurityCredential {
+  val simpleDB = getAmazonSimpleDB;
+  val orderByExp = new Select(simpleDB, "*") from (classOf[TestDomain]) orderBy ("name", SortOrder.Asc);
   
   "describe() method of OrderByExpression" should "generate encoded attribute's name" in {
     orderByExp.describe should be === "select * from test-domain order by `name` asc"

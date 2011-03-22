@@ -24,7 +24,7 @@ import org.scalatest.matchers.ShouldMatchers
 
 @RunWith(classOf[JUnitRunner])
 class OrderByExpressionSpec extends FlatSpec with ShouldMatchers {
-  val orderByExp = new Select("*") from (classOf[TestDomain]) orderBy ("name", SortOrder.Asc);
+  val orderByExp = new Select(null, "*") from (classOf[TestDomain]) orderBy ("name", SortOrder.Asc);
   
   "describe() method of OrderByExpression" should "generate encoded attribute's name" in {
     orderByExp.describe should be === "select * from test-domain order by `name` asc"

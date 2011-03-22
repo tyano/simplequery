@@ -13,59 +13,77 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.shelfmap.simplequery.expression.impl;
 
+import static com.shelfmap.simplequery.util.Assertion.*;
+import com.amazonaws.services.simpledb.AmazonSimpleDB;
 import com.shelfmap.simplequery.expression.DomainExpression;
 import com.shelfmap.simplequery.expression.LimitExpression;
 import com.shelfmap.simplequery.expression.OrderByExpression;
 import com.shelfmap.simplequery.expression.WhereExpression;
+import com.shelfmap.simplequery.util.Assertion;
 
 /**
  *
  * @author Tsutomu YANO
  */
 public class DefaultLimitExpression<T> extends BaseExpression<T> implements LimitExpression<T> {
+
     private final int limitCount;
     private DomainExpression<T> domainExpression;
     private WhereExpression<T> whereExpression;
     private OrderByExpression<T> orderByExpression;
-    
-    
-    public DefaultLimitExpression(DomainExpression<T> domainExpression, int limitCount) {
-        this(domainExpression, 
-             null, 
-             null, 
-             limitCount);
-    }
-    
-    public DefaultLimitExpression(WhereExpression<T> whereExpression, int limitCount) {
-        this(whereExpression.getDomainExpression(), 
-             whereExpression, 
-             null, 
-             limitCount);
-    }
-    
-    public DefaultLimitExpression(OrderByExpression<T> orderByExpression, int limitCount) {
-        this(orderByExpression.getDomainExpression(), 
-             orderByExpression.getWhereExpression(), 
-             orderByExpression, 
-             limitCount);
-    }
 
-    public DefaultLimitExpression(DomainExpression<T> domainExpression, WhereExpression<T> whereExpression, OrderByExpression<T> orderByExpression, int limitCount) {
+    protected DefaultLimitExpression(AmazonSimpleDB simpleDB, DomainExpression<T> domainExpression, WhereExpression<T> whereExpression, OrderByExpression<T> orderByExpression, int limitCount) {
+        super(simpleDB);
         this.limitCount = limitCount;
         this.domainExpression = domainExpression;
         this.whereExpression = whereExpression;
         this.orderByExpression = orderByExpression;
     }
-    
+
+    public DefaultLimitExpression(AmazonSimpleDB simpleDB, DomainExpression<T> domainExpression, int limitCount) {
+        this(simpleDB,
+                isNotNullAndReturn("domainExpression", domainExpression),
+                null,
+                null,
+                limitCount);
+    }
+
+    public DefaultLimitExpression(AmazonSimpleDB simpleDB, final WhereExpression<T> whereExpression, int limitCount) {
+        this(simpleDB,
+                isNotNullAndGet("whereExpression", whereExpression,
+                    new Assertion.Accessor<DomainExpression<T>>() {
+                        @Override
+                        public DomainExpression<T> get() {
+                            return whereExpression.getDomainExpression();
+                        }
+                    }),
+                whereExpression,
+                null,
+                limitCount);
+    }
+
+    public DefaultLimitExpression(AmazonSimpleDB simpleDB, final OrderByExpression<T> orderByExpression, int limitCount) {
+        this(simpleDB,
+                isNotNullAndGet("orderByExpression", orderByExpression, 
+                    new Assertion.Accessor<DomainExpression<T>>() {
+                        @Override
+                        public DomainExpression<T> get() {
+                            return orderByExpression.getDomainExpression();
+                        }
+                    }),
+                orderByExpression.getWhereExpression(),
+                orderByExpression,
+                limitCount);
+    }
+
     @Override
     public String describe() {
         return (orderByExpression != null ? orderByExpression.describe()
                 : whereExpression != null ? whereExpression.describe()
                 : domainExpression.describe())
-               + " limit " + limitCount;
+                + " limit " + limitCount;
     }
 
     @Override

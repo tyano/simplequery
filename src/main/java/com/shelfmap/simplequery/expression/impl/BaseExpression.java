@@ -16,6 +16,8 @@
 
 package com.shelfmap.simplequery.expression.impl;
 
+import static com.shelfmap.simplequery.util.Assertion.isNotNull;
+import com.amazonaws.services.simpledb.AmazonSimpleDB;
 import com.shelfmap.simplequery.expression.Expression;
 import com.shelfmap.simplequery.expression.MultipleResultsExistException;
 import com.shelfmap.simplequery.expression.QueryResults;
@@ -26,7 +28,13 @@ import com.shelfmap.simplequery.expression.SimpleQueryException;
  * @author Tsutomu YANO
  */
 public abstract class BaseExpression<T> implements Expression<T> {
+    private final AmazonSimpleDB simpleDB;
 
+    public BaseExpression(AmazonSimpleDB simpleDB) {
+        isNotNull("simpleDB", simpleDB);
+        this.simpleDB = simpleDB;
+    }
+    
     @Override
     public T getSingleResult() throws SimpleQueryException, MultipleResultsExistException {
         throw new UnsupportedOperationException("Not supported yet.");
@@ -35,5 +43,9 @@ public abstract class BaseExpression<T> implements Expression<T> {
     @Override
     public QueryResults<T> getResults() throws SimpleQueryException {
         throw new UnsupportedOperationException("Not supported yet.");
+    }
+    
+    public AmazonSimpleDB getAmazonSimpleDB() {
+        return this.simpleDB;
     }
 }

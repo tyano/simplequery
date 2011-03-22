@@ -15,6 +15,7 @@
  */
 package com.shelfmap.simplequery.expression.impl;
 
+import com.amazonaws.services.simpledb.AmazonSimpleDB;
 import com.shelfmap.simplequery.Domain;
 import com.shelfmap.simplequery.expression.DomainExpression;
 import com.shelfmap.simplequery.expression.SelectQuery;
@@ -28,10 +29,11 @@ import java.util.List;
  * @author Tsutomu YANO
  */
 public class Select implements SelectQuery {
-
+    private final AmazonSimpleDB simpleDB;
     private final List<String> attributes = new ArrayList<String>();
 
-    public Select(String... attribute) {
+    public Select(AmazonSimpleDB simpleDB, String... attribute) {
+        this.simpleDB = simpleDB;
         innerAddAttribute(attribute);
     }
 
@@ -42,7 +44,7 @@ public class Select implements SelectQuery {
             throw new IllegalArgumentException("the class object must have @Domain annotation.");
         }
         String domainName = annotation.value();
-        return new DefaultDomainExpression<T>(this, domainName, target);
+        return new DefaultDomainExpression<T>(this.simpleDB, this, domainName, target);
     }
 
     @Override
@@ -75,7 +77,7 @@ public class Select implements SelectQuery {
             newAttributes = new ArrayList<String>(this.attributes);
         }
         newAttributes.addAll(Arrays.asList(attributeArray));
-        return new Select(newAttributes.toArray(new String[newAttributes.size()]));
+        return new Select(this.simpleDB, newAttributes.toArray(new String[newAttributes.size()]));
     }
 
     @Override

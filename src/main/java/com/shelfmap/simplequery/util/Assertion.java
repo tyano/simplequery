@@ -38,4 +38,18 @@ public class Assertion {
     public static void isNotEmpty(String parameterName, Object[] values) {
         if(values.length == 0) throw new IllegalArgumentException("the parameter '" + parameterName + "' must not be empty.");
     }
+    
+    public static <T> T isNotNullAndGet(String parameterName, Object value, Accessor<T> accessor) {
+        isNotNull(parameterName, value);
+        return accessor.get();
+    }
+    
+    public static <T> T isNotNullAndReturn(String parameterName, T value) {
+        isNotNull(parameterName, value);
+        return value;
+    }
+            
+    public static interface Accessor<T> {
+        T get();
+    }
 }

@@ -13,62 +13,60 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.shelfmap.simplequery.expression.impl;
 
+import static com.shelfmap.simplequery.util.Assertion.*;
+import com.amazonaws.services.simpledb.AmazonSimpleDB;
 import com.amazonaws.services.simpledb.util.SimpleDBUtils;
 import com.shelfmap.simplequery.expression.LimitExpression;
 import com.shelfmap.simplequery.expression.SortOrder;
-import static com.shelfmap.simplequery.util.Assertion.isNotNull;
 import com.shelfmap.simplequery.expression.DomainExpression;
 import com.shelfmap.simplequery.expression.OrderByExpression;
 import com.shelfmap.simplequery.expression.WhereExpression;
+import com.shelfmap.simplequery.util.Assertion;
 
 /**
  *
  * @author Tsutomu YANO
  */
 public class DefaultOrderByExpression<T> extends BaseExpression<T> implements OrderByExpression<T> {
-
-    protected enum ParentType { DOMAIN, WHERE }
-    
-    private final ParentType parentType;
     private final DomainExpression<T> domainExpression;
     private final WhereExpression<T> whereExpression;
     private final String attributeName;
     private final SortOrder sortOrder;
 
-    public DefaultOrderByExpression(DomainExpression<T> domainExpression, String attributeName, SortOrder sortOrder) {
-        this(domainExpression, null, ParentType.DOMAIN, attributeName, sortOrder);
+    public DefaultOrderByExpression(AmazonSimpleDB simpleDB, DomainExpression<T> domainExpression, String attributeName, SortOrder sortOrder) {
+        this(simpleDB, 
+             isNotNullAndReturn("domainExpression", domainExpression), 
+             null, 
+             attributeName, 
+             sortOrder);
     }
 
-    public DefaultOrderByExpression(WhereExpression<T> whereExpression, String attributeName, SortOrder sortOrder) {
-        this(whereExpression.getDomainExpression(), whereExpression, ParentType.WHERE, attributeName, sortOrder);
+    public DefaultOrderByExpression(AmazonSimpleDB simpleDB, final WhereExpression<T> whereExpression, String attributeName, SortOrder sortOrder) {
+        this(simpleDB,
+            isNotNullAndGet("whereExpression", whereExpression, 
+                new Assertion.Accessor<DomainExpression<T>>() {
+                    @Override
+                    public DomainExpression<T> get() {
+                        return whereExpression.getDomainExpression();
+                    }
+                }), 
+            whereExpression, 
+            attributeName, 
+            sortOrder);
     }
-    
-    protected DefaultOrderByExpression(DomainExpression<T> domainExpression, WhereExpression<T> whereExpression, ParentType parentType, String attributeName, SortOrder sortOrder) {
-        isNotNull("parentType", parentType);
-        
-        switch(parentType) {
-            case DOMAIN:
-                isNotNull("domainExpression", domainExpression);
-                break;
-            case WHERE:
-                isNotNull("whereExpression", whereExpression);
-                break;
-            default:
-                throw new IllegalStateException("No such ParentType: " + parentType);
-        }
-        
+
+    protected DefaultOrderByExpression(AmazonSimpleDB simpleDB, DomainExpression<T> domainExpression, WhereExpression<T> whereExpression, String attributeName, SortOrder sortOrder) {
+        super(simpleDB);
         isNotNull("attributeName", attributeName);
         isNotNull("sortOrder", sortOrder);
         this.domainExpression = domainExpression;
         this.whereExpression = whereExpression;
-        this.parentType = parentType;
         this.attributeName = attributeName;
         this.sortOrder = sortOrder;
     }
-    
+
     @Override
     public WhereExpression<T> getWhereExpression() {
         return this.whereExpression;
@@ -78,7 +76,7 @@ public class DefaultOrderByExpression<T> extends BaseExpression<T> implements Or
     public DomainExpression<T> getDomainExpression() {
         return this.domainExpression;
     }
-    
+
     @Override
     public String getAttributeName() {
         return attributeName;
@@ -91,22 +89,18 @@ public class DefaultOrderByExpression<T> extends BaseExpression<T> implements Or
 
     @Override
     public String describe() {
-        switch(parentType) {
-            case DOMAIN:
-                return getDomainExpression().describe() + orderByExpression();
-            case WHERE:
-                return getWhereExpression().describe() + orderByExpression();
-            default:
-                throw new IllegalStateException("No such parentType: " + parentType);
-        }
+        return (getWhereExpression() != null 
+                ? getWhereExpression().describe() 
+                : getDomainExpression().describe())
+         + orderByExpression();
     }
-    
+
     private String orderByExpression() {
         return " order by " + SimpleDBUtils.quoteName(attributeName) + " " + sortOrder.describe();
     }
-    
+
     @Override
     public LimitExpression<T> limit(int limitCount) {
-        return new DefaultLimitExpression<T>(this, limitCount);
+        return new DefaultLimitExpression<T>(getAmazonSimpleDB(), this, limitCount);
     }
 }

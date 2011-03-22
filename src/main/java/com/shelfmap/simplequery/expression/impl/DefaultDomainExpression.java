@@ -16,6 +16,7 @@
 
 package com.shelfmap.simplequery.expression.impl;
 
+import com.amazonaws.services.simpledb.AmazonSimpleDB;
 import com.shelfmap.simplequery.expression.LimitExpression;
 import com.shelfmap.simplequery.expression.OrderByExpression;
 import com.shelfmap.simplequery.expression.SelectQuery;
@@ -35,7 +36,8 @@ public class DefaultDomainExpression<T> extends BaseExpression<T> implements Dom
     private String domainName;
     private Class<T> typeToken;
 
-    public DefaultDomainExpression(SelectQuery selectObject, String domainName, Class<T> typeToken) {
+    public DefaultDomainExpression(AmazonSimpleDB simpleDB, SelectQuery selectObject, String domainName, Class<T> typeToken) {
+        super(simpleDB);
         isNotNull("selectObject", selectObject);
         isNotNull("domainName", domainName);
         isNotNull("typeToken", typeToken);
@@ -46,7 +48,7 @@ public class DefaultDomainExpression<T> extends BaseExpression<T> implements Dom
     
     @Override
     public WhereExpression<T> where(Condition expression) {
-        return new DefaultWhereExpression<T>(this, expression);
+        return new DefaultWhereExpression<T>(getAmazonSimpleDB(), this, expression);
     }
 
     @Override
@@ -77,11 +79,11 @@ public class DefaultDomainExpression<T> extends BaseExpression<T> implements Dom
 
     @Override
     public LimitExpression<T> limit(int limitCount) {
-        return new DefaultLimitExpression<T>(this, limitCount);
+        return new DefaultLimitExpression<T>(getAmazonSimpleDB(), this, limitCount);
     }
 
     @Override
     public OrderByExpression<T> orderBy(String attributeName, SortOrder sortOrder) {
-        return new DefaultOrderByExpression<T>(this, attributeName, sortOrder);
+        return new DefaultOrderByExpression<T>(getAmazonSimpleDB(), this, attributeName, sortOrder);
     }
 }

@@ -45,4 +45,6 @@ public interface Expression<T> extends Describable {
      *         The result of getCause() is the original exception object that explain about the reason of error occured.
      */
     QueryResults<T> getResults() throws SimpleQueryException;
+    
+    Expression<T> rebuildWith(String... attributes);
 }

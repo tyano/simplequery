@@ -20,12 +20,14 @@ import com.amazonaws.services.simpledb.AmazonSimpleDB;
 import com.shelfmap.simplequery.expression.Attribute;
 import com.shelfmap.simplequery.expression.AttributeInfo;
 import com.shelfmap.simplequery.expression.DomainExpression;
+import com.shelfmap.simplequery.expression.Expression;
 import com.shelfmap.simplequery.expression.LimitExpression;
 import static com.shelfmap.simplequery.util.Assertion.isNotNull;
 import com.shelfmap.simplequery.expression.Condition;
 import com.shelfmap.simplequery.expression.DomainAttribute;
 import com.shelfmap.simplequery.expression.Matcher;
 import com.shelfmap.simplequery.expression.OrderByExpression;
+import com.shelfmap.simplequery.expression.SelectQuery;
 import com.shelfmap.simplequery.expression.SortOrder;
 import com.shelfmap.simplequery.expression.WhereExpression;
 
@@ -156,4 +158,9 @@ public class DefaultWhereExpression<T> extends BaseExpression<T> implements Wher
         return new DefaultWhereExpression<T>(getAmazonSimpleDB(), this.domainExpression, new ConditionGroup(this.condition));
     }
 
+    @Override
+    public Expression<T> rebuildWith(String... attributes) {
+        SelectQuery select = new Select(getAmazonSimpleDB(), attributes);
+        return domainExpression.rebuildWith(select);
+    }
 }

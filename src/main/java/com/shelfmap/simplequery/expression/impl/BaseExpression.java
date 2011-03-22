@@ -18,6 +18,8 @@ package com.shelfmap.simplequery.expression.impl;
 
 import static com.shelfmap.simplequery.util.Assertion.isNotNull;
 import com.amazonaws.services.simpledb.AmazonSimpleDB;
+import com.amazonaws.services.simpledb.model.SelectRequest;
+import com.amazonaws.services.simpledb.model.SelectResult;
 import com.shelfmap.simplequery.expression.Expression;
 import com.shelfmap.simplequery.expression.MultipleResultsExistException;
 import com.shelfmap.simplequery.expression.QueryResults;
@@ -42,10 +44,22 @@ public abstract class BaseExpression<T> implements Expression<T> {
 
     @Override
     public QueryResults<T> getResults() throws SimpleQueryException {
-        throw new UnsupportedOperationException("Not supported yet.");
+        SelectRequest selectReq = new SelectRequest(describe());
+        SelectResult result = simpleDB.select(selectReq);
+        return null;
     }
     
     public AmazonSimpleDB getAmazonSimpleDB() {
         return this.simpleDB;
+    }
+
+    @Override
+    public Object clone() {
+        try {
+            return super.clone();
+        } catch (CloneNotSupportedException ex) {
+            //never occured.
+            throw new IllegalStateException(ex);
+        }
     }
 }

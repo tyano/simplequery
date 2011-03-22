@@ -23,7 +23,8 @@ package com.shelfmap.simplequery.expression;
  * @author Tsutomu YANO
  */
 public class MultipleResultsExistException extends Exception {
-
+    private static final long serialVersionUID = 1L;
+    
     public MultipleResultsExistException(Throwable cause) {
         super(cause);
     }

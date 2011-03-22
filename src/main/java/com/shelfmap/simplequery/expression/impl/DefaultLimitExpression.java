@@ -15,11 +15,13 @@
  */
 package com.shelfmap.simplequery.expression.impl;
 
+import com.shelfmap.simplequery.expression.Expression;
 import static com.shelfmap.simplequery.util.Assertion.*;
 import com.amazonaws.services.simpledb.AmazonSimpleDB;
 import com.shelfmap.simplequery.expression.DomainExpression;
 import com.shelfmap.simplequery.expression.LimitExpression;
 import com.shelfmap.simplequery.expression.OrderByExpression;
+import com.shelfmap.simplequery.expression.SelectQuery;
 import com.shelfmap.simplequery.expression.WhereExpression;
 import com.shelfmap.simplequery.util.Assertion;
 
@@ -104,5 +106,11 @@ public class DefaultLimitExpression<T> extends BaseExpression<T> implements Limi
     @Override
     public int getLimitCount() {
         return this.limitCount;
+    }
+
+    @Override
+    public Expression<T> rebuildWith(String... attributes) {
+        SelectQuery select = new Select(getAmazonSimpleDB(), attributes);
+        return domainExpression.rebuildWith(select);
     }
 }

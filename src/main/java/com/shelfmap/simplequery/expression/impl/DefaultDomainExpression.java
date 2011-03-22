@@ -17,6 +17,7 @@
 package com.shelfmap.simplequery.expression.impl;
 
 import com.amazonaws.services.simpledb.AmazonSimpleDB;
+import com.shelfmap.simplequery.expression.Expression;
 import com.shelfmap.simplequery.expression.LimitExpression;
 import com.shelfmap.simplequery.expression.OrderByExpression;
 import com.shelfmap.simplequery.expression.SelectQuery;
@@ -31,7 +32,7 @@ import com.shelfmap.simplequery.expression.WhereExpression;
  *
  * @author Tsutomu YANO
  */
-public class DefaultDomainExpression<T> extends BaseExpression<T> implements DomainExpression<T> {
+public class DefaultDomainExpression<T> extends BaseExpression<T> implements DomainExpression<T>, Cloneable {
     private SelectQuery selectObject;
     private String domainName;
     private Class<T> typeToken;
@@ -85,5 +86,24 @@ public class DefaultDomainExpression<T> extends BaseExpression<T> implements Dom
     @Override
     public OrderByExpression<T> orderBy(String attributeName, SortOrder sortOrder) {
         return new DefaultOrderByExpression<T>(getAmazonSimpleDB(), this, attributeName, sortOrder);
+    }
+
+    @Override
+    public Expression<T> rebuildWith(String... attributes) {
+        SelectQuery select = new Select(getAmazonSimpleDB(), attributes);
+        return rebuildWith(select);
+    }
+
+    @Override
+    public DomainExpression<T> rebuildWith(SelectQuery select) {
+        DefaultDomainExpression<T> clone = this.clone();
+        clone.selectObject = select;
+        return clone;
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public DefaultDomainExpression<T> clone() {
+        return (DefaultDomainExpression<T>)super.clone();
     }
 }

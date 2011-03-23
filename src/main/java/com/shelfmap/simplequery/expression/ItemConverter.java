@@ -16,14 +16,13 @@
 
 package com.shelfmap.simplequery.expression;
 
+import com.amazonaws.services.simpledb.model.Item;
+
 /**
  *
  * @author Tsutomu YANO
  */
-public interface DomainAttribute {
-    String getName();
-    Class<?> getType();
-    int getMaxDigitLeft();
-    int getMaxDigitRight();
-    long getOffset();
+public interface ItemConverter<T> {
+    Class<T> getDomainClass();
+    T convert(Item item) throws CanNotConvertItemException;
 }

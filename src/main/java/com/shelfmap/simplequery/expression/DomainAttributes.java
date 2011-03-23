@@ -20,10 +20,8 @@ package com.shelfmap.simplequery.expression;
  *
  * @author Tsutomu YANO
  */
-public interface Attribute {
-    String getName();
-    Class<?> getType();
-    int getMaxDigitLeft();
-    int getMaxDigitRight();
-    long getOffset();
+public interface DomainAttributes extends Iterable<DomainAttribute> {
+    boolean isAttributeDefined(String attributeName);
+    DomainAttribute getAttribute(String attributeName);
+    Class<?> getDomainClass();
 }

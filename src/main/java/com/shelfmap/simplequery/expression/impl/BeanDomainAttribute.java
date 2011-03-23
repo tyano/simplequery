@@ -19,8 +19,8 @@ package com.shelfmap.simplequery.expression.impl;
 import static com.shelfmap.simplequery.util.Assertion.isNotNull;
 import com.shelfmap.simplequery.Domain;
 import com.shelfmap.simplequery.SimpleDBAttribute;
+import com.shelfmap.simplequery.expression.DomainAttributes;
 import com.shelfmap.simplequery.expression.DomainAttribute;
-import com.shelfmap.simplequery.expression.Attribute;
 import java.beans.BeanInfo;
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
@@ -34,8 +34,8 @@ import java.util.Map;
  *
  * @author Tsutomu YANO
  */
-public class BeanDomainAttribute implements DomainAttribute {
-    private final Map<String,Attribute> attributeMap = new LinkedHashMap<String, Attribute>();
+public class BeanDomainAttribute implements DomainAttributes {
+    private final Map<String,DomainAttribute> attributeMap = new LinkedHashMap<String, DomainAttribute>();
     private final Class<?> domainClass;
     
     public BeanDomainAttribute(Class<?> domainClass) {
@@ -63,7 +63,7 @@ public class BeanDomainAttribute implements DomainAttribute {
                     maxDigitRight = annotation.maxDigitRight();
                     offset = annotation.offset();
                 }
-                Attribute attribute = createAttribute(name, type, maxDigitLeft, maxDigitRight, offset);
+                DomainAttribute attribute = createAttribute(name, type, maxDigitLeft, maxDigitRight, offset);
                 attributeMap.put(name, attribute);
             }   
         } catch (IntrospectionException ex) {
@@ -71,7 +71,7 @@ public class BeanDomainAttribute implements DomainAttribute {
         }
     }
     
-    private Attribute createAttribute(String attributeName, Class<?> type, int maxDigitLeft, int maxDigitRight, long offset) {
+    private DomainAttribute createAttribute(String attributeName, Class<?> type, int maxDigitLeft, int maxDigitRight, long offset) {
         if(type == float.class || type == Float.class) {
             return new DefaultAttribute(attributeName, Float.class, maxDigitLeft, maxDigitRight, (int)offset);
         } else if(type == int.class || type == Integer.class) {
@@ -89,7 +89,7 @@ public class BeanDomainAttribute implements DomainAttribute {
     }
 
     @Override
-    public Attribute getAttribute(String attributeName) {
+    public DomainAttribute getAttribute(String attributeName) {
         return attributeMap.get(attributeName);
     }
 
@@ -99,7 +99,7 @@ public class BeanDomainAttribute implements DomainAttribute {
     }
 
     @Override
-    public Iterator<Attribute> iterator() {
+    public Iterator<DomainAttribute> iterator() {
         return attributeMap.values().iterator();
     }
 }

@@ -16,13 +16,13 @@
 
 package com.shelfmap.simplequery.expression.impl;
 
-import com.shelfmap.simplequery.expression.Attribute;
+import com.shelfmap.simplequery.expression.DomainAttribute;
 
 /**
  *
  * @author Tsutomu YANO
  */
-public enum BasicAttribute implements Attribute {
+public enum BasicAttribute implements DomainAttribute {
     ALL("*"), COUNT("count(*)");
     
     private String attributeName;

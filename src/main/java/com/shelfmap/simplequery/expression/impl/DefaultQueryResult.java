@@ -44,15 +44,15 @@ public class DefaultQueryResult<T> implements QueryResults<T> {
 
     @Override
     public Iterator<T> iterator() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return null;
     }
 
     @Override
     public int size() {
         Expression<T> rebuilt = expression.rebuildWith("count(*)");
         SelectRequest req = new SelectRequest(rebuilt.describe());
-        SelectResult result = simpleDB.select(req);
-        List<Item> items = result.getItems();
+        SelectResult selectResult = simpleDB.select(req);
+        List<Item> items = selectResult.getItems();
         if(items.isEmpty()) throw new IllegalStateException("can not count records. expression was: " + rebuilt.describe());
         
         String value  = items.get(0).getAttributes().get(0).getValue();

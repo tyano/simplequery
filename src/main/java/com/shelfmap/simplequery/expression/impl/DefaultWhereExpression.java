@@ -17,14 +17,14 @@
 package com.shelfmap.simplequery.expression.impl;
 
 import com.amazonaws.services.simpledb.AmazonSimpleDB;
-import com.shelfmap.simplequery.expression.Attribute;
+import com.shelfmap.simplequery.expression.DomainAttribute;
 import com.shelfmap.simplequery.expression.AttributeInfo;
 import com.shelfmap.simplequery.expression.DomainExpression;
 import com.shelfmap.simplequery.expression.Expression;
 import com.shelfmap.simplequery.expression.LimitExpression;
 import static com.shelfmap.simplequery.util.Assertion.isNotNull;
 import com.shelfmap.simplequery.expression.Condition;
-import com.shelfmap.simplequery.expression.DomainAttribute;
+import com.shelfmap.simplequery.expression.DomainAttributes;
 import com.shelfmap.simplequery.expression.Matcher;
 import com.shelfmap.simplequery.expression.OrderByExpression;
 import com.shelfmap.simplequery.expression.SelectQuery;
@@ -57,7 +57,7 @@ public class DefaultWhereExpression<T> extends BaseExpression<T> implements Wher
     public String describe() {
         StringBuilder sb = new StringBuilder();
         Class<T> domainClass = getDomainExpression().getDomainClass();
-        DomainAttribute domainAttribute = new BeanDomainAttribute(domainClass);
+        DomainAttributes domainAttribute = new BeanDomainAttribute(domainClass);
         
         Condition current = condition;
         while(current.getParent() != null) {
@@ -65,7 +65,7 @@ public class DefaultWhereExpression<T> extends BaseExpression<T> implements Wher
             Matcher<?> matcher = current.getMatcher();
             if(matcher != null) {
                 if(domainAttribute.isAttributeDefined(attributeName)) {
-                    Attribute attribute = domainAttribute.getAttribute(attributeName);
+                    DomainAttribute attribute = domainAttribute.getAttribute(attributeName);
                     if(attribute.getMaxDigitLeft() > 0 || attribute.getMaxDigitRight() > 0 || attribute.getOffset() > 0L) {
                         Class<?> type = attribute.getType();
                         if(type == Float.class) {

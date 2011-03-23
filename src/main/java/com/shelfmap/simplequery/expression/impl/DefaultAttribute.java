@@ -17,13 +17,13 @@
 package com.shelfmap.simplequery.expression.impl;
 
 import static com.shelfmap.simplequery.util.Assertion.isNotNull;
-import com.shelfmap.simplequery.expression.Attribute;
+import com.shelfmap.simplequery.expression.DomainAttribute;
 
 /**
  *
  * @author Tsutomu YANO
  */
-public class DefaultAttribute implements Attribute {
+public class DefaultAttribute implements DomainAttribute {
     private String attributeName;
     private Class<?> type;
     private int maxDigitLeft;

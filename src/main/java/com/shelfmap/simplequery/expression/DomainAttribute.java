@@ -20,10 +20,8 @@ package com.shelfmap.simplequery.expression;
  *
  * @author Tsutomu YANO
  */
-public interface DomainAttribute {
+public interface DomainAttribute<T> {
     String getName();
     Class<?> getType();
-    int getMaxDigitLeft();
-    int getMaxDigitRight();
-    long getOffset();
+    AttributeInfo<T> getAttributeInfo();
 }

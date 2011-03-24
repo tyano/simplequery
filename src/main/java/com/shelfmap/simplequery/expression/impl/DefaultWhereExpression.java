@@ -66,16 +66,16 @@ public class DefaultWhereExpression<T> extends BaseExpression<T> implements Wher
             if(matcher != null) {
                 if(domainAttribute.isAttributeDefined(attributeName)) {
                     DomainAttribute attribute = domainAttribute.getAttribute(attributeName);
-                    if(attribute.getMaxDigitLeft() > 0 || attribute.getMaxDigitRight() > 0 || attribute.getOffset() > 0L) {
-                        Class<?> type = attribute.getType();
-                        if(type == Float.class) {
-                            ((Matcher<Float>)matcher).setAttributeInfo(new FloatAttributeInfo(attribute.getMaxDigitLeft(), attribute.getMaxDigitRight(), (int)attribute.getOffset()));
-                        } else if(type == Integer.class) {
-                            ((Matcher<Integer>)matcher).setAttributeInfo(new IntAttributeInfo(attribute.getMaxDigitLeft(), (int)attribute.getOffset()));
-                        } else if(type == Long.class) {
-                            ((Matcher<Long>)matcher).setAttributeInfo(new LongAttributeInfo(attribute.getMaxDigitLeft(), attribute.getOffset()));
-                        }
-                    }
+//                    if(attribute.getMaxDigitLeft() > 0 || attribute.getMaxDigitRight() > 0 || attribute.getOffset() > 0L) {
+//                        Class<?> type = attribute.getType();
+//                        if(type == Float.class) {
+//                            ((Matcher<Float>)matcher).setAttributeInfo(new FloatAttributeInfo(attribute.getMaxDigitLeft(), attribute.getMaxDigitRight(), (int)attribute.getOffset()));
+//                        } else if(type == Integer.class) {
+//                            ((Matcher<Integer>)matcher).setAttributeInfo(new IntAttributeInfo(attribute.getMaxDigitLeft(), (int)attribute.getOffset()));
+//                        } else if(type == Long.class) {
+//                            ((Matcher<Long>)matcher).setAttributeInfo(new LongAttributeInfo(attribute.getMaxDigitLeft(), attribute.getOffset()));
+//                        }
+//                    }
                 }
             }
             current = current.getParent();

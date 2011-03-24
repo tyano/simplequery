@@ -14,15 +14,12 @@
  * limitations under the License.
  */
 
-package com.shelfmap.simplequery.expression;
+package com.shelfmap.simplequery;
 
 /**
  *
  * @author Tsutomu YANO
  */
-public interface DomainAttributes extends Iterable<DomainAttribute<?>> {
-    boolean isAttributeDefined(String attributeName);
-    DomainAttribute<?> getAttribute(String attributeName);
-    Class<?> getDomainClass();
-    void writeAttribute(Object instance, String attributeName, Object value);
+public interface InstanceFactory<T> {
+    T createInstance(Class<T> clazz);
 }

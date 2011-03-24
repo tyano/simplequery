@@ -48,4 +48,12 @@ public class FloatAttributeInfo implements AttributeInfo<Float> {
         }
         return result;
     }
+
+    @Override
+    public Float restoreValue(String targetValue) {
+        Float restored = null;
+        return (offset > 0)
+            ? decodeRealNumberRangeFloat(targetValue, maxDigitRight, offset)
+            : decodeZeroPaddingFloat(targetValue);
+    }
 }

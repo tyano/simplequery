@@ -16,6 +16,7 @@
 
 package com.shelfmap.simplequery.expression.impl;
 
+import com.shelfmap.simplequery.expression.AttributeInfo;
 import static com.shelfmap.simplequery.util.Assertion.isNotNull;
 import com.shelfmap.simplequery.expression.DomainAttribute;
 
@@ -68,17 +69,7 @@ public class DefaultAttribute implements DomainAttribute {
     }
 
     @Override
-    public int getMaxDigitLeft() {
-        return maxDigitLeft;
-    }
-
-    @Override
-    public int getMaxDigitRight() {
-        return maxDigitRight;
-    }
-
-    @Override
-    public long getOffset() {
-        return offset;
+    public AttributeInfo<?> getAttributeInfo() {
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 }

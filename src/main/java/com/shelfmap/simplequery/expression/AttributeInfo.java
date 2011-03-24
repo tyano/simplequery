@@ -22,4 +22,5 @@ package com.shelfmap.simplequery.expression;
  */
 public interface AttributeInfo<T> {
     String convertValue(T targetValue);
+    T restoreValue(String targetValue);
 }

@@ -17,7 +17,6 @@
 package com.shelfmap.simplequery.expression.impl;
 
 import static com.shelfmap.simplequery.util.Assertion.isNotNull;
-import com.amazonaws.services.simpledb.model.Attribute;
 import com.amazonaws.services.simpledb.model.Item;
 import com.shelfmap.simplequery.Domain;
 import com.shelfmap.simplequery.expression.CanNotConvertItemException;
@@ -44,11 +43,11 @@ public class DefaultItemConverter<T> implements ItemConverter<T> {
         if(domain == null) throw new IllegalArgumentException("domainClass do not have @Domain annotation. You can convert an Item object only to a instanceo of class which have a @Domain annotation.");
 
         DomainAttributes attributes = newDomainAttributes();
-        for(Attribute attr : item.getAttributes()) {
+        for(com.amazonaws.services.simpledb.model.Attribute attr : item.getAttributes()) {
             String attributeName = attr.getName();
             String attributeValue = attr.getValue();
             
-            DomainAttribute domainAttribute = attributes.getAttribute(attributeName);
+            DomainAttribute<?> domainAttribute = attributes.getAttribute(attributeName);
         
         }
         return null;

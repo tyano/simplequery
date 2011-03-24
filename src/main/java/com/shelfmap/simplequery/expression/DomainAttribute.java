@@ -24,4 +24,5 @@ public interface DomainAttribute extends Iterable<Attribute> {
     boolean isAttributeDefined(String attributeName);
     Attribute getAttribute(String attributeName);
     Class<?> getDomainClass();
+    void writeAttribute(Object instance, String attributeName, Object value);
 }

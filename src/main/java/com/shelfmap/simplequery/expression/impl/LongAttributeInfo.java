@@ -18,7 +18,6 @@ package com.shelfmap.simplequery.expression.impl;
 import static com.shelfmap.simplequery.util.Assertion.isNotNull;
 import static com.amazonaws.services.simpledb.util.SimpleDBUtils.*;
 import com.shelfmap.simplequery.expression.AttributeInfo;
-import com.shelfmap.simplequery.expression.Matcher;
 
 /**
  *
@@ -46,5 +45,13 @@ public class LongAttributeInfo implements AttributeInfo<Long> {
             result = quoteValue(targetValue.toString());
         }
         return result;
+    }
+
+    @Override
+    public Long restoreValue(String targetValue) {
+        isNotNull("targetValue", targetValue);
+        return (offset > 0)
+                ? decodeRealNumberRangeLong(targetValue, offset)
+                : decodeZeroPaddingLong(targetValue);
     }
 }

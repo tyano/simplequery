@@ -14,13 +14,12 @@
  * limitations under the License.
  */
 
-package com.shelfmap.simplequery.expression;
+package com.shelfmap.simplequery;
 
 /**
  *
  * @author Tsutomu YANO
  */
-public interface AttributeInfo<T> {
-    String convertValue(T targetValue);
-    T restoreValue(String targetValue);
+public interface InstanceFactory<T> {
+    T createInstance(Class<T> clazz);
 }

@@ -30,4 +30,10 @@ public class NullAttributeInfo<T> implements AttributeInfo<T> {
         isNotNull("targetValue", targetValue);
         return SimpleDBUtils.quoteValue(targetValue.toString());
     }
+
+    @Override
+    public T restoreValue(String targetValue) {
+        //TODO decide how to convert a string to the type assigned by a Type Parameter.
+        return null;
+    }
 }

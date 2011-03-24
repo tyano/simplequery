@@ -26,4 +26,5 @@ public interface Attribute {
     int getMaxDigitLeft();
     int getMaxDigitRight();
     long getOffset();
+    AttributeInfo<?> getAttributeInfo();
 }

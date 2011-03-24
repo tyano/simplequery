@@ -16,6 +16,7 @@
 
 package com.shelfmap.simplequery.expression.impl;
 
+import com.shelfmap.simplequery.expression.AttributeInfo;
 import static com.shelfmap.simplequery.util.Assertion.isNotNull;
 import com.shelfmap.simplequery.expression.Attribute;
 
@@ -80,5 +81,10 @@ public class DefaultAttribute implements Attribute {
     @Override
     public long getOffset() {
         return offset;
+    }
+
+    @Override
+    public AttributeInfo<?> getAttributeInfo() {
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 }

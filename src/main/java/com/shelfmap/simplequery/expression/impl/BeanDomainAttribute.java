@@ -25,10 +25,14 @@ import java.beans.BeanInfo;
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -36,6 +40,7 @@ import java.util.Map;
  */
 public class BeanDomainAttribute implements DomainAttribute {
     private final Map<String,Attribute> attributeMap = new LinkedHashMap<String, Attribute>();
+    private final Map<String,Method> writeMethodMap = new HashMap<String,Method>();
     private final Class<?> domainClass;
     
     public BeanDomainAttribute(Class<?> domainClass) {
@@ -52,6 +57,7 @@ public class BeanDomainAttribute implements DomainAttribute {
                 Class<?> type = descriptor.getPropertyType();
                 String name = descriptor.getName();
                 Method getter = descriptor.getReadMethod();
+                Method setter = descriptor.getWriteMethod();
                 int maxDigitLeft = 0;
                 int maxDigitRight = 0;
                 long offset = 0L;
@@ -65,6 +71,7 @@ public class BeanDomainAttribute implements DomainAttribute {
                 }
                 Attribute attribute = createAttribute(name, type, maxDigitLeft, maxDigitRight, offset);
                 attributeMap.put(name, attribute);
+                writeMethodMap.put(name, setter);
             }   
         } catch (IntrospectionException ex) {
             throw new IllegalStateException("Can not introspect a class object.", ex);
@@ -101,5 +108,22 @@ public class BeanDomainAttribute implements DomainAttribute {
     @Override
     public Iterator<Attribute> iterator() {
         return attributeMap.values().iterator();
+    }
+
+    @Override
+    public void writeAttribute(Object instance, String attributeName, Object value) {
+        Method writeMethod = writeMethodMap.get(attributeName);
+        if(writeMethod == null) throw new IllegalStateException("the attribute '" + attributeName + "' is not writable.");
+        
+        writeMethod.setAccessible(true);
+        try {
+            writeMethod.invoke(instance, value);
+        } catch (IllegalAccessException ex) {
+            Logger.getLogger(BeanDomainAttribute.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IllegalArgumentException ex) {
+            Logger.getLogger(BeanDomainAttribute.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (InvocationTargetException ex) {
+            Logger.getLogger(BeanDomainAttribute.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 }

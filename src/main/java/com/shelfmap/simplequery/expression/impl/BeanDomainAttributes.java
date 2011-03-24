@@ -78,8 +78,7 @@ public class BeanDomainAttributes implements DomainAttributes {
         }
     }
     
-    @SuppressWarnings("unchecked")
-    private DomainAttribute<?> createAttribute(String attributeName, Class<?> type, int maxDigitLeft, int maxDigitRight, long offset) {
+    private <C> DomainAttribute<?> createAttribute(String attributeName, Class<C> type, int maxDigitLeft, int maxDigitRight, long offset) {
         if(type == float.class || type == Float.class) {
             return new FloatDomainAttribute(attributeName, maxDigitLeft, maxDigitRight, (int)offset);
         } else if(type == int.class || type == Integer.class) {
@@ -87,7 +86,7 @@ public class BeanDomainAttributes implements DomainAttributes {
         } else if(type == long.class || type == Long.class) {
             return new LongDomainAttribute(attributeName, maxDigitLeft, offset);
         } else {
-            return new DefaultDomainAttribute(attributeName, type);
+            return new DefaultDomainAttribute<C>(attributeName, type);
         }
     }
     

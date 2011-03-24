@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-package com.shelfmap.simplequery.expression;
+package com.shelfmap.simplequery.expression.impl;
 
 /**
  *
  * @author Tsutomu YANO
  */
-public interface DomainAttribute<T> {
-    String getName();
-    Class<T> getType();
-    AttributeInfo<T> getAttributeInfo();
+public class FloatDomainAttribute extends DefaultDomainAttribute<Float> {
+    public FloatDomainAttribute(String attributeName, int maxDigitLeft, int maxDigitRight, int offset) {
+        super(attributeName, Float.class, new FloatAttributeInfo(maxDigitLeft, maxDigitRight, offset));
+    }
 }

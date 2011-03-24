@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.shelfmap.simplequery.expression.impl;
 
 import com.amazonaws.services.simpledb.AmazonSimpleDB;
@@ -36,6 +35,7 @@ import com.shelfmap.simplequery.expression.WhereExpression;
  * @author Tsutomu YANO
  */
 public class DefaultWhereExpression<T> extends BaseExpression<T> implements WhereExpression<T> {
+
     private DomainExpression<T> domainExpression;
     private Condition condition;
 
@@ -46,7 +46,7 @@ public class DefaultWhereExpression<T> extends BaseExpression<T> implements Wher
         this.domainExpression = domainExpression;
         this.condition = condition;
     }
-    
+
     @Override
     public OrderByExpression<T> orderBy(String attributeName, SortOrder sortOrder) {
         return new DefaultOrderByExpression<T>(getAmazonSimpleDB(), this, attributeName, sortOrder);
@@ -57,30 +57,28 @@ public class DefaultWhereExpression<T> extends BaseExpression<T> implements Wher
     public String describe() {
         StringBuilder sb = new StringBuilder();
         Class<T> domainClass = getDomainExpression().getDomainClass();
-        DomainAttributes domainAttribute = new BeanDomainAttribute(domainClass);
-        
+        DomainAttributes domainAttribute = new BeanDomainAttributes(domainClass);
+
         Condition current = condition;
-        while(current.getParent() != null) {
+        while (current.getParent() != null) {
             String attributeName = current.getAttributeName();
             Matcher<?> matcher = current.getMatcher();
-            if(matcher != null) {
-                if(domainAttribute.isAttributeDefined(attributeName)) {
-                    DomainAttribute attribute = domainAttribute.getAttribute(attributeName);
-//                    if(attribute.getMaxDigitLeft() > 0 || attribute.getMaxDigitRight() > 0 || attribute.getOffset() > 0L) {
-//                        Class<?> type = attribute.getType();
-//                        if(type == Float.class) {
-//                            ((Matcher<Float>)matcher).setAttributeInfo(new FloatAttributeInfo(attribute.getMaxDigitLeft(), attribute.getMaxDigitRight(), (int)attribute.getOffset()));
-//                        } else if(type == Integer.class) {
-//                            ((Matcher<Integer>)matcher).setAttributeInfo(new IntAttributeInfo(attribute.getMaxDigitLeft(), (int)attribute.getOffset()));
-//                        } else if(type == Long.class) {
-//                            ((Matcher<Long>)matcher).setAttributeInfo(new LongAttributeInfo(attribute.getMaxDigitLeft(), attribute.getOffset()));
-//                        }
-//                    }
+            if (matcher != null) {
+                if (domainAttribute.isAttributeDefined(attributeName)) {
+                    DomainAttribute<?> attribute = domainAttribute.getAttribute(attributeName);
+                    Class<?> type = attribute.getType();
+                    if (type == Float.class) {
+                        ((Matcher<Float>) matcher).setAttributeInfo((AttributeInfo<Float>)attribute.getAttributeInfo());
+                    } else if (type == Integer.class) {
+                        ((Matcher<Integer>) matcher).setAttributeInfo((AttributeInfo<Integer>)attribute.getAttributeInfo());
+                    } else if (type == Long.class) {
+                        ((Matcher<Long>) matcher).setAttributeInfo((AttributeInfo<Long>)attribute.getAttributeInfo());
+                    }
                 }
             }
             current = current.getParent();
         }
-        
+
         sb.append(domainExpression.describe());
         sb.append(" where ");
         sb.append(condition.describe());
@@ -101,7 +99,7 @@ public class DefaultWhereExpression<T> extends BaseExpression<T> implements Wher
     public LimitExpression<T> limit(int limitCount) {
         return new DefaultLimitExpression<T>(getAmazonSimpleDB(), this, limitCount);
     }
-    
+
     @Override
     public WhereExpression<T> and(Condition other) {
         return new DefaultWhereExpression<T>(getAmazonSimpleDB(), this.domainExpression, condition.and(other));

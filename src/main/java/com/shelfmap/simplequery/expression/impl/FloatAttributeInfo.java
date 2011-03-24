@@ -16,9 +16,7 @@
 package com.shelfmap.simplequery.expression.impl;
 
 import static com.amazonaws.services.simpledb.util.SimpleDBUtils.*;
-import static com.shelfmap.simplequery.util.Assertion.isNotNull;
 import com.shelfmap.simplequery.expression.AttributeInfo;
-import com.shelfmap.simplequery.expression.Matcher;
 
 /**
  *

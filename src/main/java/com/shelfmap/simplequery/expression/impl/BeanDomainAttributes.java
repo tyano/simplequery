@@ -38,12 +38,12 @@ import java.util.logging.Logger;
  *
  * @author Tsutomu YANO
  */
-public class BeanDomainAttribute implements DomainAttributes {
+public class BeanDomainAttributes implements DomainAttributes {
     private final Map<String,DomainAttribute<?>> attributeMap = new LinkedHashMap<String, DomainAttribute<?>>();
-    private final Map<String,Method> writeMethodMap = new HashMap<String,Method>();
     private final Class<?> domainClass;
+    private final Map<String,Method> writeMethodMap = new HashMap<String,Method>();
     
-    public BeanDomainAttribute(Class<?> domainClass) {
+    public BeanDomainAttributes(Class<?> domainClass) {
         isNotNull("domainClass", domainClass);
         if( !domainClass.isAnnotationPresent(Domain.class)) {
             throw new IllegalArgumentException("domainClass must have a @Domain annotation.");
@@ -78,15 +78,16 @@ public class BeanDomainAttribute implements DomainAttributes {
         }
     }
     
-    private DomainAttribute createAttribute(String attributeName, Class<?> type, int maxDigitLeft, int maxDigitRight, long offset) {
+    @SuppressWarnings("unchecked")
+    private DomainAttribute<?> createAttribute(String attributeName, Class<?> type, int maxDigitLeft, int maxDigitRight, long offset) {
         if(type == float.class || type == Float.class) {
-            return new DefaultAttribute(attributeName, Float.class, maxDigitLeft, maxDigitRight, (int)offset);
+            return new FloatDomainAttribute(attributeName, maxDigitLeft, maxDigitRight, (int)offset);
         } else if(type == int.class || type == Integer.class) {
-            return new DefaultAttribute(attributeName, Integer.class, maxDigitLeft, (int)offset);
+            return new IntDomainAttribute(attributeName, maxDigitLeft, (int)offset);
         } else if(type == long.class || type == Long.class) {
-            return new DefaultAttribute(attributeName, Long.class, maxDigitLeft, offset);
+            return new LongDomainAttribute(attributeName, maxDigitLeft, offset);
         } else {
-            return new DefaultAttribute(attributeName, type);
+            return new DefaultDomainAttribute(attributeName, type);
         }
     }
     
@@ -96,7 +97,7 @@ public class BeanDomainAttribute implements DomainAttributes {
     }
 
     @Override
-    public DomainAttribute getAttribute(String attributeName) {
+    public DomainAttribute<?> getAttribute(String attributeName) {
         return attributeMap.get(attributeName);
     }
 
@@ -119,11 +120,11 @@ public class BeanDomainAttribute implements DomainAttributes {
         try {
             writeMethod.invoke(instance, value);
         } catch (IllegalAccessException ex) {
-            Logger.getLogger(BeanDomainAttribute.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(BeanDomainAttributes.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IllegalArgumentException ex) {
-            Logger.getLogger(BeanDomainAttribute.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(BeanDomainAttributes.class.getName()).log(Level.SEVERE, null, ex);
         } catch (InvocationTargetException ex) {
-            Logger.getLogger(BeanDomainAttribute.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(BeanDomainAttributes.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 }

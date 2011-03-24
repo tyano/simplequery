@@ -60,6 +60,6 @@ public class DefaultItemConverter<T> implements ItemConverter<T> {
     
     //Factory method
     protected DomainAttributes newDomainAttributes() {
-        return new BeanDomainAttribute(getDomainClass());
+        return new BeanDomainAttributes(getDomainClass());
     }
 }

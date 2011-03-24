@@ -19,6 +19,7 @@ package com.shelfmap.simplequery.expression.impl;
 import static com.shelfmap.simplequery.util.Assertion.isNotNull;
 import com.shelfmap.simplequery.Domain;
 import com.shelfmap.simplequery.SimpleDBAttribute;
+import com.shelfmap.simplequery.expression.CanNotWriteAttributeException;
 import com.shelfmap.simplequery.expression.DomainAttributes;
 import com.shelfmap.simplequery.expression.DomainAttribute;
 import java.beans.BeanInfo;
@@ -31,8 +32,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
@@ -111,7 +110,8 @@ public class BeanDomainAttributes implements DomainAttributes {
     }
 
     @Override
-    public void writeAttribute(Object instance, String attributeName, Object value) {
+    public void writeAttribute(Object instance, String attributeName, Object value) throws CanNotWriteAttributeException {
+        DomainAttribute<?> attribute = attributeMap.get(attributeName);
         Method writeMethod = writeMethodMap.get(attributeName);
         if(writeMethod == null) throw new IllegalStateException("the attribute '" + attributeName + "' is not writable.");
         
@@ -119,11 +119,11 @@ public class BeanDomainAttributes implements DomainAttributes {
         try {
             writeMethod.invoke(instance, value);
         } catch (IllegalAccessException ex) {
-            Logger.getLogger(BeanDomainAttributes.class.getName()).log(Level.SEVERE, null, ex);
+            throw new CanNotWriteAttributeException(ex, attribute);
         } catch (IllegalArgumentException ex) {
-            Logger.getLogger(BeanDomainAttributes.class.getName()).log(Level.SEVERE, null, ex);
+            throw new CanNotWriteAttributeException(ex, attribute);
         } catch (InvocationTargetException ex) {
-            Logger.getLogger(BeanDomainAttributes.class.getName()).log(Level.SEVERE, null, ex);
+            throw new CanNotWriteAttributeException(ex, attribute);
         }
     }
 }

@@ -16,9 +16,10 @@
 
 package com.shelfmap.simplequery.expression.impl;
 
+import com.amazonaws.services.simpledb.model.Attribute;
 import static com.shelfmap.simplequery.util.Assertion.isNotNull;
 import com.amazonaws.services.simpledb.model.Item;
-import com.shelfmap.simplequery.Domain;
+import com.shelfmap.simplequery.InstanceFactory;
 import com.shelfmap.simplequery.expression.CanNotConvertItemException;
 import com.shelfmap.simplequery.expression.DomainAttribute;
 import com.shelfmap.simplequery.expression.DomainAttributes;
@@ -29,34 +30,46 @@ import com.shelfmap.simplequery.expression.ItemConverter;
  * @author Tsutomu YANO
  */
 public class DefaultItemConverter<T> implements ItemConverter<T> {
-
     private final Class<T> domainClass;
+    private final InstanceFactory<T> instanceFactory;
+    private DomainAttributes domainAttributes;
 
-    public DefaultItemConverter(Class<T> domainClass) {
+    public DefaultItemConverter(Class<T> domainClass, InstanceFactory<T> factory) {
         isNotNull("domainClass", domainClass);
+        isNotNull("factory", factory);
         this.domainClass = domainClass;
+        this.instanceFactory = factory;
     }
     
     @Override
     public T convert(Item item) throws CanNotConvertItemException {
-        Domain domain = domainClass.getAnnotation(Domain.class);
-        if(domain == null) throw new IllegalArgumentException("domainClass do not have @Domain annotation. You can convert an Item object only to a instanceo of class which have a @Domain annotation.");
-
-        DomainAttributes attributes = newDomainAttributes();
-        for(com.amazonaws.services.simpledb.model.Attribute attr : item.getAttributes()) {
+        if(domainAttributes == null) {
+            domainAttributes = newDomainAttributes();
+        }
+        
+        T instance = getInstanceFactory().createInstance(getDomainClass());
+        for (Attribute attr : item.getAttributes()) {
             String attributeName = attr.getName();
             String attributeValue = attr.getValue();
+            DomainAttribute<?> domainAttribute = domainAttributes.getAttribute(attributeName);
             
-            DomainAttribute<?> domainAttribute = attributes.getAttribute(attributeName);
-        
+            if(domainAttribute != null) {
+                Object convertedValue = domainAttribute.getAttributeInfo().restoreValue(attributeValue);
+                domainAttributes.writeAttribute(instance, attributeName, convertedValue);
+            }
         }
-        return null;
+        return instance;
     }
 
     @Override
     public Class<T> getDomainClass() {
         return domainClass;
     }
+
+    @Override
+    public InstanceFactory<T> getInstanceFactory() {
+        return this.instanceFactory;
+    }    
     
     //Factory method
     protected DomainAttributes newDomainAttributes() {

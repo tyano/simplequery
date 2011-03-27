@@ -18,10 +18,17 @@ package com.shelfmap.simplequery.expression
 
 import com.shelfmap.simplequery.Configuration
 import com.shelfmap.simplequery.InstanceFactory
+import com.shelfmap.simplequery.expression.impl.DefaultItemConverter
 
 trait ConfigurationAware {
-  def getConfiguration: Configuration = new Configuration() {
-    def getItemConverter[T](): ItemConverter[T] = null
-    def getInstanceFactory[T](): InstanceFactory[T] = null
-  };
+  def getConfiguration: Configuration = new DefaultConfiguration
+}
+
+class DefaultConfiguration extends Configuration {
+  override def getItemConverter[T](domainClass: Class[T]): ItemConverter[T] = new DefaultItemConverter[T](domainClass, getInstanceFactory(domainClass))
+  override def getInstanceFactory[T](domainClass: Class[T]): InstanceFactory[T] = {
+    new InstanceFactory[T] {
+      def createInstance(domainClass: Class[T]): T = domainClass.newInstance
+    }
+  }  
 }

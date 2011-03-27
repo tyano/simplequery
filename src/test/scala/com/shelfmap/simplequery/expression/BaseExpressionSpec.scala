@@ -20,7 +20,6 @@ package com.shelfmap.simplequery.expression
  * Test class for 'getResults()' and 'getSingleResult()' of the BaseExpression class.
  */
 import org.scalatest.FlatSpec
-import org.scalatest.matchers.ShouldMatchers
 import com.amazonaws.services.simpledb.model.BatchPutAttributesRequest
 import com.amazonaws.services.simpledb.model.CreateDomainRequest
 import com.amazonaws.services.simpledb.model.DeleteDomainRequest
@@ -31,6 +30,9 @@ import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
 import Conditions._
 import MatcherFactory._
+import collection.JavaConversions._
+import org.scalatest.matchers.ShouldMatchers
+import scala.reflect.BeanProperty
 
 @RunWith(classOf[JUnitRunner])
 class BaseExpressionSpec extends FlatSpec with ShouldMatchers with AWSSecurityCredential with ConfigurationAware {
@@ -45,18 +47,27 @@ class BaseExpressionSpec extends FlatSpec with ShouldMatchers with AWSSecurityCr
   val client = new SimpleQueryClient(simpleDB, configuration)
   
   //tests.
+  val exp = client.select("*").from(classOf[ExpressionTestDomain]).where("age", greaterThan(19)).orderBy("age", SortOrder.Desc)
+  
   "selecting items that have age of more than 19" should "return 2 items" in {
-    val exp = client.select("*").from(classOf[ExpressionTestDomain]).where("age", greaterThan(19)).orderBy("age", SortOrder.Desc)
-    val results = exp.getResults
-    
-    results.size should be === 2
+    exp.getResults.size should be === 2
+  }
+  //TODO size()を呼び出したときにExpressionが書き換えられて、それ以降正常にクエリを投げられない。
+  
+  "2 items of results" should "have age of 20 and 21, name of 'test-3' and 'test-4'" in {
+    for (result <- exp.getResults) {
+      result.name should (be === "test-3" or be === "test-4")
+      result.age should (be === 20 or be === 21)
+      
+      if(result.name == "test-3") result.age should be === 20
+      if(result.name == "test-4") result.age should be === 21
+    }
   }
   
   def initialize(): Unit = {
     simpleDB.deleteDomain(new DeleteDomainRequest(domainName))
     simpleDB.createDomain(new CreateDomainRequest(domainName))
 
-    import collection.JavaConversions._
     val putData = List(new ReplaceableItem()
                          .withName("1")
                          .withAttributes(
@@ -92,13 +103,14 @@ import _root_.com.shelfmap.simplequery.SimpleDBAttribute
 
 @Domain("expression-test")
 class ExpressionTestDomain {
-  var id: String = ""
-  var name: String = ""
+  @BeanProperty var id: String = ""
+  @BeanProperty var name: String = ""
   var age: Int = 0
 
-  def getId() = id
-  def getName() = name
-  
   @SimpleDBAttribute(maxDigitLeft=3)
   def getAge() = age
+  
+  def setAge(age: Int):Unit = {
+    this.age = age
+  }
 }

@@ -58,10 +58,9 @@ public class SampleTestSteps {
         domainNames = result.getDomainNames();
     }
     
-    @Then("the count of the domains should be $count and the name of the domain should be '$name'.")
-    public void checkDomainCountAndName(int count, String name) {
+    @Then("the count of the domains should be $count.")
+    public void checkDomainCountAndName(int count) {
         assertThat(domainNames.size(), is(count));
-        assertThat(domainNames.get(0), is(name));
     }
     
     private String getSecurityCredentialPath() {

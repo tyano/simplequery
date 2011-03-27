@@ -23,6 +23,7 @@ import org.scalatest.FlatSpec
 import org.scalatest.matchers.ShouldMatchers
 import com.amazonaws.services.simpledb.model.BatchPutAttributesRequest
 import com.amazonaws.services.simpledb.model.CreateDomainRequest
+import com.amazonaws.services.simpledb.model.DeleteDomainRequest
 import com.amazonaws.services.simpledb.model.ReplaceableAttribute
 import com.amazonaws.services.simpledb.model.ReplaceableItem
 import com.shelfmap.simplequery.SimpleQueryClient
@@ -45,15 +46,15 @@ class BaseExpressionSpec extends FlatSpec with ShouldMatchers with AWSSecurityCr
   
   //tests.
   "selecting items that have age of more than 19" should "return 2 items" in {
-    val exp = client.select("*").from(classOf[ExpressionTestDomain]).where("age", greaterThan(19)).orderBy("name", SortOrder.Asc)
+    val exp = client.select("*").from(classOf[ExpressionTestDomain]).where("age", greaterThan(19)).orderBy("age", SortOrder.Desc)
     val results = exp.getResults
     
     results.size() should be === 2
   }
   
   def initialize(): Unit = {
-    val createDomainReq = new CreateDomainRequest(domainName)
-    simpleDB.createDomain(createDomainReq)
+    simpleDB.deleteDomain(new DeleteDomainRequest(domainName))
+    simpleDB.createDomain(new CreateDomainRequest(domainName))
 
     import java.util.{List => JList}
     import collection.JavaConversions._

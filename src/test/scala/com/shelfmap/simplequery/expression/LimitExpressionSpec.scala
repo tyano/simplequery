@@ -18,11 +18,11 @@ package com.shelfmap.simplequery.expression
 
 import com.shelfmap.simplequery.expression.impl.Select
 import org.scalatest.FlatSpec
-import org.scalatest.matchers.ShouldMatchers
 import com.shelfmap.simplequery.expression.Conditions._
 import com.shelfmap.simplequery.expression.MatcherFactory._
 import org.scalatest.junit.JUnitRunner
 import org.junit.runner.RunWith
+import org.scalatest.matchers.ShouldMatchers
 
 @RunWith(classOf[JUnitRunner])
 class LimitExpressionSpec extends FlatSpec with ShouldMatchers with AWSSecurityCredential with ConfigurationAware {

@@ -49,41 +49,39 @@ class BaseExpressionSpec extends FlatSpec with ShouldMatchers with AWSSecurityCr
     val exp = client.select("*").from(classOf[ExpressionTestDomain]).where("age", greaterThan(19)).orderBy("age", SortOrder.Desc)
     val results = exp.getResults
     
-    results.size() should be === 2
+    results.size should be === 2
   }
   
   def initialize(): Unit = {
     simpleDB.deleteDomain(new DeleteDomainRequest(domainName))
     simpleDB.createDomain(new CreateDomainRequest(domainName))
 
-    import java.util.{List => JList}
     import collection.JavaConversions._
-    val putData: JList[ReplaceableItem] = List(new ReplaceableItem()
-                                             .withName("1")
-                                             .withAttributes(
-                                               new ReplaceableAttribute("name", "test-1", true),
-                                               new ReplaceableAttribute("age", "018", true)
-                                             ),
-                                           new ReplaceableItem()
-                                             .withName("2")
-                                             .withAttributes(
-                                               new ReplaceableAttribute("name", "test-2", true),
-                                               new ReplaceableAttribute("age", "019", true)
-                                             ),
-                                           new ReplaceableItem()
-                                             .withName("3")
-                                             .withAttributes(
-                                               new ReplaceableAttribute("name", "test-3", true),
-                                               new ReplaceableAttribute("age", "020", true)
-                                             ),
-                                           new ReplaceableItem()
-                                             .withName("4")
-                                             .withAttributes(
-                                               new ReplaceableAttribute("name", "test-4", true),
-                                               new ReplaceableAttribute("age", "021", true)
-                                             ))
-    val batchReq: BatchPutAttributesRequest = new BatchPutAttributesRequest(domainName, putData)  
-    simpleDB.batchPutAttributes(batchReq)
+    val putData = List(new ReplaceableItem()
+                         .withName("1")
+                         .withAttributes(
+                           new ReplaceableAttribute("name", "test-1", true),
+                           new ReplaceableAttribute("age", "018", true)
+                         ),
+                       new ReplaceableItem()
+                         .withName("2")
+                         .withAttributes(
+                           new ReplaceableAttribute("name", "test-2", true),
+                           new ReplaceableAttribute("age", "019", true)
+                         ),
+                       new ReplaceableItem()
+                         .withName("3")
+                         .withAttributes(
+                           new ReplaceableAttribute("name", "test-3", true),
+                           new ReplaceableAttribute("age", "020", true)
+                         ),
+                       new ReplaceableItem()
+                         .withName("4")
+                         .withAttributes(
+                           new ReplaceableAttribute("name", "test-4", true),
+                           new ReplaceableAttribute("age", "021", true)
+                         ))
+    simpleDB.batchPutAttributes(new BatchPutAttributesRequest(domainName, putData))
   }
 }
 

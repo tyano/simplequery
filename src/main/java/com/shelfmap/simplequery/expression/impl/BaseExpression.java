@@ -16,16 +16,20 @@
 
 package com.shelfmap.simplequery.expression.impl;
 
+import com.shelfmap.simplequery.expression.CanNotConvertItemException;
 import static com.shelfmap.simplequery.util.Assertion.isNotNull;
 import com.amazonaws.services.simpledb.AmazonSimpleDB;
+import com.amazonaws.services.simpledb.model.Item;
 import com.amazonaws.services.simpledb.model.SelectRequest;
 import com.amazonaws.services.simpledb.model.SelectResult;
 import com.shelfmap.simplequery.Configuration;
-import com.shelfmap.simplequery.Domain;
 import com.shelfmap.simplequery.expression.Expression;
 import com.shelfmap.simplequery.expression.MultipleResultsExistException;
 import com.shelfmap.simplequery.expression.QueryResults;
 import com.shelfmap.simplequery.expression.SimpleQueryException;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -48,7 +52,19 @@ public abstract class BaseExpression<T> implements Expression<T> {
     
     @Override
     public T getSingleResult() throws SimpleQueryException, MultipleResultsExistException {
-        throw new UnsupportedOperationException("Not supported yet.");
+        String expression = describe();
+        SelectRequest selectReq = new SelectRequest(expression);
+        SelectResult result = simpleDB.select(selectReq);
+        List<Item> items = result.getItems();
+        if(items.size() > 1) throw new MultipleResultsExistException("more than 1 results returned by the expression: " + expression);
+        if(items.isEmpty()) return null;
+        
+        Item first = items.get(0);
+        try {
+            return getConfiguration().getItemConveter(domainClass).convert(first);
+        } catch (CanNotConvertItemException ex) {
+            throw new SimpleQueryException("Can not convert an item", ex);
+        }
     }
 
     @Override

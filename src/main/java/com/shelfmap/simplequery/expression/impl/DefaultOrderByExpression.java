@@ -63,7 +63,7 @@ public class DefaultOrderByExpression<T> extends BaseExpression<T> implements Or
     }
 
     protected DefaultOrderByExpression(AmazonSimpleDB simpleDB, Configuration configuration, DomainExpression<T> domainExpression, WhereExpression<T> whereExpression, String attributeName, SortOrder sortOrder) {
-        super(simpleDB, configuration);
+        super(simpleDB, configuration, domainExpression.getDomainClass());
         isNotNull("attributeName", attributeName);
         isNotNull("sortOrder", sortOrder);
         this.domainExpression = domainExpression;

@@ -30,6 +30,7 @@ import com.shelfmap.simplequery.expression.OrderByExpression;
 import com.shelfmap.simplequery.expression.SelectQuery;
 import com.shelfmap.simplequery.expression.SortOrder;
 import com.shelfmap.simplequery.expression.WhereExpression;
+import com.shelfmap.simplequery.util.Assertion;
 
 /**
  *
@@ -40,9 +41,15 @@ public class DefaultWhereExpression<T> extends BaseExpression<T> implements Wher
     private DomainExpression<T> domainExpression;
     private Condition condition;
 
-    public DefaultWhereExpression(AmazonSimpleDB simpleDB, Configuration configuration, DomainExpression<T> domainExpression, Condition condition) {
-        super(simpleDB, configuration);
-        isNotNull("domainExpression", domainExpression);
+    public DefaultWhereExpression(AmazonSimpleDB simpleDB, Configuration configuration, final DomainExpression<T> domainExpression, Condition condition) {
+        super(simpleDB, 
+              configuration, 
+              Assertion.isNotNullAndGet("domainExpression", domainExpression, new Assertion.Accessor<Class<T>>() {
+                    @Override
+                    public Class<T> get() {
+                        return domainExpression.getDomainClass();
+                    }
+              })); 
         isNotNull("condition", condition);
         this.domainExpression = domainExpression;
         this.condition = condition;

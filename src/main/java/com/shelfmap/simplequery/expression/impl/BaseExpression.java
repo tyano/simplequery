@@ -21,6 +21,7 @@ import com.amazonaws.services.simpledb.AmazonSimpleDB;
 import com.amazonaws.services.simpledb.model.SelectRequest;
 import com.amazonaws.services.simpledb.model.SelectResult;
 import com.shelfmap.simplequery.Configuration;
+import com.shelfmap.simplequery.Domain;
 import com.shelfmap.simplequery.expression.Expression;
 import com.shelfmap.simplequery.expression.MultipleResultsExistException;
 import com.shelfmap.simplequery.expression.QueryResults;
@@ -34,12 +35,15 @@ public abstract class BaseExpression<T> implements Expression<T> {
 
     private final Configuration configuration;
     private final AmazonSimpleDB simpleDB;
+    private final Class<T> domainClass;
 
-    public BaseExpression(AmazonSimpleDB simpleDB, Configuration configuration) {
+    public BaseExpression(AmazonSimpleDB simpleDB, Configuration configuration, Class<T> domainClass) {
         isNotNull("simpleDB", simpleDB);
         isNotNull("configuration", configuration);
+        isNotNull("domainClass", domainClass);
         this.simpleDB = simpleDB;
         this.configuration = configuration;
+        this.domainClass = domainClass;
     }
     
     @Override
@@ -51,7 +55,7 @@ public abstract class BaseExpression<T> implements Expression<T> {
     public QueryResults<T> getResults() throws SimpleQueryException {
         SelectRequest selectReq = new SelectRequest(describe());
         SelectResult result = simpleDB.select(selectReq);
-        return null;
+        return new DefaultQueryResult<T>(simpleDB, this, result, getConfiguration().getItemConveter(domainClass));
     }
     
     public AmazonSimpleDB getAmazonSimpleDB() {

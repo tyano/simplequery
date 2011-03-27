@@ -39,7 +39,7 @@ public class DefaultDomainExpression<T> extends BaseExpression<T> implements Dom
     private Class<T> typeToken;
 
     public DefaultDomainExpression(AmazonSimpleDB simpleDB, Configuration configuration, SelectQuery selectObject, String domainName, Class<T> typeToken) {
-        super(simpleDB, configuration);
+        super(simpleDB, configuration, typeToken);
         isNotNull("selectObject", selectObject);
         isNotNull("domainName", domainName);
         isNotNull("typeToken", typeToken);

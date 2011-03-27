@@ -38,7 +38,7 @@ public class DefaultLimitExpression<T> extends BaseExpression<T> implements Limi
     private OrderByExpression<T> orderByExpression;
 
     protected DefaultLimitExpression(AmazonSimpleDB simpleDB, Configuration configuration, DomainExpression<T> domainExpression, WhereExpression<T> whereExpression, OrderByExpression<T> orderByExpression, int limitCount) {
-        super(simpleDB, configuration);
+        super(simpleDB, configuration, domainExpression.getDomainClass());
         this.limitCount = limitCount;
         this.domainExpression = domainExpression;
         this.whereExpression = whereExpression;

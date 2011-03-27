@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.shelfmap.simplequery.expression;
 
 /**
@@ -25,4 +24,7 @@ public interface WhereExpression<T> extends Expression<T>, Conjunctive<WhereExpr
     Condition getCondition();
     OrderByExpression<T> orderBy(String attributeName, SortOrder sortOrder);
     LimitExpression<T> limit(int limitCount);
+
+    @Override
+    WhereExpression<T> rebuildWith(String... attributes);
 }

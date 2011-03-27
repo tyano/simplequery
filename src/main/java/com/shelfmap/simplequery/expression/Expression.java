@@ -46,5 +46,6 @@ public interface Expression<T> extends Describable {
      */
     QueryResults<T> getResults() throws SimpleQueryException;
     
+    int count() throws SimpleQueryException;
     Expression<T> rebuildWith(String... attributes);
 }

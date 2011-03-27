@@ -29,4 +29,7 @@ public interface DomainExpression<T> extends Expression<T>{
     OrderByExpression<T> orderBy(String attributeName, SortOrder sortOrder);
     LimitExpression<T> limit(int limitCount);
     DomainExpression<T> rebuildWith(SelectQuery select);
+
+    @Override
+    DomainExpression<T> rebuildWith(String... attributes);
 }

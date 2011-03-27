@@ -110,9 +110,17 @@ public class DefaultOrderByExpression<T> extends BaseExpression<T> implements Or
     }
 
     @Override
-    public Expression<T> rebuildWith(String... attributes) {
-        SelectQuery select = new Select(getAmazonSimpleDB(), getConfiguration(), attributes);
-        domainExpression.rebuildWith(select);
-        return this;
+    public OrderByExpression<T> rebuildWith(String... attributes) {
+        return (getWhereExpression() != null)
+                ? new DefaultOrderByExpression<T>(getAmazonSimpleDB(),
+                                                  getConfiguration(),
+                                                  getWhereExpression().rebuildWith(attributes),
+                                                  attributeName,
+                                                  sortOrder)
+                : new DefaultOrderByExpression<T>(getAmazonSimpleDB(), 
+                                                  getConfiguration(), 
+                                                  getDomainExpression().rebuildWith(attributes), 
+                                                  attributeName, 
+                                                  sortOrder);
     }
 }

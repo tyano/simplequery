@@ -26,4 +26,7 @@ public interface OrderByExpression<T> extends Expression<T> {
     LimitExpression<T> limit(int limitCount);
     String getAttributeName();
     SortOrder getSortOrder();
+
+    @Override
+    OrderByExpression<T> rebuildWith(String... attributes);
 }

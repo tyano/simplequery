@@ -25,4 +25,7 @@ public interface LimitExpression<T> extends Expression<T> {
     WhereExpression<T> getWhereExpression();
     OrderByExpression<T> getOrderByExpression();
     int getLimitCount();
+    
+    @Override
+    LimitExpression<T> rebuildWith(String... attributes);
 }

@@ -91,15 +91,14 @@ public class DefaultDomainExpression<T> extends BaseExpression<T> implements Dom
     }
 
     @Override
-    public Expression<T> rebuildWith(String... attributes) {
+    public DomainExpression<T> rebuildWith(String... attributes) {
         SelectQuery select = new Select(getAmazonSimpleDB(), getConfiguration(), attributes);
         return rebuildWith(select);
     }
 
     @Override
     public DomainExpression<T> rebuildWith(SelectQuery select) {
-        this.selectObject = select;
-        return this;
+        return new DefaultDomainExpression<T>(getAmazonSimpleDB(), getConfiguration(), select, domainName, typeToken);
     }
 
     @Override

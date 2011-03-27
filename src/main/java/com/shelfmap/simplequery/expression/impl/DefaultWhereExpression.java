@@ -165,9 +165,10 @@ public class DefaultWhereExpression<T> extends BaseExpression<T> implements Wher
     }
 
     @Override
-    public Expression<T> rebuildWith(String... attributes) {
-        SelectQuery select = new Select(getAmazonSimpleDB(), getConfiguration(), attributes);
-        domainExpression.rebuildWith(select);
-        return this;
+    public WhereExpression<T> rebuildWith(String... attributes) {
+        return new DefaultWhereExpression<T>(getAmazonSimpleDB(), 
+                                             getConfiguration(), 
+                                             domainExpression.rebuildWith(attributes), 
+                                             condition);
     }
 }

@@ -34,6 +34,8 @@ import java.util.List;
  * @author Tsutomu YANO
  */
 public abstract class BaseExpression<T> implements Expression<T> {
+    private static final String COUNT_ATTRIBUTE = "count(*)";
+    
     private final Configuration configuration;
     private final AmazonSimpleDB simpleDB;
     private final Class<T> domainClass;
@@ -70,6 +72,18 @@ public abstract class BaseExpression<T> implements Expression<T> {
         SelectResult result = simpleDB.select(selectReq);
         return new DefaultQueryResult<T>(simpleDB, this, result, getConfiguration().getItemConverter(domainClass));
     }
+
+    @Override
+    public int count() throws SimpleQueryException {
+        Expression<T> rebuilt = rebuildWith(COUNT_ATTRIBUTE);
+        SelectRequest req = new SelectRequest(rebuilt.describe());
+        SelectResult selectResult = simpleDB.select(req);
+        List<Item> items = selectResult.getItems();
+        if(items.isEmpty()) throw new IllegalStateException("can not count records. expression was: " + rebuilt.describe());
+        
+        String value  = items.get(0).getAttributes().get(0).getValue();
+        return Integer.parseInt(value);        
+    }
     
     public AmazonSimpleDB getAmazonSimpleDB() {
         return this.simpleDB;
@@ -78,7 +92,7 @@ public abstract class BaseExpression<T> implements Expression<T> {
     public Configuration getConfiguration() {
         return configuration;
     }
-
+    
     @Override
     public Object clone() {
         try {

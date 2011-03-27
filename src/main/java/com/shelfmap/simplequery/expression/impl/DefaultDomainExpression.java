@@ -98,9 +98,8 @@ public class DefaultDomainExpression<T> extends BaseExpression<T> implements Dom
 
     @Override
     public DomainExpression<T> rebuildWith(SelectQuery select) {
-        DefaultDomainExpression<T> clone = this.clone();
-        clone.selectObject = select;
-        return clone;
+        this.selectObject = select;
+        return this;
     }
 
     @Override

@@ -114,6 +114,7 @@ public class DefaultLimitExpression<T> extends BaseExpression<T> implements Limi
     @Override
     public Expression<T> rebuildWith(String... attributes) {
         SelectQuery select = new Select(getAmazonSimpleDB(), getConfiguration(), attributes);
-        return domainExpression.rebuildWith(select);
+        domainExpression.rebuildWith(select);
+        return this;
     }
 }

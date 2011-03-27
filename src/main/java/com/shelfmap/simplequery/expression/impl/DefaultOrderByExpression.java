@@ -19,6 +19,7 @@ import com.shelfmap.simplequery.expression.Expression;
 import static com.shelfmap.simplequery.util.Assertion.*;
 import com.amazonaws.services.simpledb.AmazonSimpleDB;
 import com.amazonaws.services.simpledb.util.SimpleDBUtils;
+import com.shelfmap.simplequery.Configuration;
 import com.shelfmap.simplequery.expression.LimitExpression;
 import com.shelfmap.simplequery.expression.SortOrder;
 import com.shelfmap.simplequery.expression.DomainExpression;
@@ -37,16 +38,18 @@ public class DefaultOrderByExpression<T> extends BaseExpression<T> implements Or
     private final String attributeName;
     private final SortOrder sortOrder;
 
-    public DefaultOrderByExpression(AmazonSimpleDB simpleDB, DomainExpression<T> domainExpression, String attributeName, SortOrder sortOrder) {
+    public DefaultOrderByExpression(AmazonSimpleDB simpleDB, Configuration configuration, DomainExpression<T> domainExpression, String attributeName, SortOrder sortOrder) {
         this(simpleDB, 
+             configuration,
              isNotNullAndReturn("domainExpression", domainExpression), 
              null, 
              attributeName, 
              sortOrder);
     }
 
-    public DefaultOrderByExpression(AmazonSimpleDB simpleDB, final WhereExpression<T> whereExpression, String attributeName, SortOrder sortOrder) {
+    public DefaultOrderByExpression(AmazonSimpleDB simpleDB, Configuration configuration, final WhereExpression<T> whereExpression, String attributeName, SortOrder sortOrder) {
         this(simpleDB,
+             configuration,
             isNotNullAndGet("whereExpression", whereExpression, 
                 new Assertion.Accessor<DomainExpression<T>>() {
                     @Override
@@ -59,8 +62,8 @@ public class DefaultOrderByExpression<T> extends BaseExpression<T> implements Or
             sortOrder);
     }
 
-    protected DefaultOrderByExpression(AmazonSimpleDB simpleDB, DomainExpression<T> domainExpression, WhereExpression<T> whereExpression, String attributeName, SortOrder sortOrder) {
-        super(simpleDB);
+    protected DefaultOrderByExpression(AmazonSimpleDB simpleDB, Configuration configuration, DomainExpression<T> domainExpression, WhereExpression<T> whereExpression, String attributeName, SortOrder sortOrder) {
+        super(simpleDB, configuration);
         isNotNull("attributeName", attributeName);
         isNotNull("sortOrder", sortOrder);
         this.domainExpression = domainExpression;
@@ -103,12 +106,12 @@ public class DefaultOrderByExpression<T> extends BaseExpression<T> implements Or
 
     @Override
     public LimitExpression<T> limit(int limitCount) {
-        return new DefaultLimitExpression<T>(getAmazonSimpleDB(), this, limitCount);
+        return new DefaultLimitExpression<T>(getAmazonSimpleDB(), getConfiguration(), this, limitCount);
     }
 
     @Override
     public Expression<T> rebuildWith(String... attributes) {
-        SelectQuery select = new Select(getAmazonSimpleDB(), attributes);
+        SelectQuery select = new Select(getAmazonSimpleDB(), getConfiguration(), attributes);
         return domainExpression.rebuildWith(select);
     }
 }

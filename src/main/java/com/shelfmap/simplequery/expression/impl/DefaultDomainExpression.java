@@ -17,6 +17,7 @@
 package com.shelfmap.simplequery.expression.impl;
 
 import com.amazonaws.services.simpledb.AmazonSimpleDB;
+import com.shelfmap.simplequery.Configuration;
 import com.shelfmap.simplequery.expression.Expression;
 import com.shelfmap.simplequery.expression.LimitExpression;
 import com.shelfmap.simplequery.expression.OrderByExpression;
@@ -37,8 +38,8 @@ public class DefaultDomainExpression<T> extends BaseExpression<T> implements Dom
     private String domainName;
     private Class<T> typeToken;
 
-    public DefaultDomainExpression(AmazonSimpleDB simpleDB, SelectQuery selectObject, String domainName, Class<T> typeToken) {
-        super(simpleDB);
+    public DefaultDomainExpression(AmazonSimpleDB simpleDB, Configuration configuration, SelectQuery selectObject, String domainName, Class<T> typeToken) {
+        super(simpleDB, configuration);
         isNotNull("selectObject", selectObject);
         isNotNull("domainName", domainName);
         isNotNull("typeToken", typeToken);
@@ -49,7 +50,7 @@ public class DefaultDomainExpression<T> extends BaseExpression<T> implements Dom
     
     @Override
     public WhereExpression<T> where(Condition expression) {
-        return new DefaultWhereExpression<T>(getAmazonSimpleDB(), this, expression);
+        return new DefaultWhereExpression<T>(getAmazonSimpleDB(), getConfiguration(), this, expression);
     }
 
     @Override
@@ -80,17 +81,17 @@ public class DefaultDomainExpression<T> extends BaseExpression<T> implements Dom
 
     @Override
     public LimitExpression<T> limit(int limitCount) {
-        return new DefaultLimitExpression<T>(getAmazonSimpleDB(), this, limitCount);
+        return new DefaultLimitExpression<T>(getAmazonSimpleDB(), getConfiguration(), this, limitCount);
     }
 
     @Override
     public OrderByExpression<T> orderBy(String attributeName, SortOrder sortOrder) {
-        return new DefaultOrderByExpression<T>(getAmazonSimpleDB(), this, attributeName, sortOrder);
+        return new DefaultOrderByExpression<T>(getAmazonSimpleDB(), getConfiguration(), this, attributeName, sortOrder);
     }
 
     @Override
     public Expression<T> rebuildWith(String... attributes) {
-        SelectQuery select = new Select(getAmazonSimpleDB(), attributes);
+        SelectQuery select = new Select(getAmazonSimpleDB(), getConfiguration(), attributes);
         return rebuildWith(select);
     }
 

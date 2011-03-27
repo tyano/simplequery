@@ -20,6 +20,7 @@ import static com.shelfmap.simplequery.util.Assertion.isNotNull;
 import com.amazonaws.services.simpledb.AmazonSimpleDB;
 import com.amazonaws.services.simpledb.model.SelectRequest;
 import com.amazonaws.services.simpledb.model.SelectResult;
+import com.shelfmap.simplequery.Configuration;
 import com.shelfmap.simplequery.expression.Expression;
 import com.shelfmap.simplequery.expression.MultipleResultsExistException;
 import com.shelfmap.simplequery.expression.QueryResults;
@@ -30,11 +31,15 @@ import com.shelfmap.simplequery.expression.SimpleQueryException;
  * @author Tsutomu YANO
  */
 public abstract class BaseExpression<T> implements Expression<T> {
+
+    private final Configuration configuration;
     private final AmazonSimpleDB simpleDB;
 
-    public BaseExpression(AmazonSimpleDB simpleDB) {
+    public BaseExpression(AmazonSimpleDB simpleDB, Configuration configuration) {
         isNotNull("simpleDB", simpleDB);
+        isNotNull("configuration", configuration);
         this.simpleDB = simpleDB;
+        this.configuration = configuration;
     }
     
     @Override
@@ -51,6 +56,10 @@ public abstract class BaseExpression<T> implements Expression<T> {
     
     public AmazonSimpleDB getAmazonSimpleDB() {
         return this.simpleDB;
+    }
+
+    public Configuration getConfiguration() {
+        return configuration;
     }
 
     @Override

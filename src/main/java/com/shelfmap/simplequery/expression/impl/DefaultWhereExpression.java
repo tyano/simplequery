@@ -16,6 +16,7 @@
 package com.shelfmap.simplequery.expression.impl;
 
 import com.amazonaws.services.simpledb.AmazonSimpleDB;
+import com.shelfmap.simplequery.Configuration;
 import com.shelfmap.simplequery.expression.DomainAttribute;
 import com.shelfmap.simplequery.expression.AttributeInfo;
 import com.shelfmap.simplequery.expression.DomainExpression;
@@ -39,8 +40,8 @@ public class DefaultWhereExpression<T> extends BaseExpression<T> implements Wher
     private DomainExpression<T> domainExpression;
     private Condition condition;
 
-    public DefaultWhereExpression(AmazonSimpleDB simpleDB, DomainExpression<T> domainExpression, Condition condition) {
-        super(simpleDB);
+    public DefaultWhereExpression(AmazonSimpleDB simpleDB, Configuration configuration, DomainExpression<T> domainExpression, Condition condition) {
+        super(simpleDB, configuration);
         isNotNull("domainExpression", domainExpression);
         isNotNull("condition", condition);
         this.domainExpression = domainExpression;
@@ -49,7 +50,7 @@ public class DefaultWhereExpression<T> extends BaseExpression<T> implements Wher
 
     @Override
     public OrderByExpression<T> orderBy(String attributeName, SortOrder sortOrder) {
-        return new DefaultOrderByExpression<T>(getAmazonSimpleDB(), this, attributeName, sortOrder);
+        return new DefaultOrderByExpression<T>(getAmazonSimpleDB(), getConfiguration(), this, attributeName, sortOrder);
     }
 
     @Override
@@ -97,12 +98,12 @@ public class DefaultWhereExpression<T> extends BaseExpression<T> implements Wher
 
     @Override
     public LimitExpression<T> limit(int limitCount) {
-        return new DefaultLimitExpression<T>(getAmazonSimpleDB(), this, limitCount);
+        return new DefaultLimitExpression<T>(getAmazonSimpleDB(), getConfiguration(), this, limitCount);
     }
 
     @Override
     public WhereExpression<T> and(Condition other) {
-        return new DefaultWhereExpression<T>(getAmazonSimpleDB(), this.domainExpression, condition.and(other));
+        return new DefaultWhereExpression<T>(getAmazonSimpleDB(), getConfiguration(), this.domainExpression, condition.and(other));
     }
 
     @Override
@@ -119,7 +120,7 @@ public class DefaultWhereExpression<T> extends BaseExpression<T> implements Wher
 
     @Override
     public WhereExpression<T> or(Condition other) {
-        return new DefaultWhereExpression<T>(getAmazonSimpleDB(), this.domainExpression, condition.or(other));
+        return new DefaultWhereExpression<T>(getAmazonSimpleDB(), getConfiguration(), this.domainExpression, condition.or(other));
     }
 
     @Override
@@ -136,7 +137,7 @@ public class DefaultWhereExpression<T> extends BaseExpression<T> implements Wher
 
     @Override
     public WhereExpression<T> intersection(Condition other) {
-        return new DefaultWhereExpression<T>(getAmazonSimpleDB(), this.domainExpression, condition.intersection(other));
+        return new DefaultWhereExpression<T>(getAmazonSimpleDB(), getConfiguration(), this.domainExpression, condition.intersection(other));
     }
 
     @Override
@@ -153,12 +154,12 @@ public class DefaultWhereExpression<T> extends BaseExpression<T> implements Wher
 
     @Override
     public WhereExpression<T> group() {
-        return new DefaultWhereExpression<T>(getAmazonSimpleDB(), this.domainExpression, new ConditionGroup(this.condition));
+        return new DefaultWhereExpression<T>(getAmazonSimpleDB(), getConfiguration(), this.domainExpression, new ConditionGroup(this.condition));
     }
 
     @Override
     public Expression<T> rebuildWith(String... attributes) {
-        SelectQuery select = new Select(getAmazonSimpleDB(), attributes);
+        SelectQuery select = new Select(getAmazonSimpleDB(), getConfiguration(), attributes);
         return domainExpression.rebuildWith(select);
     }
 }

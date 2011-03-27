@@ -26,9 +26,11 @@ import com.shelfmap.simplequery.expression.impl.Select;
  */
 public class SimpleQueryClient implements Client {
     private final AmazonSimpleDB simpleDB;
+    private final Configuration configuration;
 
-    public SimpleQueryClient(AmazonSimpleDB simpleDb) {
+    public SimpleQueryClient(AmazonSimpleDB simpleDb, Configuration configuration) {
         this.simpleDB = simpleDb;
+        this.configuration = configuration;
     }
     
     @Override
@@ -42,6 +44,6 @@ public class SimpleQueryClient implements Client {
     }
     
     protected SelectQuery newSelectQuery(String... attribute) {
-        return new Select(simpleDB, attribute);
+        return new Select(simpleDB, configuration, attribute);
     }
 }

@@ -18,6 +18,7 @@ package com.shelfmap.simplequery.expression.impl;
 import com.shelfmap.simplequery.expression.Expression;
 import static com.shelfmap.simplequery.util.Assertion.*;
 import com.amazonaws.services.simpledb.AmazonSimpleDB;
+import com.shelfmap.simplequery.Configuration;
 import com.shelfmap.simplequery.expression.DomainExpression;
 import com.shelfmap.simplequery.expression.LimitExpression;
 import com.shelfmap.simplequery.expression.OrderByExpression;
@@ -36,24 +37,25 @@ public class DefaultLimitExpression<T> extends BaseExpression<T> implements Limi
     private WhereExpression<T> whereExpression;
     private OrderByExpression<T> orderByExpression;
 
-    protected DefaultLimitExpression(AmazonSimpleDB simpleDB, DomainExpression<T> domainExpression, WhereExpression<T> whereExpression, OrderByExpression<T> orderByExpression, int limitCount) {
-        super(simpleDB);
+    protected DefaultLimitExpression(AmazonSimpleDB simpleDB, Configuration configuration, DomainExpression<T> domainExpression, WhereExpression<T> whereExpression, OrderByExpression<T> orderByExpression, int limitCount) {
+        super(simpleDB, configuration);
         this.limitCount = limitCount;
         this.domainExpression = domainExpression;
         this.whereExpression = whereExpression;
         this.orderByExpression = orderByExpression;
     }
 
-    public DefaultLimitExpression(AmazonSimpleDB simpleDB, DomainExpression<T> domainExpression, int limitCount) {
-        this(simpleDB,
+    public DefaultLimitExpression(AmazonSimpleDB simpleDB, Configuration configuration, DomainExpression<T> domainExpression, int limitCount) {
+        this(simpleDB, configuration,
                 isNotNullAndReturn("domainExpression", domainExpression),
                 null,
                 null,
                 limitCount);
     }
 
-    public DefaultLimitExpression(AmazonSimpleDB simpleDB, final WhereExpression<T> whereExpression, int limitCount) {
+    public DefaultLimitExpression(AmazonSimpleDB simpleDB, Configuration configuration, final WhereExpression<T> whereExpression, int limitCount) {
         this(simpleDB,
+             configuration,
                 isNotNullAndGet("whereExpression", whereExpression,
                     new Assertion.Accessor<DomainExpression<T>>() {
                         @Override
@@ -66,8 +68,9 @@ public class DefaultLimitExpression<T> extends BaseExpression<T> implements Limi
                 limitCount);
     }
 
-    public DefaultLimitExpression(AmazonSimpleDB simpleDB, final OrderByExpression<T> orderByExpression, int limitCount) {
+    public DefaultLimitExpression(AmazonSimpleDB simpleDB, Configuration configuration, final OrderByExpression<T> orderByExpression, int limitCount) {
         this(simpleDB,
+             configuration,
                 isNotNullAndGet("orderByExpression", orderByExpression, 
                     new Assertion.Accessor<DomainExpression<T>>() {
                         @Override
@@ -110,7 +113,7 @@ public class DefaultLimitExpression<T> extends BaseExpression<T> implements Limi
 
     @Override
     public Expression<T> rebuildWith(String... attributes) {
-        SelectQuery select = new Select(getAmazonSimpleDB(), attributes);
+        SelectQuery select = new Select(getAmazonSimpleDB(), getConfiguration(), attributes);
         return domainExpression.rebuildWith(select);
     }
 }

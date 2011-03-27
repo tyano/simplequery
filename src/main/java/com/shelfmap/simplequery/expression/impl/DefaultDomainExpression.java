@@ -17,6 +17,7 @@
 package com.shelfmap.simplequery.expression.impl;
 
 import com.amazonaws.services.simpledb.AmazonSimpleDB;
+import com.amazonaws.services.simpledb.util.SimpleDBUtils;
 import com.shelfmap.simplequery.Configuration;
 import com.shelfmap.simplequery.expression.Expression;
 import com.shelfmap.simplequery.expression.LimitExpression;
@@ -61,7 +62,7 @@ public class DefaultDomainExpression<T> extends BaseExpression<T> implements Dom
 
     @Override
     public String describe() {
-        return selectObject.describe() + " from " + domainName;
+        return selectObject.describe() + " from " + SimpleDBUtils.quoteName(domainName);
     }
 
     @Override

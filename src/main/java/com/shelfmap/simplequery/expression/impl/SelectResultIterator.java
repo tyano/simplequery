@@ -20,9 +20,13 @@ import com.amazonaws.services.simpledb.AmazonSimpleDB;
 import com.amazonaws.services.simpledb.model.Item;
 import com.amazonaws.services.simpledb.model.SelectRequest;
 import com.amazonaws.services.simpledb.model.SelectResult;
+import com.shelfmap.simplequery.expression.CanNotConvertItemException;
 import com.shelfmap.simplequery.expression.Expression;
+import com.shelfmap.simplequery.expression.ItemConverter;
 import java.util.Iterator;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -32,18 +36,20 @@ public class SelectResultIterator<T> implements Iterator<T> {
     private AmazonSimpleDB simpleDB;
     private Expression<?> expression;
     private SelectResult currentResult;
+    private ItemConverter<T> itemConverter;
     private List<Item> currentItemList;
     private int currentListSize;
     private int currentIndex;
     
 
-    public SelectResultIterator(AmazonSimpleDB simpleDB, Expression<?> expression, SelectResult result) {
+    public SelectResultIterator(AmazonSimpleDB simpleDB, Expression<?> expression, SelectResult result, ItemConverter<T> itemConveter) {
         this.simpleDB = simpleDB;
         this.expression = expression;
         this.currentResult = result;
         this.currentItemList = result.getItems();
         this.currentIndex = 0;
         this.currentListSize = this.currentItemList.size();
+        this.itemConverter = itemConveter;
     }
 
     @Override
@@ -63,10 +69,14 @@ public class SelectResultIterator<T> implements Iterator<T> {
             currentIndex++;
         }
         
-        //TODO convert an Item to a Domain Object.
+        T instance = null;
+        try {
+            instance = itemConverter.convert(item);
+        } catch (CanNotConvertItemException ex) {
+            throw new IllegalStateException("Could not convert an item to a domain object.", ex);
+        }
         
-        
-        return null;
+        return instance;
     }
 
     @Override

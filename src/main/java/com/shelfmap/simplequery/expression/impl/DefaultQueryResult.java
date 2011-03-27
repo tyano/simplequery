@@ -21,6 +21,7 @@ import com.amazonaws.services.simpledb.model.Item;
 import com.amazonaws.services.simpledb.model.SelectRequest;
 import com.amazonaws.services.simpledb.model.SelectResult;
 import com.shelfmap.simplequery.expression.Expression;
+import com.shelfmap.simplequery.expression.ItemConverter;
 import com.shelfmap.simplequery.expression.QueryResults;
 import java.util.Collection;
 import java.util.Iterator;
@@ -35,16 +36,18 @@ public class DefaultQueryResult<T> implements QueryResults<T> {
     private final AmazonSimpleDB simpleDB;
     private final Expression<T> expression;
     private final SelectResult result;
+    private final ItemConverter<T> itemConveter;
 
-    public DefaultQueryResult(AmazonSimpleDB simpleDB, Expression<T> expression, SelectResult result) {
+    public DefaultQueryResult(AmazonSimpleDB simpleDB, Expression<T> expression, SelectResult result, ItemConverter<T> itemConveter) {
         this.simpleDB = simpleDB;
         this.expression = expression;
         this.result = result;
+        this.itemConveter = itemConveter;
     }
 
     @Override
     public Iterator<T> iterator() {
-        return null;
+        return new SelectResultIterator<T>(simpleDB, expression, result, itemConveter);
     }
 
     @Override

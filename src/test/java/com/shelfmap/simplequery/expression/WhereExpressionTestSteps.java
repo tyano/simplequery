@@ -59,7 +59,7 @@ public class WhereExpressionTestSteps {
 
     @Then("WhereExpression will generate a simple expression with no padding and no offset.")
     public void assertExpression() {
-        assertThat(expression.describe(), Matchers.is("select * from testdomain where `saving` > '100000'"));
+        assertThat(expression.describe(), Matchers.is("select * from `testdomain` where `saving` > '100000'"));
     }
 
     @When("TestDomain have a @SimpleDBAttribute on a property whose name is same with the attribute specified in a expression")
@@ -69,7 +69,7 @@ public class WhereExpressionTestSteps {
 
     @Then("WhereExpression will use a padding and a offset on the annotation")
     public void assertExpressionWithAnnotation() {
-        assertThat(expression.describe(), Matchers.is("select * from with-attribute where `saving` > '01100000'"));
+        assertThat(expression.describe(), Matchers.is("select * from `with-attribute` where `saving` > '01100000'"));
     }
 
     @When("a property have a @SimpleDBAttribute annotation, but the annotation don't have attributeName,")
@@ -79,7 +79,7 @@ public class WhereExpressionTestSteps {
 
     @Then("this library will find the annotation through the name of property instead of the attributeName, and uses values of the annotation.")
     public void assertExpressionWithoutAttributeName() {
-        assertThat(expression.describe(), Matchers.is("select * from without-attributename where `saving` > '0200500'"));
+        assertThat(expression.describe(), Matchers.is("select * from `without-attributename` where `saving` > '0200500'"));
     }
 
     

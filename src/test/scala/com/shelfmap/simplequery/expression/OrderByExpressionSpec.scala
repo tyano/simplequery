@@ -28,6 +28,6 @@ class OrderByExpressionSpec extends FlatSpec with ShouldMatchers with AWSSecurit
   val orderByExp = new Select(simpleDB, getConfiguration, "*") from (classOf[TestDomain]) orderBy ("name", SortOrder.Asc);
   
   "describe() method of OrderByExpression" should "generate encoded attribute's name" in {
-    orderByExp.describe should be === "select * from test-domain order by `name` asc"
+    orderByExp.describe should be === "select * from `test-domain` order by `name` asc"
   }
 }

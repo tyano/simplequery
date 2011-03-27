@@ -32,16 +32,16 @@ class LimitExpressionSpec extends FlatSpec with ShouldMatchers with AWSSecurityC
 
   "limit() for OrderByExpression" should "generate 'limit 10'" in {
     val expression = new Select(simpleDB, configuration, "*").from(classOf[TestDomain]).where("name", like("yano%")).orderBy("name", SortOrder.Asc).limit(10)
-    expression.describe should be === "select * from test-domain where `name` like 'yano%' order by `name` asc limit 10"
+    expression.describe should be === "select * from `test-domain` where `name` like 'yano%' order by `name` asc limit 10"
   }
   
   "limit() for WhereExpression" should "generate 'limit 10' after where expression" in {
     val expression = new Select(simpleDB, configuration, "*").from(classOf[TestDomain]).where("name", like("yano%")).limit(10)
-    expression.describe should be === "select * from test-domain where `name` like 'yano%' limit 10"
+    expression.describe should be === "select * from `test-domain` where `name` like 'yano%' limit 10"
   }
   
   "limit() for DomainExpression" should "generate 'limit 10' after domain expression" in {
     val expression = new Select(simpleDB, configuration, "*").from(classOf[TestDomain]).limit(10)
-    expression.describe should be === "select * from test-domain limit 10"
+    expression.describe should be === "select * from `test-domain` limit 10"
   }
 }

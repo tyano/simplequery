@@ -17,6 +17,7 @@
 package com.shelfmap.simplequery.expression.impl;
 
 import com.amazonaws.services.simpledb.model.Attribute;
+import com.shelfmap.simplequery.expression.CanNotWriteAttributeException;
 import static com.shelfmap.simplequery.util.Assertion.isNotNull;
 import com.amazonaws.services.simpledb.model.Item;
 import com.shelfmap.simplequery.InstanceFactory;
@@ -26,7 +27,7 @@ import com.shelfmap.simplequery.expression.DomainAttributes;
 import com.shelfmap.simplequery.expression.ItemConverter;
 
 /**
- *
+ * <b>this class is NOT THREAD SAFE</b>
  * @author Tsutomu YANO
  */
 public class DefaultItemConverter<T> implements ItemConverter<T> {
@@ -55,7 +56,12 @@ public class DefaultItemConverter<T> implements ItemConverter<T> {
             
             if(domainAttribute != null) {
                 Object convertedValue = domainAttribute.getAttributeInfo().restoreValue(attributeValue);
-                domainAttributes.writeAttribute(instance, attributeName, convertedValue);
+                try {
+                    domainAttributes.writeAttribute(instance, attributeName, convertedValue);
+                } catch (CanNotWriteAttributeException ex) {
+                    Throwable cause = ex.getCause();
+                    throw new CanNotConvertItemException("could not write a attribute: " + domainAttribute.getName() + " for the item: " + item.getName(), cause, item);
+                }
             }
         }
         return instance;

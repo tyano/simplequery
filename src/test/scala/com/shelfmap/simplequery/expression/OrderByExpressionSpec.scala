@@ -17,15 +17,15 @@
 package com.shelfmap.simplequery.expression
 
 import org.junit.runner.RunWith
-import com.shelfmap.simplequery.expression.impl.Select
+import impl.Select
 import org.scalatest.FlatSpec
 import org.scalatest.junit.JUnitRunner
 import org.scalatest.matchers.ShouldMatchers
 
 @RunWith(classOf[JUnitRunner])
-class OrderByExpressionSpec extends FlatSpec with ShouldMatchers with AWSSecurityCredential {
+class OrderByExpressionSpec extends FlatSpec with ShouldMatchers with AWSSecurityCredential with ConfigurationAware {
   val simpleDB = getAmazonSimpleDB;
-  val orderByExp = new Select(simpleDB, "*") from (classOf[TestDomain]) orderBy ("name", SortOrder.Asc);
+  val orderByExp = new Select(simpleDB, getConfiguration, "*") from (classOf[TestDomain]) orderBy ("name", SortOrder.Asc);
   
   "describe() method of OrderByExpression" should "generate encoded attribute's name" in {
     orderByExp.describe should be === "select * from test-domain order by `name` asc"

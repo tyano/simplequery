@@ -19,7 +19,6 @@ import com.amazonaws.auth.PropertiesCredentials;
 import com.amazonaws.services.simpledb.AmazonSimpleDB;
 import com.amazonaws.services.simpledb.AmazonSimpleDBClient;
 import com.shelfmap.simplequery.Configuration;
-import com.shelfmap.simplequery.InstanceFactory;
 import static org.junit.Assert.*;
 import static com.shelfmap.simplequery.expression.MatcherFactory.*;
 import com.shelfmap.simplequery.Domain;
@@ -42,18 +41,7 @@ public class WhereExpressionTestSteps {
 
     Expression<?> expression;
     AmazonSimpleDB simpleDB;
-    Configuration configuration = new Configuration() {
-
-        @Override
-        public <T> ItemConverter<T> getItemConveter(Class<T> domainClass) {
-            throw new UnsupportedOperationException("Not supported yet.");
-        }
-
-        @Override
-        public <T> InstanceFactory<T> getInstanceFactory(Class<T> domainClass) {
-            throw new UnsupportedOperationException("Not supported yet.");
-        }
-    };
+    Configuration configuration = new DummyConfiguration();
     
     private String getSecurityCredentialPath() {
         return "/Users/t_yano/aws.credential.properties";

@@ -34,7 +34,6 @@ import java.util.List;
  * @author Tsutomu YANO
  */
 public abstract class BaseExpression<T> implements Expression<T> {
-
     private final Configuration configuration;
     private final AmazonSimpleDB simpleDB;
     private final Class<T> domainClass;
@@ -59,7 +58,7 @@ public abstract class BaseExpression<T> implements Expression<T> {
         
         Item first = items.get(0);
         try {
-            return getConfiguration().getItemConveter(domainClass).convert(first);
+            return getConfiguration().getItemConverter(domainClass).convert(first);
         } catch (CanNotConvertItemException ex) {
             throw new SimpleQueryException("Can not convert an item", ex);
         }
@@ -69,7 +68,7 @@ public abstract class BaseExpression<T> implements Expression<T> {
     public QueryResults<T> getResults() throws SimpleQueryException {
         SelectRequest selectReq = new SelectRequest(describe());
         SelectResult result = simpleDB.select(selectReq);
-        return new DefaultQueryResult<T>(simpleDB, this, result, getConfiguration().getItemConveter(domainClass));
+        return new DefaultQueryResult<T>(simpleDB, this, result, getConfiguration().getItemConverter(domainClass));
     }
     
     public AmazonSimpleDB getAmazonSimpleDB() {

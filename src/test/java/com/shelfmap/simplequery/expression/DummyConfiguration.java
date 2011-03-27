@@ -14,15 +14,23 @@
  * limitations under the License.
  */
 
-package com.shelfmap.simplequery;
+package com.shelfmap.simplequery.expression;
 
-import com.shelfmap.simplequery.expression.ItemConverter;
+import com.shelfmap.simplequery.Configuration;
+import com.shelfmap.simplequery.InstanceFactory;
 
 /**
  *
  * @author Tsutomu YANO
  */
-public interface Configuration {
-    <T> ItemConverter<T> getItemConverter(Class<T> domainClass);
-    <T> InstanceFactory<T> getInstanceFactory(Class<T> domainClass);
+public class DummyConfiguration implements Configuration {
+    @Override
+    public <T> ItemConverter<T> getItemConverter(Class<T> domainClass) {
+        return null;
+    }
+
+    @Override
+    public <T> InstanceFactory<T> getInstanceFactory(Class<T> domainClass) {
+        return null;
+    }
 }

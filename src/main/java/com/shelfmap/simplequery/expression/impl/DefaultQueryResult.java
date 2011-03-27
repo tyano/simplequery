@@ -17,12 +17,11 @@
 package com.shelfmap.simplequery.expression.impl;
 
 import com.amazonaws.services.simpledb.AmazonSimpleDB;
-import com.amazonaws.services.simpledb.model.Item;
-import com.amazonaws.services.simpledb.model.SelectRequest;
 import com.amazonaws.services.simpledb.model.SelectResult;
 import com.shelfmap.simplequery.expression.Expression;
 import com.shelfmap.simplequery.expression.ItemConverter;
 import com.shelfmap.simplequery.expression.QueryResults;
+import com.shelfmap.simplequery.expression.SimpleQueryException;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
@@ -52,14 +51,11 @@ public class DefaultQueryResult<T> implements QueryResults<T> {
 
     @Override
     public int size() {
-        Expression<T> rebuilt = expression.rebuildWith("count(*)");
-        SelectRequest req = new SelectRequest(rebuilt.describe());
-        SelectResult selectResult = simpleDB.select(req);
-        List<Item> items = selectResult.getItems();
-        if(items.isEmpty()) throw new IllegalStateException("can not count records. expression was: " + rebuilt.describe());
-        
-        String value  = items.get(0).getAttributes().get(0).getValue();
-        return Integer.parseInt(value);
+        try {
+            return expression.count();
+        } catch (SimpleQueryException ex) {
+            throw new IllegalStateException("could not count the expression.", ex);
+        }
     }
 
     @Override

@@ -52,10 +52,10 @@ class BaseExpressionSpec extends FlatSpec with ShouldMatchers with AWSSecurityCr
   "selecting items that have age of more than 19" should "return 2 items" in {
     exp.getResults.size should be === 2
   }
-  //TODO size()を呼び出したときにExpressionが書き換えられて、それ以降正常にクエリを投げられない。
   
   "2 items of results" should "have age of 20 and 21, name of 'test-3' and 'test-4'" in {
-    for (result <- exp.getResults) {
+    val results = exp.getResults
+    for (result <- results) {
       result.name should (be === "test-3" or be === "test-4")
       result.age should (be === 20 or be === 21)
       

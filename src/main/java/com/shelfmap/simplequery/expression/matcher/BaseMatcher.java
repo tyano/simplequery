@@ -32,9 +32,9 @@ public abstract class BaseMatcher<T> implements Matcher<T> {
     private AttributeInfo<T> attributeInfo;
 
     public BaseMatcher(T... values) {
-        this(new NullAttributeInfo<T>(), values);
+        this(new NullAttributeInfo<T>(values[0]), values);
     }
-
+    
     protected BaseMatcher(AttributeInfo<T> attributeInfo, T... values) {
         isNotNull("attributeInfo", attributeInfo);
         isNotNull("values", values);

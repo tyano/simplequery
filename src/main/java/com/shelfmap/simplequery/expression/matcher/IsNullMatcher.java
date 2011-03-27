@@ -28,7 +28,7 @@ import java.util.Collections;
  */
 public class IsNullMatcher implements Matcher<Void> {
 
-    private final AttributeInfo<Void> attributeInfo = new NullAttributeInfo<Void>();
+    private final AttributeInfo<Void> attributeInfo = new NullAttributeInfo<Void>(Void.class);
     
     public IsNullMatcher() {
     }

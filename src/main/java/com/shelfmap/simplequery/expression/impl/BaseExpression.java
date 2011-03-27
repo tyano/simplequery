@@ -79,10 +79,10 @@ public abstract class BaseExpression<T> implements Expression<T> {
         SelectRequest req = new SelectRequest(rebuilt.describe());
         SelectResult selectResult = simpleDB.select(req);
         List<Item> items = selectResult.getItems();
-        if(items.isEmpty()) throw new IllegalStateException("can not count records. expression was: " + rebuilt.describe());
+        if(items.isEmpty()) throw new SimpleQueryException("can not count records. expression was: " + rebuilt.describe());
         
         String value  = items.get(0).getAttributes().get(0).getValue();
-        return Integer.parseInt(value);        
+        return Integer.parseInt(value);
     }
     
     public AmazonSimpleDB getAmazonSimpleDB() {

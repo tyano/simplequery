@@ -27,16 +27,15 @@ import java.lang.reflect.Method;
  * @author Tsutomu YANO
  */
 public class NullAttributeInfo<T> implements AttributeInfo<T> {
-    private final Class<T> clazz;
+    private final Class<? extends T> clazz;
 
-    public NullAttributeInfo(Class<T> clazz) {
+    public NullAttributeInfo(Class<? extends T> clazz) {
         this.clazz = clazz;
     }
     
     @SuppressWarnings("unchecked")
     public NullAttributeInfo(T sampleValue) {
-        //TODO sampleValueはTのサブクラスかもしれないので、Class<T>とは合致しない可能性がある。
-        this.clazz = (Class<T>) sampleValue.getClass();
+        this.clazz = (Class<? extends T>) sampleValue.getClass();
     }
     
     @Override

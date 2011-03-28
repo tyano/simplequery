@@ -39,7 +39,7 @@ public class DefaultDomainAttribute<T> implements DomainAttribute<T> {
     }
     
     public DefaultDomainAttribute(String attributeName, Class<T> type) {
-        this(attributeName, type, new NullAttributeInfo<T>(type));
+        this(attributeName, type, new DefaultAttributeInfo<T>(type));
     }
     
     @Override

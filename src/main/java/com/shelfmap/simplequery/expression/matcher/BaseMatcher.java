@@ -18,7 +18,7 @@ package com.shelfmap.simplequery.expression.matcher;
 import com.shelfmap.simplequery.expression.AttributeInfo;
 import static com.shelfmap.simplequery.util.Assertion.*;
 import com.shelfmap.simplequery.expression.Matcher;
-import com.shelfmap.simplequery.expression.impl.NullAttributeInfo;
+import com.shelfmap.simplequery.expression.impl.DefaultAttributeInfo;
 import java.util.Arrays;
 import java.util.Collection;
 
@@ -32,7 +32,7 @@ public abstract class BaseMatcher<T> implements Matcher<T> {
     private AttributeInfo<T> attributeInfo;
 
     public BaseMatcher(T... values) {
-        this(new NullAttributeInfo<T>(values[0]), values);
+        this(new DefaultAttributeInfo<T>(values[0]), values);
     }
     
     protected BaseMatcher(AttributeInfo<T> attributeInfo, T... values) {
@@ -82,6 +82,6 @@ public abstract class BaseMatcher<T> implements Matcher<T> {
 
     @Override
     public boolean isAttributeInfoApplied() {
-        return (this.attributeInfo instanceof NullAttributeInfo);
+        return (this.attributeInfo instanceof DefaultAttributeInfo);
     }
 }

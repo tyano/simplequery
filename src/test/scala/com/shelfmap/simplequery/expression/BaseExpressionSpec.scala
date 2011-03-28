@@ -31,7 +31,6 @@ import MatcherFactory._
 import collection.JavaConversions._
 import org.scalatest.matchers.ShouldMatchers
 import scala.reflect.BeanProperty
-import java.util.ArrayList
 import java.util.{List => JList}
 
 class BaseExpressionSpec extends FlatSpec with ShouldMatchers with AWSSecurityCredential with ConfigurationAware {
@@ -53,8 +52,7 @@ class BaseExpressionSpec extends FlatSpec with ShouldMatchers with AWSSecurityCr
   }
   
   "2 items of results" should "have age of 20 and 21, name of 'test-3' and 'test-4'" in {
-    val results = exp.getResults
-    for (result <- results) {
+    for (result <- exp.getResults) {
       result.name should (be === "test-3" or be === "test-4")
       result.age should (be === 20 or be === 21)
       

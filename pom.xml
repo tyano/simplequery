@@ -158,6 +158,36 @@
                 <groupId>org.scala-tools</groupId>
                 <artifactId>maven-scala-plugin</artifactId>
                 <version>2.15.2</version>
+                <configuration>
+                    <launchers>
+                        <launcher>
+                            <id>testing</id>
+                            <mainClass>org.scalatest.tools.Runner</mainClass>
+                            <args>
+                                <arg>-p</arg>
+                                <arg>target/test-classes</arg>
+                                <arg>-o</arg>
+                                <arg>-w</arg>
+                                <arg>com.shelfmap</arg>
+                            </args>
+                            <jvmArgs>
+                                <jvmArg>-Xmx64m</jvmArg>
+                            </jvmArgs>
+                        </launcher>
+                        <launcher>
+                            <id>filetest</id>
+                            <mainClass>org.scalatest.tools.Runner</mainClass>
+                            <args>
+                                <arg>-p</arg>
+                                <arg>target/test-classes</arg>
+                                <arg>-o</arg>
+                            </args>
+                            <jvmArgs>
+                                <jvmArg>-Xmx64m</jvmArg>
+                            </jvmArgs>
+                        </launcher>                        
+                    </launchers>                
+                </configuration>
                 <executions>
                     <execution>
                         <id>scala-compile-first</id>
@@ -174,6 +204,13 @@
                             <goal>testCompile</goal>
                         </goals>
                     </execution>
+                    <execution>
+                        <id>scalatest-run</id>
+                        <phase>test</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                    </execution>
                 </executions>
             </plugin>
             
@@ -185,7 +222,7 @@
                     <useFile>false</useFile>
                     <includes>
                         <include>**/*Test.class</include>
-                        <include>**/*Spec.class</include>
+<!--                        <include>**/*Spec.class</include>-->
                     </includes>
                 </configuration>
             </plugin>            

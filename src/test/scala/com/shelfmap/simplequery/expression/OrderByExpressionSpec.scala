@@ -16,13 +16,10 @@
 
 package com.shelfmap.simplequery.expression
 
-import org.junit.runner.RunWith
 import impl.Select
 import org.scalatest.FlatSpec
-import org.scalatest.junit.JUnitRunner
 import org.scalatest.matchers.ShouldMatchers
 
-@RunWith(classOf[JUnitRunner])
 class OrderByExpressionSpec extends FlatSpec with ShouldMatchers with AWSSecurityCredential with ConfigurationAware {
   val simpleDB = getAmazonSimpleDB;
   val orderByExp = new Select(simpleDB, getConfiguration, "*") from (classOf[TestDomain]) orderBy ("name", SortOrder.Asc);

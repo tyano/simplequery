@@ -26,15 +26,12 @@ import com.amazonaws.services.simpledb.model.DeleteDomainRequest
 import com.amazonaws.services.simpledb.model.ReplaceableAttribute
 import com.amazonaws.services.simpledb.model.ReplaceableItem
 import com.shelfmap.simplequery.SimpleQueryClient
-import org.junit.runner.RunWith
-import org.scalatest.junit.JUnitRunner
 import Conditions._
 import MatcherFactory._
 import collection.JavaConversions._
 import org.scalatest.matchers.ShouldMatchers
 import scala.reflect.BeanProperty
 
-@RunWith(classOf[JUnitRunner])
 class BaseExpressionSpec extends FlatSpec with ShouldMatchers with AWSSecurityCredential with ConfigurationAware {
   val simpleDB = getAmazonSimpleDB
   val configuration = getConfiguration
@@ -68,34 +65,24 @@ class BaseExpressionSpec extends FlatSpec with ShouldMatchers with AWSSecurityCr
     simpleDB.deleteDomain(new DeleteDomainRequest(domainName))
     simpleDB.createDomain(new CreateDomainRequest(domainName))
 
+    implicit def attrToReplaceableAttribute(a: Attr): ReplaceableAttribute = new ReplaceableAttribute(a.name, a.value, a.replace)
+
     val putData = List(new ReplaceableItem()
                          .withName("1")
-                         .withAttributes(
-                           new ReplaceableAttribute("name", "test-1", true),
-                           new ReplaceableAttribute("age", "018", true)
-                         ),
+                         .withAttributes(Attr("name", "test-1", true), Attr("age", "018", true)),
                        new ReplaceableItem()
                          .withName("2")
-                         .withAttributes(
-                           new ReplaceableAttribute("name", "test-2", true),
-                           new ReplaceableAttribute("age", "019", true)
-                         ),
+                         .withAttributes(Attr("name", "test-2", true), Attr("age", "019", true)),
                        new ReplaceableItem()
                          .withName("3")
-                         .withAttributes(
-                           new ReplaceableAttribute("name", "test-3", true),
-                           new ReplaceableAttribute("age", "020", true)
-                         ),
+                         .withAttributes(Attr("name", "test-3", true), Attr("age", "020", true)),
                        new ReplaceableItem()
                          .withName("4")
-                         .withAttributes(
-                           new ReplaceableAttribute("name", "test-4", true),
-                           new ReplaceableAttribute("age", "021", true)
-                         ))
+                         .withAttributes(Attr("name", "test-4", true), Attr("age", "021", true))
+                       )
     simpleDB.batchPutAttributes(new BatchPutAttributesRequest(domainName, putData))
   }
 }
-
 
 
 import _root_.com.shelfmap.simplequery.Domain
@@ -114,3 +101,5 @@ class ExpressionTestDomain {
     this.age = age
   }
 }
+
+case class Attr(val name: String, val value: String, val replace: Boolean)

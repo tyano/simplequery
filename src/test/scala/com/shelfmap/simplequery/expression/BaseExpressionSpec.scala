@@ -31,6 +31,8 @@ import MatcherFactory._
 import collection.JavaConversions._
 import org.scalatest.matchers.ShouldMatchers
 import scala.reflect.BeanProperty
+import java.util.ArrayList
+import java.util.{List => JList}
 
 class BaseExpressionSpec extends FlatSpec with ShouldMatchers with AWSSecurityCredential with ConfigurationAware {
   val simpleDB = getAmazonSimpleDB
@@ -65,21 +67,19 @@ class BaseExpressionSpec extends FlatSpec with ShouldMatchers with AWSSecurityCr
     simpleDB.deleteDomain(new DeleteDomainRequest(domainName))
     simpleDB.createDomain(new CreateDomainRequest(domainName))
 
-    implicit def attrToReplaceableAttribute(a: Attr): ReplaceableAttribute = new ReplaceableAttribute(a.name, a.value, a.replace)
-
-    val putData = List(new ReplaceableItem()
-                         .withName("1")
-                         .withAttributes(Attr("name", "test-1", true), Attr("age", "018", true)),
-                       new ReplaceableItem()
-                         .withName("2")
-                         .withAttributes(Attr("name", "test-2", true), Attr("age", "019", true)),
-                       new ReplaceableItem()
-                         .withName("3")
-                         .withAttributes(Attr("name", "test-3", true), Attr("age", "020", true)),
-                       new ReplaceableItem()
-                         .withName("4")
-                         .withAttributes(Attr("name", "test-4", true), Attr("age", "021", true))
+    implicit def itemListToReplaceableItemList(l: List[Itm]): JList[ReplaceableItem] = {
+      for(i <- l) yield {
+        new ReplaceableItem().withName(i.itemName).withAttributes(
+                        for(a <- i.attrs) yield { new ReplaceableAttribute(a.name, a.value, a.replace) }
                        )
+      }
+    }
+    
+    val putData = List(Itm("1", Attr("name", "test-1", true), Attr("age", "018", true)),
+                       Itm("2", Attr("name", "test-2", true), Attr("age", "019", true)),
+                       Itm("3", Attr("name", "test-3", true), Attr("age", "020", true)),
+                       Itm("4", Attr("name", "test-4", true), Attr("age", "021", true)))
+    
     simpleDB.batchPutAttributes(new BatchPutAttributesRequest(domainName, putData))
   }
 }
@@ -103,3 +103,4 @@ class ExpressionTestDomain {
 }
 
 case class Attr(val name: String, val value: String, val replace: Boolean)
+case class Itm(val itemName: String, val attrs: Attr*)

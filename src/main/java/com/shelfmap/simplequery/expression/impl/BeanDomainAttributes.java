@@ -18,7 +18,11 @@ package com.shelfmap.simplequery.expression.impl;
 
 import static com.shelfmap.simplequery.util.Assertion.isNotNull;
 import com.shelfmap.simplequery.Domain;
+import com.shelfmap.simplequery.FloatAttribute;
+import com.shelfmap.simplequery.IntAttribute;
+import com.shelfmap.simplequery.LongAttribute;
 import com.shelfmap.simplequery.SimpleDBAttribute;
+import com.shelfmap.simplequery.expression.AttributeConverter;
 import com.shelfmap.simplequery.expression.CanNotWriteAttributeException;
 import com.shelfmap.simplequery.expression.DomainAttributes;
 import com.shelfmap.simplequery.expression.DomainAttribute;
@@ -54,39 +58,53 @@ public class BeanDomainAttributes implements DomainAttributes {
             PropertyDescriptor[] descriptors = info.getPropertyDescriptors();
             for(PropertyDescriptor descriptor : descriptors) {
                 Class<?> type = descriptor.getPropertyType();
-                String name = descriptor.getName();
+                String propertyName = descriptor.getName();
                 Method getter = descriptor.getReadMethod();
                 Method setter = descriptor.getWriteMethod();
-                int maxDigitLeft = 0;
-                int maxDigitRight = 0;
-                long offset = 0L;
-                SimpleDBAttribute annotation = getter.getAnnotation(SimpleDBAttribute.class);
-                if(annotation != null) {
-                    String attributeName = annotation.attributeName();
-                    if( !attributeName.isEmpty()) name = attributeName;
-                    maxDigitLeft = annotation.maxDigitLeft();
-                    maxDigitRight = annotation.maxDigitRight();
-                    offset = annotation.offset();
-                }
-                DomainAttribute<?> attribute = createAttribute(name, type, maxDigitLeft, maxDigitRight, offset);
-                attributeMap.put(name, attribute);
-                writeMethodMap.put(name, setter);
+                DomainAttribute<?> attribute = createAttribute(propertyName, type, getter);
+                attributeMap.put(attribute.getName(), attribute);
+                writeMethodMap.put(attribute.getName(), setter);
             }   
         } catch (IntrospectionException ex) {
             throw new IllegalStateException("Can not introspect a class object.", ex);
         }
     }
     
-    private <C> DomainAttribute<?> createAttribute(String attributeName, Class<C> type, int maxDigitLeft, int maxDigitRight, long offset) {
-        if(type == float.class || type == Float.class) {
-            return new FloatDomainAttribute(attributeName, maxDigitLeft, maxDigitRight, (int)offset);
-        } else if(type == int.class || type == Integer.class) {
-            return new IntDomainAttribute(attributeName, maxDigitLeft, (int)offset);
-        } else if(type == long.class || type == Long.class) {
-            return new LongDomainAttribute(attributeName, maxDigitLeft, offset);
+    @SuppressWarnings("unchecked")
+    private <C> DomainAttribute<?> createAttribute(String propertyName, Class<C> type, Method getter) {
+        DomainAttribute<?> result = null;
+        if(getter.isAnnotationPresent(FloatAttribute.class)) {
+            FloatAttribute annotation = getter.getAnnotation(FloatAttribute.class);
+            String attributeName = annotation.attributeName().isEmpty() ? propertyName : annotation.attributeName();
+            result = new FloatDomainAttribute(attributeName, annotation.maxDigitLeft(), annotation.maxDigitRight(), annotation.offset());
+        } else if(getter.isAnnotationPresent(IntAttribute.class)) {
+            IntAttribute annotation = getter.getAnnotation(IntAttribute.class);
+            String attributeName = annotation.attributeName().isEmpty() ? propertyName : annotation.attributeName();
+            result = new IntDomainAttribute(attributeName, annotation.padding(), annotation.offset());
+        } else if(getter.isAnnotationPresent(LongAttribute.class)) {
+            LongAttribute annotation = getter.getAnnotation(LongAttribute.class);
+            String attributeName = annotation.attributeName().isEmpty() ? propertyName : annotation.attributeName();
+            result = new LongDomainAttribute(attributeName, annotation.padding(), annotation.offset());
+        } else if(getter.isAnnotationPresent(SimpleDBAttribute.class)) {
+            try {
+                SimpleDBAttribute annotation = getter.getAnnotation(SimpleDBAttribute.class);
+                String attributeName = annotation.attributeName().isEmpty() ? propertyName : annotation.attributeName();
+                Class<? extends AttributeConverter<?>> converterClass = annotation.attributeConverter();
+                AttributeConverter<?> converter = 
+                        (converterClass.equals(NullAttributeConverter.class)) 
+                            ? new DefaultAttributeConverter<C>(type)
+                            : converterClass.newInstance();
+                result = new DefaultDomainAttribute<C>(attributeName, type, (AttributeConverter<C>)converter);
+            } catch (InstantiationException ex) {
+                throw new IllegalArgumentException("Can not instanciate a converter. possible cause is that the converter class specified in @SimpleDBAttribute do not have a default constructor.", ex);
+            } catch (IllegalAccessException ex) {
+                throw new IllegalStateException("Can not instanciate a converter, because we could not be able to access the default constructor of the converter class specified in a @SimpleDBAttribute annotation.", ex);
+            }
         } else {
-            return new DefaultDomainAttribute<C>(attributeName, type);
+            result = new DefaultDomainAttribute<C>(propertyName, type);
         }
+        
+        return result;
     }
     
     @Override

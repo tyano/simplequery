@@ -84,7 +84,7 @@ class BaseExpressionSpec extends FlatSpec with ShouldMatchers with AWSSecurityCr
 
 
 import _root_.com.shelfmap.simplequery.Domain
-import _root_.com.shelfmap.simplequery.SimpleDBAttribute
+import _root_.com.shelfmap.simplequery.IntAttribute
 
 @Domain("expression-test")
 class ExpressionTestDomain {
@@ -92,7 +92,7 @@ class ExpressionTestDomain {
   @BeanProperty var name: String = ""
   var age: Int = 0
 
-  @SimpleDBAttribute(maxDigitLeft=3)
+  @IntAttribute(padding = 3)
   def getAge() = age
   
   def setAge(age: Int):Unit = {

@@ -1,7 +1,7 @@
 package com.shelfmap.simplequery.expression;
 
 import com.shelfmap.simplequery.Domain;
-import com.shelfmap.simplequery.SimpleDBAttribute;
+import com.shelfmap.simplequery.IntAttribute;
 
 /*
  * Copyright 2011 Tsutomu YANO.
@@ -27,6 +27,6 @@ import com.shelfmap.simplequery.SimpleDBAttribute;
 public interface TestDomain {
     String getName();
     
-    @SimpleDBAttribute(maxDigitLeft=3)
+    @IntAttribute(padding=3)
     int getAge();
 }

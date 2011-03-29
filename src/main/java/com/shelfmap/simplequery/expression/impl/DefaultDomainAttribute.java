@@ -29,13 +29,13 @@ public class DefaultDomainAttribute<T> implements DomainAttribute<T> {
     private Class<T> type;
     private AttributeConverter<T> attributeInfo;
 
-    public DefaultDomainAttribute(String attributeName, Class<T> type, AttributeConverter<T> attributeInfo) {
+    public DefaultDomainAttribute(String attributeName, Class<T> type, AttributeConverter<T> attributeConverter) {
         isNotNull("attributeName", attributeName);
         isNotNull("type", type);
-        isNotNull("attributeInfo", attributeInfo);
+        isNotNull("attributeInfo", attributeConverter);
         this.attributeName = attributeName;
         this.type = type;
-        this.attributeInfo = attributeInfo;
+        this.attributeInfo = attributeConverter;
     }
     
     public DefaultDomainAttribute(String attributeName, Class<T> type) {

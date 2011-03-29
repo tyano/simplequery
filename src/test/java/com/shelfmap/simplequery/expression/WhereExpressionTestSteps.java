@@ -22,7 +22,7 @@ import com.shelfmap.simplequery.Configuration;
 import static org.junit.Assert.*;
 import static com.shelfmap.simplequery.expression.MatcherFactory.*;
 import com.shelfmap.simplequery.Domain;
-import com.shelfmap.simplequery.SimpleDBAttribute;
+import com.shelfmap.simplequery.IntAttribute;
 import com.shelfmap.simplequery.expression.impl.Select;
 import com.shelfmap.specsfinder.Steps;
 import java.io.File;
@@ -92,13 +92,13 @@ public class WhereExpressionTestSteps {
     @Domain("with-attribute")
     public static interface DomainWithAttribute {
 
-        @SimpleDBAttribute(attributeName = "saving", maxDigitLeft = 8, offset = 1000000L)
+        @IntAttribute(attributeName = "saving", padding = 8, offset = 1000000)
         int getAccountSaving();
     }
     
     @Domain("without-attributename")
     public static interface DomainWithoutAttributeName {
-        @SimpleDBAttribute(maxDigitLeft=7, offset=200000L)
+        @IntAttribute(padding=7, offset=200000)
         int getSaving();
     }
 

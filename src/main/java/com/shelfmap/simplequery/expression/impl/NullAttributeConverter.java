@@ -14,22 +14,28 @@
  * limitations under the License.
  */
 
-package com.shelfmap.simplequery;
+package com.shelfmap.simplequery.expression.impl;
 
 import com.shelfmap.simplequery.expression.AttributeConverter;
-import com.shelfmap.simplequery.expression.impl.NullAttributeConverter;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import com.shelfmap.simplequery.expression.CanNotRestoreAttributeException;
 
 /**
  *
  * @author Tsutomu YANO
  */
-@Target(ElementType.METHOD)
-@Retention(RetentionPolicy.RUNTIME)
-public @interface SimpleDBAttribute {
-    String attributeName() default "";
-    Class<? extends AttributeConverter<?>> attributeConverter() default NullAttributeConverter.class;
+public class NullAttributeConverter implements AttributeConverter<Object> {
+    private static final NullAttributeConverter INSTANCE = new NullAttributeConverter();
+
+    private NullAttributeConverter() {
+    }
+    
+    @Override
+    public String convertValue(Object targetValue) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public Object restoreValue(String targetValue) throws CanNotRestoreAttributeException {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
 }

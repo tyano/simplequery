@@ -53,7 +53,7 @@ public class DefaultDomainAttribute<T> implements DomainAttribute<T> {
     }
 
     @Override
-    public AttributeConverter<T> getAttributeInfo() {
+    public AttributeConverter<T> getAttributeConverter() {
         return attributeInfo;
     }
 }

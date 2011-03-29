@@ -57,7 +57,7 @@ public class DefaultItemConverter<T> implements ItemConverter<T> {
             
             if(domainAttribute != null) {
                 try {
-                    Object convertedValue = domainAttribute.getAttributeInfo().restoreValue(attributeValue);
+                    Object convertedValue = domainAttribute.getAttributeConverter().restoreValue(attributeValue);
                     domainAttributes.writeAttribute(instance, attributeName, convertedValue);
                 } catch (CanNotRestoreAttributeException ex) {
                     throw new CanNotConvertItemException("could not write a attribute: " + domainAttribute.getName() + " for the item: " + item.getName(), ex, item);

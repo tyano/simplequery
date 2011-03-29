@@ -76,11 +76,11 @@ public class DefaultWhereExpression<T> extends BaseExpression<T> implements Wher
                     DomainAttribute<?> attribute = domainAttribute.getAttribute(attributeName);
                     Class<?> type = attribute.getType();
                     if (type == Float.class) {
-                        ((Matcher<Float>) matcher).setAttributeInfo((AttributeConverter<Float>)attribute.getAttributeInfo());
+                        ((Matcher<Float>) matcher).setAttributeInfo((AttributeConverter<Float>)attribute.getAttributeConverter());
                     } else if (type == Integer.class) {
-                        ((Matcher<Integer>) matcher).setAttributeInfo((AttributeConverter<Integer>)attribute.getAttributeInfo());
+                        ((Matcher<Integer>) matcher).setAttributeInfo((AttributeConverter<Integer>)attribute.getAttributeConverter());
                     } else if (type == Long.class) {
-                        ((Matcher<Long>) matcher).setAttributeInfo((AttributeConverter<Long>)attribute.getAttributeInfo());
+                        ((Matcher<Long>) matcher).setAttributeInfo((AttributeConverter<Long>)attribute.getAttributeConverter());
                     }
                 }
             }

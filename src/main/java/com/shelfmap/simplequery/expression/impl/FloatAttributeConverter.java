@@ -15,20 +15,22 @@
  */
 package com.shelfmap.simplequery.expression.impl;
 
+import static com.shelfmap.simplequery.util.Assertion.isNotNull;
 import static com.amazonaws.services.simpledb.util.SimpleDBUtils.*;
 import com.shelfmap.simplequery.expression.AttributeConverter;
+import com.shelfmap.simplequery.expression.CanNotRestoreAttributeException;
 
 /**
  *
  * @author Tsutomu YANO
  */
-public class FloatAttributeInfo implements AttributeConverter<Float> {
+public class FloatAttributeConverter implements AttributeConverter<Float> {
 
     private final int maxDigitLeft;
     private final int maxDigitRight;
     private final int offset;
 
-    public FloatAttributeInfo(int maxDigitLeft, int maxDigitRight, int offset) {
+    public FloatAttributeConverter(int maxDigitLeft, int maxDigitRight, int offset) {
         this.maxDigitLeft = maxDigitLeft;
         this.maxDigitRight = maxDigitRight;
         this.offset = offset;
@@ -36,6 +38,7 @@ public class FloatAttributeInfo implements AttributeConverter<Float> {
 
     @Override
     public String convertValue(Float targetValue) {
+        isNotNull("targetValue", targetValue);
         String result = "";
         if (offset > 0) {
             result = quoteValue(encodeRealNumberRange(targetValue.floatValue(), maxDigitLeft, maxDigitRight, offset));
@@ -48,8 +51,8 @@ public class FloatAttributeInfo implements AttributeConverter<Float> {
     }
 
     @Override
-    public Float restoreValue(String targetValue) {
-        Float restored = null;
+    public Float restoreValue(String targetValue)  throws CanNotRestoreAttributeException {
+        isNotNull("targetValue", targetValue);
         return (offset > 0)
             ? decodeRealNumberRangeFloat(targetValue, maxDigitRight, offset)
             : decodeZeroPaddingFloat(targetValue);

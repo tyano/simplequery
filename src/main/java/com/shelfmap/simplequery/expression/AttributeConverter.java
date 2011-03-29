@@ -22,5 +22,5 @@ package com.shelfmap.simplequery.expression;
  */
 public interface AttributeConverter<T> {
     String convertValue(T targetValue);
-    T restoreValue(String targetValue);
+    T restoreValue(String targetValue) throws CanNotRestoreAttributeException;
 }

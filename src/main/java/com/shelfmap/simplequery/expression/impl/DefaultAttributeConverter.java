@@ -18,6 +18,7 @@ package com.shelfmap.simplequery.expression.impl;
 import com.amazonaws.services.simpledb.util.SimpleDBUtils;
 import static com.shelfmap.simplequery.util.Assertion.isNotNull;
 import com.shelfmap.simplequery.expression.AttributeConverter;
+import com.shelfmap.simplequery.expression.CanNotRestoreAttributeException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -26,16 +27,16 @@ import java.lang.reflect.Method;
  *
  * @author Tsutomu YANO
  */
-public class DefaultAttributeInfo<T> implements AttributeConverter<T> {
+public class DefaultAttributeConverter<T> implements AttributeConverter<T> {
 
     private final Class<? extends T> clazz;
 
-    public DefaultAttributeInfo(Class<? extends T> clazz) {
+    public DefaultAttributeConverter(Class<? extends T> clazz) {
         this.clazz = clazz;
     }
 
     @SuppressWarnings("unchecked")
-    public DefaultAttributeInfo(T sampleValue) {
+    public DefaultAttributeConverter(T sampleValue) {
         this.clazz = (Class<? extends T>) sampleValue.getClass();
     }
 
@@ -46,7 +47,7 @@ public class DefaultAttributeInfo<T> implements AttributeConverter<T> {
     }
 
     @Override
-    public T restoreValue(String targetValue) {
+    public T restoreValue(String targetValue) throws CanNotRestoreAttributeException {
         if (clazz.isAssignableFrom(String.class)) {
             return clazz.cast(targetValue);
         }
@@ -68,13 +69,13 @@ public class DefaultAttributeInfo<T> implements AttributeConverter<T> {
                 }
             }
         } catch (InstantiationException ex) {
-            throw new IllegalStateException(ex);
+            throw new CanNotRestoreAttributeException(ex, targetValue, clazz);
         } catch (IllegalAccessException ex) {
-            throw new IllegalStateException(ex);
+            throw new CanNotRestoreAttributeException(ex, targetValue, clazz);
         } catch (IllegalArgumentException ex) {
-            throw new IllegalStateException(ex);
+            throw new CanNotRestoreAttributeException(ex, targetValue, clazz);
         } catch (InvocationTargetException ex) {
-            throw new IllegalStateException(ex);
+            throw new CanNotRestoreAttributeException(ex, targetValue, clazz);
         }
     }
 }

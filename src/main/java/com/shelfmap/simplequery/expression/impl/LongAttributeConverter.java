@@ -15,26 +15,27 @@
  */
 package com.shelfmap.simplequery.expression.impl;
 
-import static com.amazonaws.services.simpledb.util.SimpleDBUtils.*;
 import static com.shelfmap.simplequery.util.Assertion.isNotNull;
+import static com.amazonaws.services.simpledb.util.SimpleDBUtils.*;
 import com.shelfmap.simplequery.expression.AttributeConverter;
+import com.shelfmap.simplequery.expression.CanNotRestoreAttributeException;
 
 /**
  *
  * @author Tsutomu YANO
  */
-public class IntAttributeInfo implements AttributeConverter<Integer> {
+public class LongAttributeConverter implements AttributeConverter<Long> {
 
     private final int maxNumberOfDigits;
-    private final int offset;
+    private final long offset;
 
-    public IntAttributeInfo(int maxNumberOfDigits, int offset) {
+    public LongAttributeConverter(int maxNumberOfDigits, long offset) {
         this.maxNumberOfDigits = maxNumberOfDigits;
         this.offset = offset;
     }
 
     @Override
-    public String convertValue(Integer targetValue) {
+    public String convertValue(Long targetValue) {
         isNotNull("targetValue", targetValue);
         String result = "";
         if (offset > 0) {
@@ -48,11 +49,10 @@ public class IntAttributeInfo implements AttributeConverter<Integer> {
     }
 
     @Override
-    public Integer restoreValue(String targetValue) {
+    public Long restoreValue(String targetValue) throws CanNotRestoreAttributeException {
         isNotNull("targetValue", targetValue);
-        Integer restored = null;
-        return (offset > 0) 
-            ? decodeRealNumberRangeInt(targetValue, offset)
-            : decodeZeroPaddingInt(targetValue);
+        return (offset > 0)
+                ? decodeRealNumberRangeLong(targetValue, offset)
+                : decodeZeroPaddingLong(targetValue);
     }
 }

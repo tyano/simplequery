@@ -21,6 +21,20 @@ package com.shelfmap.simplequery.expression;
  * @author Tsutomu YANO
  */
 public interface AttributeConverter<T> {
+    /**
+     * convert a passed object to a String object for sending to Amazon SimpleDB.
+     * 
+     * @param targetValue a target object for converting
+     * @return a converted string
+     */
     String convertValue(T targetValue);
+    
+    /**
+     * restore an object from a string object of an attribute value of Amazin SimpleDB.
+     * 
+     * @param targetValue a string for restoring an object.
+     * @return a restored object
+     * @throws CanNotRestoreAttributeException when the string value could not be restored for any cause.
+     */
     T restoreValue(String targetValue) throws CanNotRestoreAttributeException;
 }

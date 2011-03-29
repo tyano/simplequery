@@ -24,7 +24,11 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 /**
- *
+ * This implementation convert an object to String through the toString() method of 
+ * the passed object, and restore a string to an object through the constructor
+ * with a String argument or through the static method 'valueOf()' with a String
+ * argument.
+ * 
  * @author Tsutomu YANO
  */
 public class DefaultAttributeConverter<T> implements AttributeConverter<T> {
@@ -46,6 +50,16 @@ public class DefaultAttributeConverter<T> implements AttributeConverter<T> {
         return SimpleDBUtils.quoteValue(targetValue.toString());
     }
 
+    /**
+     * {inherit}
+     * 
+     * @param targetValue a String object to restore.
+     * @return restored object whose type is the type of the target property.
+     * @throws CanNotRestoreAttributeException 
+     *         if any exception is thrown when accessing the target class object with reflection api.
+     *         Or the class object do not have a constructor with single string argument or 
+     *         a valueOf(String) static method.
+     */
     @Override
     public T restoreValue(String targetValue) throws CanNotRestoreAttributeException {
         if (clazz.isAssignableFrom(String.class)) {
@@ -62,10 +76,12 @@ public class DefaultAttributeConverter<T> implements AttributeConverter<T> {
                     if (clazz.isAssignableFrom(m.getReturnType())) {
                         return clazz.cast(m.invoke(null, targetValue));
                     } else {
-                        return null;
+                        //the return-type of valueOf() method do not match with the target class.
+                        throw new CanNotRestoreAttributeException("There are no constructor with a String argument nor 'valueOf(String)' static method in the target class.", targetValue, clazz);
                     }
                 } catch (NoSuchMethodException ex) {
-                    return null;
+                    //There are no constructor nor method for restoring a value.
+                    throw new CanNotRestoreAttributeException("There are no constructor with a String argument nor 'valueOf(String)' static method in the target class.", targetValue, clazz);
                 }
             }
         } catch (InstantiationException ex) {

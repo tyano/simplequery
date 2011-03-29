@@ -18,7 +18,7 @@ package com.shelfmap.simplequery.expression.matcher;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import com.shelfmap.simplequery.expression.Matcher;
-import com.shelfmap.simplequery.expression.impl.IntAttributeInfo;
+import com.shelfmap.simplequery.expression.impl.IntAttributeConverter;
 import com.shelfmap.specsfinder.Steps;
 import org.jbehave.core.annotations.Named;
 import org.jbehave.core.annotations.Then;
@@ -50,12 +50,12 @@ public class MatcherTestSteps {
 
     @When("the padding size is <paddingSize> and the int value is <targetValue>,")
     public void convertIntWithPadding(@Named("paddingSize") int padding, @Named("targetValue") int value) {
-        matcher = new IsMatcher<Integer>(value).withAttributeInfo(new IntAttributeInfo(padding, 0));
+        matcher = new IsMatcher<Integer>(value).withAttributeInfo(new IntAttributeConverter(padding, 0));
     }
 
     @When("the padding size is <paddingSize>, the offset is <offset> and the int value is <targetValue>,")
     public void convertIntWithOffsetAndPadding(@Named("paddingSize") int padding, @Named("offset") int offset, @Named("targetValue") int value) {
-        matcher = new IsMatcher<Integer>(value).withAttributeInfo(new IntAttributeInfo(padding, offset));
+        matcher = new IsMatcher<Integer>(value).withAttributeInfo(new IntAttributeConverter(padding, offset));
     }
 
     @When("a IsNullMatcher is described")
@@ -90,6 +90,6 @@ public class MatcherTestSteps {
 
     @When("a InMatcher's parameters are $arg1 and $arg2, and padding = $padding, offset = $offset")
     public void createInMatcherWithPaddingOffset(int arg1, int arg2, int padding, int offset) {
-        matcher = new InMatcher<Integer>(arg1, arg2).withAttributeInfo(new IntAttributeInfo(padding, offset));
+        matcher = new InMatcher<Integer>(arg1, arg2).withAttributeInfo(new IntAttributeConverter(padding, offset));
     }
 }

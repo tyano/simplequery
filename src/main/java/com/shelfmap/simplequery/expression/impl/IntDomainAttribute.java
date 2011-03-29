@@ -21,6 +21,6 @@ package com.shelfmap.simplequery.expression.impl;
  */
 public class IntDomainAttribute extends DefaultDomainAttribute<Integer> {
     public IntDomainAttribute(String attributeName, int maxNumberOfDigits, int offset) {
-        super(attributeName, Integer.class, new IntAttributeInfo(maxNumberOfDigits, offset));
+        super(attributeName, Integer.class, new IntAttributeConverter(maxNumberOfDigits, offset));
     }
 }

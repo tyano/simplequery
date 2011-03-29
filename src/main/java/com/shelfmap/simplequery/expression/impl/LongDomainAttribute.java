@@ -23,7 +23,7 @@ package com.shelfmap.simplequery.expression.impl;
 public class LongDomainAttribute extends DefaultDomainAttribute<Long> {
 
     public LongDomainAttribute(String attributeName, int maxNumberOfDigits, long offset) {
-        super(attributeName, Long.class, new LongAttributeInfo(maxNumberOfDigits, offset));
+        super(attributeName, Long.class, new LongAttributeConverter(maxNumberOfDigits, offset));
     }
 
 }

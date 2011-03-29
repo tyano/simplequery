@@ -18,7 +18,7 @@ package com.shelfmap.simplequery.expression.matcher;
 
 import com.shelfmap.simplequery.expression.AttributeConverter;
 import com.shelfmap.simplequery.expression.Matcher;
-import com.shelfmap.simplequery.expression.impl.DefaultAttributeInfo;
+import com.shelfmap.simplequery.expression.impl.DefaultAttributeConverter;
 import java.util.Collection;
 import java.util.Collections;
 
@@ -28,7 +28,7 @@ import java.util.Collections;
  */
 public class IsNullMatcher implements Matcher<Void> {
 
-    private final AttributeConverter<Void> attributeInfo = new DefaultAttributeInfo<Void>(Void.class);
+    private final AttributeConverter<Void> attributeInfo = new DefaultAttributeConverter<Void>(Void.class);
     
     public IsNullMatcher() {
     }

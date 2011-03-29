@@ -17,6 +17,7 @@
 package com.shelfmap.simplequery.expression.impl;
 
 import com.amazonaws.services.simpledb.model.Attribute;
+import com.shelfmap.simplequery.expression.CanNotRestoreAttributeException;
 import com.shelfmap.simplequery.expression.CanNotWriteAttributeException;
 import static com.shelfmap.simplequery.util.Assertion.isNotNull;
 import com.amazonaws.services.simpledb.model.Item;
@@ -55,9 +56,11 @@ public class DefaultItemConverter<T> implements ItemConverter<T> {
             DomainAttribute<?> domainAttribute = domainAttributes.getAttribute(attributeName);
             
             if(domainAttribute != null) {
-                Object convertedValue = domainAttribute.getAttributeInfo().restoreValue(attributeValue);
                 try {
+                    Object convertedValue = domainAttribute.getAttributeInfo().restoreValue(attributeValue);
                     domainAttributes.writeAttribute(instance, attributeName, convertedValue);
+                } catch (CanNotRestoreAttributeException ex) {
+                    throw new CanNotConvertItemException("could not write a attribute: " + domainAttribute.getName() + " for the item: " + item.getName(), ex, item);
                 } catch (CanNotWriteAttributeException ex) {
                     Throwable cause = ex.getCause();
                     throw new CanNotConvertItemException("could not write a attribute: " + domainAttribute.getName() + " for the item: " + item.getName(), cause, item);

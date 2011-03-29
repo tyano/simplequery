@@ -56,39 +56,39 @@ public class DefaultLimitExpression<T> extends BaseExpression<T> implements Limi
     public DefaultLimitExpression(AmazonSimpleDB simpleDB, Configuration configuration, final WhereExpression<T> whereExpression, int limitCount) {
         this(simpleDB,
              configuration,
-                isNotNullAndGet("whereExpression", whereExpression,
-                    new Assertion.Accessor<DomainExpression<T>>() {
-                        @Override
-                        public DomainExpression<T> get() {
-                            return whereExpression.getDomainExpression();
-                        }
-                    }),
-                whereExpression,
-                null,
-                limitCount);
+             isNotNullAndGet("whereExpression", whereExpression,
+                 new Assertion.Accessor<DomainExpression<T>>() {
+                     @Override
+                     public DomainExpression<T> get() {
+                         return whereExpression.getDomainExpression();
+                     }
+                 }),
+             whereExpression,
+             null,
+             limitCount);
     }
 
     public DefaultLimitExpression(AmazonSimpleDB simpleDB, Configuration configuration, final OrderByExpression<T> orderByExpression, int limitCount) {
         this(simpleDB,
              configuration,
-                isNotNullAndGet("orderByExpression", orderByExpression, 
-                    new Assertion.Accessor<DomainExpression<T>>() {
-                        @Override
-                        public DomainExpression<T> get() {
-                            return orderByExpression.getDomainExpression();
-                        }
-                    }),
-                orderByExpression.getWhereExpression(),
-                orderByExpression,
-                limitCount);
+             isNotNullAndGet("orderByExpression", orderByExpression, 
+                 new Assertion.Accessor<DomainExpression<T>>() {
+                     @Override
+                     public DomainExpression<T> get() {
+                         return orderByExpression.getDomainExpression();
+                     }
+                 }),
+             orderByExpression.getWhereExpression(),
+             orderByExpression,
+             limitCount);
     }
 
     @Override
     public String describe() {
         return (orderByExpression != null ? orderByExpression.describe()
-                : whereExpression != null ? whereExpression.describe()
-                : domainExpression.describe())
-                + " limit " + limitCount;
+                  : whereExpression != null ? whereExpression.describe()
+                  : domainExpression.describe())
+                  + " limit " + limitCount;
     }
 
     @Override

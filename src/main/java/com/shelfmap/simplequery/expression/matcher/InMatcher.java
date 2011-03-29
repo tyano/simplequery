@@ -16,7 +16,7 @@
 
 package com.shelfmap.simplequery.expression.matcher;
 
-import com.shelfmap.simplequery.expression.AttributeInfo;
+import com.shelfmap.simplequery.expression.AttributeConverter;
 
 /**
  *
@@ -28,7 +28,7 @@ public class InMatcher<T> extends BaseMatcher<T> {
         super(values);
     }
 
-    protected InMatcher(AttributeInfo<T> attributeInfo, T[] values) {
+    protected InMatcher(AttributeConverter<T> attributeInfo, T[] values) {
         super(attributeInfo, values);
     }
 
@@ -53,7 +53,7 @@ public class InMatcher<T> extends BaseMatcher<T> {
     }
 
     @Override
-    protected InMatcher<T> newMatcher(AttributeInfo<T> attributeInfo, T... values) {
+    protected InMatcher<T> newMatcher(AttributeConverter<T> attributeInfo, T... values) {
         return new InMatcher<T>(attributeInfo, values);
     }
 }

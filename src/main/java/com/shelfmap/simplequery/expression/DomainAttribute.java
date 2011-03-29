@@ -23,5 +23,5 @@ package com.shelfmap.simplequery.expression;
 public interface DomainAttribute<T> {
     String getName();
     Class<T> getType();
-    AttributeInfo<T> getAttributeInfo();
+    AttributeConverter<T> getAttributeInfo();
 }

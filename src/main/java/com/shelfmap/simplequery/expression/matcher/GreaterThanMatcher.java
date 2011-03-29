@@ -16,7 +16,7 @@
 
 package com.shelfmap.simplequery.expression.matcher;
 
-import com.shelfmap.simplequery.expression.AttributeInfo;
+import com.shelfmap.simplequery.expression.AttributeConverter;
 
 /**
  *
@@ -29,7 +29,7 @@ public class GreaterThanMatcher<T> extends BaseMatcher<T> {
         super(value);
     }
 
-    protected GreaterThanMatcher(AttributeInfo<T> attributeInfo, T[] values) {
+    protected GreaterThanMatcher(AttributeConverter<T> attributeInfo, T[] values) {
         super(attributeInfo, values);
     }
 
@@ -39,7 +39,7 @@ public class GreaterThanMatcher<T> extends BaseMatcher<T> {
     }
 
     @Override
-    protected BaseMatcher<T> newMatcher(AttributeInfo<T> attributeInfo, T... values) {
+    protected BaseMatcher<T> newMatcher(AttributeConverter<T> attributeInfo, T... values) {
         return new GreaterThanMatcher<T>(attributeInfo, values);
     }
 }

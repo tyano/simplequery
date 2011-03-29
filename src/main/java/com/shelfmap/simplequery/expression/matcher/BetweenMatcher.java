@@ -16,7 +16,7 @@
 
 package com.shelfmap.simplequery.expression.matcher;
 
-import com.shelfmap.simplequery.expression.AttributeInfo;
+import com.shelfmap.simplequery.expression.AttributeConverter;
 import com.shelfmap.simplequery.expression.Matcher;
 
 /**
@@ -32,7 +32,7 @@ public class BetweenMatcher<T> extends BaseMatcher<T> {
     }
 
     @SuppressWarnings("unchecked")
-    protected BetweenMatcher(AttributeInfo<T> attributeInfo, T... value) {
+    protected BetweenMatcher(AttributeConverter<T> attributeInfo, T... value) {
         super(attributeInfo, value);
     }
     
@@ -53,12 +53,12 @@ public class BetweenMatcher<T> extends BaseMatcher<T> {
     }
 
     @Override
-    protected BetweenMatcher<T> newMatcher(AttributeInfo<T> attributeInfo, T... values) {
+    protected BetweenMatcher<T> newMatcher(AttributeConverter<T> attributeInfo, T... values) {
         return new BetweenMatcher<T>(attributeInfo, values);
     }
 
     @Override
-    public Matcher<T> withAttributeInfo(AttributeInfo<T> attributeInfo) {
+    public Matcher<T> withAttributeInfo(AttributeConverter<T> attributeInfo) {
         BetweenMatcher<T> newMatcher = newMatcher(attributeInfo, values());
         newMatcher.second = this.second;
         return newMatcher;

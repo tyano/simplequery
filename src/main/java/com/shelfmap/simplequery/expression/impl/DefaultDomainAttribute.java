@@ -16,7 +16,7 @@
 
 package com.shelfmap.simplequery.expression.impl;
 
-import com.shelfmap.simplequery.expression.AttributeInfo;
+import com.shelfmap.simplequery.expression.AttributeConverter;
 import static com.shelfmap.simplequery.util.Assertion.isNotNull;
 import com.shelfmap.simplequery.expression.DomainAttribute;
 
@@ -27,9 +27,9 @@ import com.shelfmap.simplequery.expression.DomainAttribute;
 public class DefaultDomainAttribute<T> implements DomainAttribute<T> {
     private String attributeName;
     private Class<T> type;
-    private AttributeInfo<T> attributeInfo;
+    private AttributeConverter<T> attributeInfo;
 
-    public DefaultDomainAttribute(String attributeName, Class<T> type, AttributeInfo<T> attributeInfo) {
+    public DefaultDomainAttribute(String attributeName, Class<T> type, AttributeConverter<T> attributeInfo) {
         isNotNull("attributeName", attributeName);
         isNotNull("type", type);
         isNotNull("attributeInfo", attributeInfo);
@@ -53,7 +53,7 @@ public class DefaultDomainAttribute<T> implements DomainAttribute<T> {
     }
 
     @Override
-    public AttributeInfo<T> getAttributeInfo() {
+    public AttributeConverter<T> getAttributeInfo() {
         return attributeInfo;
     }
 }

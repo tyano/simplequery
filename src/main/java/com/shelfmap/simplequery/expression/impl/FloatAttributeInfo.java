@@ -16,13 +16,13 @@
 package com.shelfmap.simplequery.expression.impl;
 
 import static com.amazonaws.services.simpledb.util.SimpleDBUtils.*;
-import com.shelfmap.simplequery.expression.AttributeInfo;
+import com.shelfmap.simplequery.expression.AttributeConverter;
 
 /**
  *
  * @author Tsutomu YANO
  */
-public class FloatAttributeInfo implements AttributeInfo<Float> {
+public class FloatAttributeInfo implements AttributeConverter<Float> {
 
     private final int maxDigitLeft;
     private final int maxDigitRight;

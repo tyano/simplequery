@@ -17,7 +17,7 @@ package com.shelfmap.simplequery.expression.impl;
 
 import com.amazonaws.services.simpledb.util.SimpleDBUtils;
 import static com.shelfmap.simplequery.util.Assertion.isNotNull;
-import com.shelfmap.simplequery.expression.AttributeInfo;
+import com.shelfmap.simplequery.expression.AttributeConverter;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -26,7 +26,7 @@ import java.lang.reflect.Method;
  *
  * @author Tsutomu YANO
  */
-public class DefaultAttributeInfo<T> implements AttributeInfo<T> {
+public class DefaultAttributeInfo<T> implements AttributeConverter<T> {
 
     private final Class<? extends T> clazz;
 

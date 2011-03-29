@@ -20,7 +20,7 @@ package com.shelfmap.simplequery.expression;
  *
  * @author Tsutomu YANO
  */
-public interface AttributeInfo<T> {
+public interface AttributeConverter<T> {
     String convertValue(T targetValue);
     T restoreValue(String targetValue);
 }

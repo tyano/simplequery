@@ -15,7 +15,7 @@
  */
 package com.shelfmap.simplequery.expression.impl;
 
-import com.shelfmap.simplequery.expression.AttributeInfo;
+import com.shelfmap.simplequery.expression.AttributeConverter;
 import com.shelfmap.simplequery.expression.Condition;
 import com.shelfmap.simplequery.expression.Matcher;
 import com.shelfmap.simplequery.expression.Operator;
@@ -72,12 +72,12 @@ public final class NullCondition implements Condition {
     }
 
     @Override
-    public <E> Condition and(String attributeName, Matcher<E> matcher, AttributeInfo<E> attributeInfo) {
+    public <E> Condition and(String attributeName, Matcher<E> matcher, AttributeConverter<E> attributeInfo) {
         return new DefaultCondition(attributeName, matcher.withAttributeInfo(attributeInfo));
     }
 
     @Override
-    public <E> Condition or(String attributeName, Matcher<E> matcher, AttributeInfo<E> attributeInfo) {
+    public <E> Condition or(String attributeName, Matcher<E> matcher, AttributeConverter<E> attributeInfo) {
         return new DefaultCondition(attributeName, matcher.withAttributeInfo(attributeInfo));
     }
 
@@ -92,7 +92,7 @@ public final class NullCondition implements Condition {
     }
 
     @Override
-    public <E> Condition intersection(String attributeName, Matcher<E> matcher, AttributeInfo<E> attributeInfo) {
+    public <E> Condition intersection(String attributeName, Matcher<E> matcher, AttributeConverter<E> attributeInfo) {
         return new DefaultCondition(attributeName, matcher.withAttributeInfo(attributeInfo));
     }
 

@@ -16,7 +16,7 @@
 
 package com.shelfmap.simplequery.expression.matcher;
 
-import com.shelfmap.simplequery.expression.AttributeInfo;
+import com.shelfmap.simplequery.expression.AttributeConverter;
 
 /**
  *
@@ -29,7 +29,7 @@ public class NotLikeMatcher<T> extends BaseMatcher<T> {
         super(value);
     }
 
-    public NotLikeMatcher(AttributeInfo<T> attributeInfo, T[] values) {
+    public NotLikeMatcher(AttributeConverter<T> attributeInfo, T[] values) {
         super(attributeInfo, values);
     }
 
@@ -39,7 +39,7 @@ public class NotLikeMatcher<T> extends BaseMatcher<T> {
     }
 
     @Override
-    protected NotLikeMatcher<T> newMatcher(AttributeInfo<T> attributeInfo, T... values) {
+    protected NotLikeMatcher<T> newMatcher(AttributeConverter<T> attributeInfo, T... values) {
         return new NotLikeMatcher<T>(attributeInfo, values);
     }
 }

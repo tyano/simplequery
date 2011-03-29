@@ -15,7 +15,7 @@
  */
 package com.shelfmap.simplequery.expression.matcher;
 
-import com.shelfmap.simplequery.expression.AttributeInfo;
+import com.shelfmap.simplequery.expression.AttributeConverter;
 import static com.shelfmap.simplequery.util.Assertion.*;
 import com.shelfmap.simplequery.expression.Matcher;
 import com.shelfmap.simplequery.expression.impl.DefaultAttributeInfo;
@@ -29,13 +29,13 @@ import java.util.Collection;
 public abstract class BaseMatcher<T> implements Matcher<T> {
 
     private T[] values;
-    private AttributeInfo<T> attributeInfo;
+    private AttributeConverter<T> attributeInfo;
 
     public BaseMatcher(T... values) {
         this(new DefaultAttributeInfo<T>(values[0]), values);
     }
     
-    protected BaseMatcher(AttributeInfo<T> attributeInfo, T... values) {
+    protected BaseMatcher(AttributeConverter<T> attributeInfo, T... values) {
         isNotNull("attributeInfo", attributeInfo);
         isNotNull("values", values);
         isNotEmpty("values", values);
@@ -44,7 +44,7 @@ public abstract class BaseMatcher<T> implements Matcher<T> {
         this.values = values;
     }
 
-    protected abstract BaseMatcher<T> newMatcher(AttributeInfo<T> attributeInfo, T... values);
+    protected abstract BaseMatcher<T> newMatcher(AttributeConverter<T> attributeInfo, T... values);
 
     @Override
     public String describe() {
@@ -55,17 +55,17 @@ public abstract class BaseMatcher<T> implements Matcher<T> {
     }
 
     @Override
-    public Matcher<T> withAttributeInfo(AttributeInfo<T> attributeInfo) {
+    public Matcher<T> withAttributeInfo(AttributeConverter<T> attributeInfo) {
         return newMatcher(attributeInfo, values);
     }
     
     @Override
-    public AttributeInfo<T> getAttributeInfo() {
+    public AttributeConverter<T> getAttributeInfo() {
         return this.attributeInfo;
     }
     
     @Override 
-    public void setAttributeInfo(AttributeInfo<T> attributeInfo) {
+    public void setAttributeInfo(AttributeConverter<T> attributeInfo) {
         this.attributeInfo = attributeInfo;
     }
 

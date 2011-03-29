@@ -17,7 +17,7 @@
 package com.shelfmap.simplequery.expression.impl;
 
 import com.amazonaws.services.simpledb.util.SimpleDBUtils;
-import com.shelfmap.simplequery.expression.AttributeInfo;
+import com.shelfmap.simplequery.expression.AttributeConverter;
 import static com.shelfmap.simplequery.util.Assertion.isNotNull;
 import com.shelfmap.simplequery.expression.Condition;
 import com.shelfmap.simplequery.expression.Matcher;
@@ -115,13 +115,13 @@ public class DefaultCondition implements Condition {
     }
 
     @Override
-    public <E> Condition and(String attributeName, Matcher<E> matcher, AttributeInfo<E> attributeInfo) {
+    public <E> Condition and(String attributeName, Matcher<E> matcher, AttributeConverter<E> attributeInfo) {
         Condition other = new DefaultCondition(attributeName, matcher.withAttributeInfo(attributeInfo));
         return this.and(other);
     }
 
     @Override
-    public <E> Condition or(String attributeName, Matcher<E> matcher, AttributeInfo<E> attributeInfo) {
+    public <E> Condition or(String attributeName, Matcher<E> matcher, AttributeConverter<E> attributeInfo) {
         Condition other = new DefaultCondition(attributeName, matcher.withAttributeInfo(attributeInfo));
         return this.or(other);
     }
@@ -138,7 +138,7 @@ public class DefaultCondition implements Condition {
     }
 
     @Override
-    public <E> Condition intersection(String attributeName, Matcher<E> matcher, AttributeInfo<E> attributeInfo) {
+    public <E> Condition intersection(String attributeName, Matcher<E> matcher, AttributeConverter<E> attributeInfo) {
         Condition other = new DefaultCondition(attributeName, matcher.withAttributeInfo(attributeInfo));
         return this.intersection(other);
     }

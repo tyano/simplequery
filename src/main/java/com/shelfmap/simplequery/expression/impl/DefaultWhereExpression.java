@@ -18,7 +18,7 @@ package com.shelfmap.simplequery.expression.impl;
 import com.amazonaws.services.simpledb.AmazonSimpleDB;
 import com.shelfmap.simplequery.Configuration;
 import com.shelfmap.simplequery.expression.DomainAttribute;
-import com.shelfmap.simplequery.expression.AttributeInfo;
+import com.shelfmap.simplequery.expression.AttributeConverter;
 import com.shelfmap.simplequery.expression.DomainExpression;
 import com.shelfmap.simplequery.expression.Expression;
 import com.shelfmap.simplequery.expression.LimitExpression;
@@ -76,11 +76,11 @@ public class DefaultWhereExpression<T> extends BaseExpression<T> implements Wher
                     DomainAttribute<?> attribute = domainAttribute.getAttribute(attributeName);
                     Class<?> type = attribute.getType();
                     if (type == Float.class) {
-                        ((Matcher<Float>) matcher).setAttributeInfo((AttributeInfo<Float>)attribute.getAttributeInfo());
+                        ((Matcher<Float>) matcher).setAttributeInfo((AttributeConverter<Float>)attribute.getAttributeInfo());
                     } else if (type == Integer.class) {
-                        ((Matcher<Integer>) matcher).setAttributeInfo((AttributeInfo<Integer>)attribute.getAttributeInfo());
+                        ((Matcher<Integer>) matcher).setAttributeInfo((AttributeConverter<Integer>)attribute.getAttributeInfo());
                     } else if (type == Long.class) {
-                        ((Matcher<Long>) matcher).setAttributeInfo((AttributeInfo<Long>)attribute.getAttributeInfo());
+                        ((Matcher<Long>) matcher).setAttributeInfo((AttributeConverter<Long>)attribute.getAttributeInfo());
                     }
                 }
             }
@@ -120,7 +120,7 @@ public class DefaultWhereExpression<T> extends BaseExpression<T> implements Wher
     }
 
     @Override
-    public <E> WhereExpression<T> and(String attributeName, Matcher<E> matcher, AttributeInfo<E> attributeInfo) {
+    public <E> WhereExpression<T> and(String attributeName, Matcher<E> matcher, AttributeConverter<E> attributeInfo) {
         Condition other = new DefaultCondition(attributeName, matcher.withAttributeInfo(attributeInfo));
         return this.and(other);
     }
@@ -137,7 +137,7 @@ public class DefaultWhereExpression<T> extends BaseExpression<T> implements Wher
     }
 
     @Override
-    public <E> WhereExpression<T> or(String attributeName, Matcher<E> matcher, AttributeInfo<E> attributeInfo) {
+    public <E> WhereExpression<T> or(String attributeName, Matcher<E> matcher, AttributeConverter<E> attributeInfo) {
         Condition other = new DefaultCondition(attributeName, matcher.withAttributeInfo(attributeInfo));
         return this.or(other);
     }
@@ -154,7 +154,7 @@ public class DefaultWhereExpression<T> extends BaseExpression<T> implements Wher
     }
 
     @Override
-    public <E> WhereExpression<T> intersection(String attributeName, Matcher<E> matcher, AttributeInfo<E> attributeInfo) {
+    public <E> WhereExpression<T> intersection(String attributeName, Matcher<E> matcher, AttributeConverter<E> attributeInfo) {
         Condition other = new DefaultCondition(attributeName, matcher.withAttributeInfo(attributeInfo));
         return this.intersection(other);
     }

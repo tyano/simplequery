@@ -24,11 +24,11 @@ import java.util.Collection;
  */
 public interface Matcher<T> extends Describable {
     /* properties */
-    AttributeInfo<T> getAttributeInfo();
-    void setAttributeInfo(AttributeInfo<T> attributeInfo);
+    AttributeConverter<T> getAttributeInfo();
+    void setAttributeInfo(AttributeConverter<T> attributeInfo);
     Collection<T> getValues();
     boolean isAttributeInfoApplied();
     
     /* methods for building new instance with new property value. */
-    Matcher<T> withAttributeInfo(AttributeInfo<T> attributeInfo);
+    Matcher<T> withAttributeInfo(AttributeConverter<T> attributeInfo);
 }

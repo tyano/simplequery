@@ -24,11 +24,11 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 /**
- * This implementation convert an object to String through the toString() method of 
+ * This implementation convert an object to String through the toString() method of
  * the passed object, and restore a string to an object through the constructor
  * with a String argument or through the static method 'valueOf()' with a String
  * argument.
- * 
+ *
  * @author Tsutomu YANO
  */
 public class DefaultAttributeConverter<T> implements AttributeConverter<T> {
@@ -51,13 +51,13 @@ public class DefaultAttributeConverter<T> implements AttributeConverter<T> {
     }
 
     /**
-     * {inherit}
-     * 
+     * @{inheritDoc}
+     *
      * @param targetValue a String object to restore.
      * @return restored object whose type is the type of the target property.
-     * @throws CanNotRestoreAttributeException 
+     * @throws CanNotRestoreAttributeException
      *         if any exception is thrown when accessing the target class object with reflection api.
-     *         Or the class object do not have a constructor with single string argument or 
+     *         Or the class object do not have a constructor with single string argument or
      *         a valueOf(String) static method.
      */
     @Override
@@ -65,7 +65,7 @@ public class DefaultAttributeConverter<T> implements AttributeConverter<T> {
         if (clazz.isAssignableFrom(String.class)) {
             return clazz.cast(targetValue);
         }
-        
+
         try {
             try {
                 Constructor<? extends T> cons = clazz.getConstructor(String.class);

@@ -51,7 +51,6 @@ public class IntAttributeConverter implements AttributeConverter<Integer> {
     @Override
     public Integer restoreValue(String targetValue)  throws CanNotRestoreAttributeException {
         isNotNull("targetValue", targetValue);
-        Integer restored = null;
         return (offset > 0) 
             ? decodeRealNumberRangeInt(targetValue, offset)
             : decodeZeroPaddingInt(targetValue);

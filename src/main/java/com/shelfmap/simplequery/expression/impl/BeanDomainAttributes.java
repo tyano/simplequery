@@ -75,23 +75,35 @@ public class BeanDomainAttributes implements DomainAttributes {
         DomainAttribute<?> result = null;
         if(getter.isAnnotationPresent(FloatAttribute.class)) {
             FloatAttribute annotation = getter.getAnnotation(FloatAttribute.class);
-            String attributeName = annotation.attributeName().isEmpty() ? propertyName : annotation.attributeName();
+            String attributeName = annotation.attributeName().isEmpty() 
+                                        ? propertyName 
+                                        : annotation.attributeName();
             result = new FloatDomainAttribute(attributeName, annotation.maxDigitLeft(), annotation.maxDigitRight(), annotation.offset());
+        
         } else if(getter.isAnnotationPresent(IntAttribute.class)) {
             IntAttribute annotation = getter.getAnnotation(IntAttribute.class);
-            String attributeName = annotation.attributeName().isEmpty() ? propertyName : annotation.attributeName();
+            String attributeName = annotation.attributeName().isEmpty() 
+                                        ? propertyName 
+                                        : annotation.attributeName();
             result = new IntDomainAttribute(attributeName, annotation.padding(), annotation.offset());
+        
         } else if(getter.isAnnotationPresent(LongAttribute.class)) {
             LongAttribute annotation = getter.getAnnotation(LongAttribute.class);
-            String attributeName = annotation.attributeName().isEmpty() ? propertyName : annotation.attributeName();
+            String attributeName = annotation.attributeName().isEmpty() 
+                                        ? propertyName 
+                                        : annotation.attributeName();
             result = new LongDomainAttribute(attributeName, annotation.padding(), annotation.offset());
+        
         } else if(getter.isAnnotationPresent(SimpleDBAttribute.class)) {
             try {
                 SimpleDBAttribute annotation = getter.getAnnotation(SimpleDBAttribute.class);
-                String attributeName = annotation.attributeName().isEmpty() ? propertyName : annotation.attributeName();
+                String attributeName = annotation.attributeName().isEmpty() 
+                                            ? propertyName 
+                                            : annotation.attributeName();
                 Class<? extends AttributeConverter<?>> converterClass = annotation.attributeConverter();
+                
                 AttributeConverter<?> converter = 
-                        (converterClass.equals(NullAttributeConverter.class)) 
+                        (converterClass.equals(DefaultAttributeConverter.class)) 
                             ? new DefaultAttributeConverter<C>(type)
                             : converterClass.newInstance();
                 result = new DefaultDomainAttribute<C>(attributeName, type, (AttributeConverter<C>)converter);

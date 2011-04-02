@@ -31,11 +31,11 @@ public class NullAttributeConverter implements AttributeConverter<Object> {
     
     @Override
     public String convertValue(Object targetValue) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return targetValue.toString();
     }
 
     @Override
     public Object restoreValue(String targetValue) throws CanNotRestoreAttributeException {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return targetValue;
     }
 }

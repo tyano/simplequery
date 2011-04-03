@@ -24,5 +24,6 @@ public interface DomainAttributes extends Iterable<DomainAttribute<?>> {
     boolean isAttributeDefined(String attributeName);
     DomainAttribute<?> getAttribute(String attributeName);
     Class<?> getDomainClass();
+    String getDomainName();
     void writeAttribute(Object instance, String attributeName, Object value) throws CanNotWriteAttributeException;
 }

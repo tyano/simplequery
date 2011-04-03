@@ -63,7 +63,8 @@ public class DefaultWhereExpression<T> extends BaseExpression<T> implements Wher
     public String describe() {
         StringBuilder sb = new StringBuilder();
         Class<T> domainClass = getDomainExpression().getDomainClass();
-        DomainAttributes domainAttribute = new BeanDomainAttributes(domainClass);
+        String domainName = getDomainExpression().getDomainName();
+        DomainAttributes domainAttribute = new BeanDomainAttributes(domainClass, domainName);
 
         Condition current = condition;
         while (current.getParent() != null) {

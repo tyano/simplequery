@@ -33,13 +33,15 @@ import com.shelfmap.simplequery.expression.ItemConverter;
  */
 public class DefaultItemConverter<T> implements ItemConverter<T> {
     private final Class<T> domainClass;
+    private final String domainName;
     private final InstanceFactory<T> instanceFactory;
     private DomainAttributes domainAttributes;
 
-    public DefaultItemConverter(Class<T> domainClass, InstanceFactory<T> factory) {
+    public DefaultItemConverter(Class<T> domainClass, String domainName, InstanceFactory<T> factory) {
         isNotNull("domainClass", domainClass);
         isNotNull("factory", factory);
         this.domainClass = domainClass;
+        this.domainName = domainName;
         this.instanceFactory = factory;
     }
     
@@ -60,10 +62,10 @@ public class DefaultItemConverter<T> implements ItemConverter<T> {
                     Object convertedValue = domainAttribute.getAttributeConverter().restoreValue(attributeValue);
                     domainAttributes.writeAttribute(instance, attributeName, convertedValue);
                 } catch (CanNotRestoreAttributeException ex) {
-                    throw new CanNotConvertItemException("could not write a attribute: " + domainAttribute.getName() + " for the item: " + item.getName(), ex, item);
+                    throw new CanNotConvertItemException("could not write a attribute: " + domainAttribute.getAttributeName() + " for the item: " + item.getName(), ex, item);
                 } catch (CanNotWriteAttributeException ex) {
                     Throwable cause = ex.getCause();
-                    throw new CanNotConvertItemException("could not write a attribute: " + domainAttribute.getName() + " for the item: " + item.getName(), cause, item);
+                    throw new CanNotConvertItemException("could not write a attribute: " + domainAttribute.getAttributeName() + " for the item: " + item.getName(), cause, item);
                 }
             }
         }
@@ -78,10 +80,15 @@ public class DefaultItemConverter<T> implements ItemConverter<T> {
     @Override
     public InstanceFactory<T> getInstanceFactory() {
         return this.instanceFactory;
-    }    
+    }
+
+    @Override
+    public String getDomainName() {
+        return domainName;
+    }
     
     //Factory method
     protected DomainAttributes newDomainAttributes() {
-        return new BeanDomainAttributes(getDomainClass());
+        return new BeanDomainAttributes(getDomainClass(), getDomainName());
     }
 }

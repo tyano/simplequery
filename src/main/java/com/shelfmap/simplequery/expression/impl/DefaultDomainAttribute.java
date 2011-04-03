@@ -16,6 +16,7 @@
 
 package com.shelfmap.simplequery.expression.impl;
 
+import com.shelfmap.simplequery.expression.AttributeAccessor;
 import com.shelfmap.simplequery.expression.AttributeConverter;
 import static com.shelfmap.simplequery.util.Assertion.isNotNull;
 import com.shelfmap.simplequery.expression.DomainAttribute;
@@ -25,25 +26,27 @@ import com.shelfmap.simplequery.expression.DomainAttribute;
  * @author Tsutomu YANO
  */
 public class DefaultDomainAttribute<T> implements DomainAttribute<T> {
+    private String domainName;
     private String attributeName;
     private Class<T> type;
-    private AttributeConverter<T> attributeInfo;
+    private AttributeConverter<T> attributeConverte;
 
-    public DefaultDomainAttribute(String attributeName, Class<T> type, AttributeConverter<T> attributeConverter) {
+    public DefaultDomainAttribute(String domainName, String attributeName, Class<T> type, AttributeConverter<T> attributeConverter) {
+        isNotNull("domainName", domainName);
         isNotNull("attributeName", attributeName);
         isNotNull("type", type);
         isNotNull("attributeInfo", attributeConverter);
         this.attributeName = attributeName;
         this.type = type;
-        this.attributeInfo = attributeConverter;
+        this.attributeConverte = attributeConverter;
     }
     
-    public DefaultDomainAttribute(String attributeName, Class<T> type) {
-        this(attributeName, type, new DefaultAttributeConverter<T>(type));
+    public DefaultDomainAttribute(String domainName, String attributeName, Class<T> type) {
+        this(domainName, attributeName, type, new DefaultAttributeConverter<T>(type));
     }
     
     @Override
-    public String getName() {
+    public String getAttributeName() {
         return attributeName;
     }
 
@@ -54,6 +57,16 @@ public class DefaultDomainAttribute<T> implements DomainAttribute<T> {
 
     @Override
     public AttributeConverter<T> getAttributeConverter() {
-        return attributeInfo;
+        return attributeConverte;
+    }
+
+    @Override
+    public AttributeAccessor<T> getAttributeAccessor() {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public String getDomainName() {
+        return domainName;
     }
 }

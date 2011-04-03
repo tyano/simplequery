@@ -16,7 +16,6 @@
 package com.shelfmap.simplequery.expression.impl;
 
 import static com.shelfmap.simplequery.util.Assertion.isNotNull;
-import com.shelfmap.simplequery.Domain;
 import com.shelfmap.simplequery.FlatAttribute;
 import com.shelfmap.simplequery.FloatAttribute;
 import com.shelfmap.simplequery.IntAttribute;
@@ -45,15 +44,15 @@ public class BeanDomainAttributes implements DomainAttributes {
 
     private final Map<String, DomainAttribute<?>> attributeMap = new LinkedHashMap<String, DomainAttribute<?>>();
     private final Class<?> domainClass;
+    private final String domainName;
     private final Map<String, Method> writeMethodMap = new HashMap<String, Method>();
 
-    public BeanDomainAttributes(Class<?> domainClass) {
+    public BeanDomainAttributes(Class<?> domainClass, String domainName) {
         isNotNull("domainClass", domainClass);
-        if (!domainClass.isAnnotationPresent(Domain.class)) {
-            throw new IllegalArgumentException("domainClass must have a @Domain annotation.");
-        }
-
+        isNotNull("domainName", domainName);
+        
         this.domainClass = domainClass;
+        this.domainName = domainName;
         try {
             BeanInfo info = Introspector.getBeanInfo(domainClass);
             PropertyDescriptor[] descriptors = info.getPropertyDescriptors();
@@ -67,8 +66,8 @@ public class BeanDomainAttributes implements DomainAttributes {
                     buildFlatAttribute(type);
                 } else {
                     DomainAttribute<?> attribute = createAttribute(propertyName, type, getter);
-                    attributeMap.put(attribute.getName(), attribute);
-                    writeMethodMap.put(attribute.getName(), setter);
+                    attributeMap.put(attribute.getAttributeName(), attribute);
+                    writeMethodMap.put(attribute.getAttributeName(), setter);
                 }
             }
         } catch (IntrospectionException ex) {
@@ -95,7 +94,7 @@ public class BeanDomainAttributes implements DomainAttributes {
             SimpleDBAttribute annotation = getter.getAnnotation(SimpleDBAttribute.class);
             result = processSimpleDBAttribute(annotation, propertyName, type, getter);
         } else {
-            result = new DefaultDomainAttribute<C>(propertyName, type);
+            result = new DefaultDomainAttribute<C>(getDomainName(), propertyName, type);
         }
 
         return result;
@@ -105,21 +104,21 @@ public class BeanDomainAttributes implements DomainAttributes {
         String attributeName = annotation.attributeName().isEmpty()
                 ? propertyName
                 : annotation.attributeName();
-        return new FloatDomainAttribute(attributeName, annotation.maxDigitLeft(), annotation.maxDigitRight(), annotation.offset());
+        return new FloatDomainAttribute(getDomainName(), attributeName, annotation.maxDigitLeft(), annotation.maxDigitRight(), annotation.offset());
     }
 
     private DomainAttribute<Integer> processIntAttribute(IntAttribute annotation, String propertyName, Method getter) {
         String attributeName = annotation.attributeName().isEmpty()
                 ? propertyName
                 : annotation.attributeName();
-        return new IntDomainAttribute(attributeName, annotation.padding(), annotation.offset());
+        return new IntDomainAttribute(getDomainName(), attributeName, annotation.padding(), annotation.offset());
     }
 
     private DomainAttribute<Long> processLongAttribute(LongAttribute annotation, String propertyName, Method getter) {
         String attributeName = annotation.attributeName().isEmpty()
                 ? propertyName
                 : annotation.attributeName();
-        return new LongDomainAttribute(attributeName, annotation.padding(), annotation.offset());
+        return new LongDomainAttribute(getDomainName(), attributeName, annotation.padding(), annotation.offset());
     }
 
     @SuppressWarnings("unchecked")
@@ -134,7 +133,7 @@ public class BeanDomainAttributes implements DomainAttributes {
                     (converterClass.equals(DefaultAttributeConverter.class))
                     ? new DefaultAttributeConverter<C>(type)
                     : converterClass.newInstance();
-            return new DefaultDomainAttribute<C>(attributeName, type, (AttributeConverter<C>) converter);
+            return new DefaultDomainAttribute<C>(getDomainName(), attributeName, type, (AttributeConverter<C>) converter);
         } catch (InstantiationException ex) {
             throw new IllegalArgumentException("Can not instanciate a converter. possible cause is that the converter class specified in @SimpleDBAttribute do not have a default constructor.", ex);
         } catch (IllegalAccessException ex) {
@@ -149,7 +148,7 @@ public class BeanDomainAttributes implements DomainAttributes {
      * @param type the return type of the method on which FlatAttribute annotation is applied.
      */
     private void buildFlatAttribute(Class<?> type) {
-        BeanDomainAttributes attributes = new BeanDomainAttributes(type);
+        BeanDomainAttributes attributes = new BeanDomainAttributes(type, getDomainName());
         copy(attributes, this);
     }
     
@@ -178,6 +177,11 @@ public class BeanDomainAttributes implements DomainAttributes {
         return domainClass;
     }
 
+    @Override
+    public String getDomainName() {
+        return domainName;
+    }
+    
     @Override
     public Iterator<DomainAttribute<?>> iterator() {
         return attributeMap.values().iterator();

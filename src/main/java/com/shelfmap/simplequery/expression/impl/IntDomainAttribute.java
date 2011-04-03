@@ -20,7 +20,7 @@ package com.shelfmap.simplequery.expression.impl;
  * @author Tsutomu YANO
  */
 public class IntDomainAttribute extends DefaultDomainAttribute<Integer> {
-    public IntDomainAttribute(String attributeName, int maxNumberOfDigits, int offset) {
-        super(attributeName, Integer.class, new IntAttributeConverter(maxNumberOfDigits, offset));
+    public IntDomainAttribute(String domainName, String attributeName, int maxNumberOfDigits, int offset) {
+        super(domainName, attributeName, Integer.class, new IntAttributeConverter(maxNumberOfDigits, offset));
     }
 }

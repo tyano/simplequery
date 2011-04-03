@@ -25,6 +25,7 @@ import com.shelfmap.simplequery.InstanceFactory;
  */
 public interface ItemConverter<T> {
     Class<T> getDomainClass();
+    String getDomainName();
     InstanceFactory<T> getInstanceFactory();
     T convert(Item item) throws CanNotConvertItemException;
 }

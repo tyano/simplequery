@@ -21,7 +21,7 @@ package com.shelfmap.simplequery.expression.impl;
  * @author Tsutomu YANO
  */
 public class FloatDomainAttribute extends DefaultDomainAttribute<Float> {
-    public FloatDomainAttribute(String attributeName, int maxDigitLeft, int maxDigitRight, int offset) {
-        super(attributeName, Float.class, new FloatAttributeConverter(maxDigitLeft, maxDigitRight, offset));
+    public FloatDomainAttribute(String domainName, String attributeName, int maxDigitLeft, int maxDigitRight, int offset) {
+        super(domainName, attributeName, Float.class, new FloatAttributeConverter(maxDigitLeft, maxDigitRight, offset));
     }
 }

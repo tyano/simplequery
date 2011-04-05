@@ -15,6 +15,7 @@
  */
 package com.shelfmap.simplequery.expression.impl;
 
+import com.shelfmap.simplequery.expression.AttributeStore;
 import static com.shelfmap.simplequery.util.Assertion.isNotNull;
 import com.shelfmap.simplequery.FlatAttribute;
 import com.shelfmap.simplequery.FloatAttribute;
@@ -22,6 +23,7 @@ import com.shelfmap.simplequery.IntAttribute;
 import com.shelfmap.simplequery.LongAttribute;
 import com.shelfmap.simplequery.SimpleDBAttribute;
 import com.shelfmap.simplequery.expression.AttributeConverter;
+import com.shelfmap.simplequery.expression.AttributeKey;
 import com.shelfmap.simplequery.expression.CanNotWriteAttributeException;
 import com.shelfmap.simplequery.expression.DomainAttributes;
 import com.shelfmap.simplequery.expression.DomainAttribute;
@@ -29,25 +31,19 @@ import java.beans.BeanInfo;
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.Map;
 
 /**
  *
  * @author Tsutomu YANO
  */
 public class BeanDomainAttributes implements DomainAttributes {
-
-    private final Map<String, DomainAttribute<?>> attributeMap = new LinkedHashMap<String, DomainAttribute<?>>();
+    private final AttributeStore attributeStore = new DefaultAttributeStore();
     private final Class<?> domainClass;
     private final String domainName;
-    private final Map<String, Method> writeMethodMap = new HashMap<String, Method>();
 
-    public BeanDomainAttributes(Class<?> domainClass, String domainName) {
+    public <T> BeanDomainAttributes(Class<?> domainClass, String domainName) {
         isNotNull("domainClass", domainClass);
         isNotNull("domainName", domainName);
         
@@ -57,17 +53,16 @@ public class BeanDomainAttributes implements DomainAttributes {
             BeanInfo info = Introspector.getBeanInfo(domainClass);
             PropertyDescriptor[] descriptors = info.getPropertyDescriptors();
             for (PropertyDescriptor descriptor : descriptors) {
-                Class<?> type = descriptor.getPropertyType();
+                @SuppressWarnings("unchecked")
+                Class<T> type = (Class<T>) descriptor.getPropertyType();
                 String propertyName = descriptor.getName();
                 Method getter = descriptor.getReadMethod();
-                Method setter = descriptor.getWriteMethod();
                 
                 if(getter.isAnnotationPresent(FlatAttribute.class)) {
                     buildFlatAttribute(type);
                 } else {
-                    DomainAttribute<?> attribute = createAttribute(propertyName, type, getter);
-                    attributeMap.put(attribute.getAttributeName(), attribute);
-                    writeMethodMap.put(attribute.getAttributeName(), setter);
+                    DomainAttribute<T> attribute = createAttribute(propertyName, type, getter);
+                    attributeStore.putAttribute(attribute.getAttributeName(), type, attribute);
                 }
             }
         } catch (IntrospectionException ex) {
@@ -76,19 +71,19 @@ public class BeanDomainAttributes implements DomainAttributes {
     }
 
     @SuppressWarnings("unchecked")
-    private <C> DomainAttribute<?> createAttribute(String propertyName, Class<C> type, Method getter) {
-        DomainAttribute<?> result = null;
-        if (getter.isAnnotationPresent(FloatAttribute.class)) {
+    private <C> DomainAttribute<C> createAttribute(String propertyName, Class<C> type, Method getter) {
+        DomainAttribute<C> result = null;
+        if (getter.isAnnotationPresent(FloatAttribute.class) && (type.equals(Float.class) || type.equals(float.class))) {
             FloatAttribute annotation = getter.getAnnotation(FloatAttribute.class);
-            result = processFloatAttribute(annotation, propertyName, getter);
+            result = (DomainAttribute<C>) processFloatAttribute(annotation, propertyName, getter);
 
-        } else if (getter.isAnnotationPresent(IntAttribute.class)) {
+        } else if (getter.isAnnotationPresent(IntAttribute.class) && (type.equals(Integer.class) || type.equals(int.class))) {
             IntAttribute annotation = getter.getAnnotation(IntAttribute.class);
-            result = processIntAttribute(annotation, propertyName, getter);
+            result = (DomainAttribute<C>) processIntAttribute(annotation, propertyName, getter);
 
-        } else if (getter.isAnnotationPresent(LongAttribute.class)) {
+        } else if (getter.isAnnotationPresent(LongAttribute.class) && (type.equals(Long.class) || type.equals(long.class))) {
             LongAttribute annotation = getter.getAnnotation(LongAttribute.class);
-            result = processLongAttribute(annotation, propertyName, getter);
+            result = (DomainAttribute<C>) processLongAttribute(annotation, propertyName, getter);
 
         } else if (getter.isAnnotationPresent(SimpleDBAttribute.class)) {
             SimpleDBAttribute annotation = getter.getAnnotation(SimpleDBAttribute.class);
@@ -152,25 +147,31 @@ public class BeanDomainAttributes implements DomainAttributes {
         copy(attributes, this);
     }
     
-    private void copy(BeanDomainAttributes source, BeanDomainAttributes dest) {
-        for (String key : source.attributeMap.keySet()) {
-            if(dest.attributeMap.containsKey(key)) {
+    private <T> void copy(BeanDomainAttributes source, BeanDomainAttributes dest) {
+        for (AttributeKey key : source.attributeStore.keySet()) {
+            if(dest.attributeStore.isAttributeDefined(key.getAttributeName())) {
                 throw new IllegalArgumentException("Can not retrieve attributes from classes: the name of the attribute '" + key + "' of " + source.getDomainClass().getCanonicalName() + " is duplicated with the parent domainClass '" + dest.getDomainClass().getCanonicalName() + "'.");
             }
+            @SuppressWarnings("unchecked")
+            Class<T> type = (Class<T>) key.getType();
+            dest.attributeStore.putAttribute(key.getAttributeName(), type, source.getAttribute(key.getAttributeName(), type));
         }
-        dest.attributeMap.putAll(source.attributeMap);
-        dest.writeMethodMap.putAll(source.writeMethodMap);
     }
 
     @Override
     public boolean isAttributeDefined(String attributeName) {
-        return attributeMap.get(attributeName) != null;
+        return attributeStore.isAttributeDefined(attributeName);
     }
 
     @Override
-    public DomainAttribute<?> getAttribute(String attributeName) {
-        return attributeMap.get(attributeName);
+    public <T> DomainAttribute<T> getAttribute(String attributeName, Class<T> type) {
+        return attributeStore.getAttribute(attributeName, type);
     }
+    
+    @Override
+    public DomainAttribute<?> getAttribute(String attributeName) {
+        return attributeStore.getAttribute(attributeName);
+    }    
 
     @Override
     public Class<?> getDomainClass() {
@@ -184,28 +185,12 @@ public class BeanDomainAttributes implements DomainAttributes {
     
     @Override
     public Iterator<DomainAttribute<?>> iterator() {
-        return attributeMap.values().iterator();
+        return attributeStore.values().iterator();
     }
 
     @Override
-    public void writeAttribute(Object instance, String attributeName, Object value) throws CanNotWriteAttributeException {
-        //TODO must process @FlatAttribute in this method.
-        
-        DomainAttribute<?> attribute = attributeMap.get(attributeName);
-        Method writeMethod = writeMethodMap.get(attributeName);
-        if (writeMethod == null) {
-            throw new IllegalStateException("the attribute '" + attributeName + "' is not writable.");
-        }
-
-        writeMethod.setAccessible(true);
-        try {
-            writeMethod.invoke(instance, value);
-        } catch (IllegalAccessException ex) {
-            throw new CanNotWriteAttributeException(ex, attribute);
-        } catch (IllegalArgumentException ex) {
-            throw new CanNotWriteAttributeException(ex, attribute);
-        } catch (InvocationTargetException ex) {
-            throw new CanNotWriteAttributeException(ex, attribute);
-        }
+    public <T> void writeAttribute(Object instance, String attributeName, Class<T> type, T value) throws CanNotWriteAttributeException {
+        DomainAttribute<T> attribute = attributeStore.getAttribute(attributeName, type);
+        attribute.getAttributeAccessor().write(instance, value);
     }
 }

@@ -15,13 +15,17 @@
  */
 package com.shelfmap.simplequery.expression;
 
-import com.shelfmap.simplequery.expression.DomainAttribute;
+import java.util.Set;
 
 /**
  *
  * @author Tsutomu YANO
  */
-public interface AttributeStore{
+public interface AttributeStore {
     <T> DomainAttribute<T> putAttribute(String attributeName, Class<T> type, DomainAttribute<T> value);
     <T> DomainAttribute<T> getAttribute(String attributeName, Class<T> type);
+    DomainAttribute<?> getAttribute(String attributeName);
+    boolean isAttributeDefined(String attributeName);
+    Set<AttributeKey> keySet();
+    Set<DomainAttribute<?>> values();
 }

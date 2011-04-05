@@ -22,8 +22,9 @@ package com.shelfmap.simplequery.expression;
  */
 public interface DomainAttributes extends Iterable<DomainAttribute<?>> {
     boolean isAttributeDefined(String attributeName);
+    <T> DomainAttribute<T> getAttribute(String attributeName, Class<T> type);
     DomainAttribute<?> getAttribute(String attributeName);
     Class<?> getDomainClass();
     String getDomainName();
-    void writeAttribute(Object instance, String attributeName, Object value) throws CanNotWriteAttributeException;
+    <T> void writeAttribute(Object instance, String attributeName, Class<T> type, T value) throws CanNotWriteAttributeException;
 }

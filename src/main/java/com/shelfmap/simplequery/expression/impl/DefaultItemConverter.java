@@ -18,9 +18,9 @@ package com.shelfmap.simplequery.expression.impl;
 
 import com.amazonaws.services.simpledb.model.Attribute;
 import com.shelfmap.simplequery.expression.CanNotRestoreAttributeException;
-import com.shelfmap.simplequery.expression.CanNotWriteAttributeException;
 import static com.shelfmap.simplequery.util.Assertion.isNotNull;
 import com.amazonaws.services.simpledb.model.Item;
+import com.shelfmap.simplequery.Configuration;
 import com.shelfmap.simplequery.InstanceFactory;
 import com.shelfmap.simplequery.expression.CanNotConvertItemException;
 import com.shelfmap.simplequery.expression.DomainAttribute;
@@ -34,38 +34,38 @@ import com.shelfmap.simplequery.expression.ItemConverter;
 public class DefaultItemConverter<T> implements ItemConverter<T> {
     private final Class<T> domainClass;
     private final String domainName;
+    private final Configuration configuration;
     private final InstanceFactory<T> instanceFactory;
     private DomainAttributes domainAttributes;
 
-    public DefaultItemConverter(Class<T> domainClass, String domainName, InstanceFactory<T> factory) {
+    public DefaultItemConverter(Class<T> domainClass, String domainName, Configuration configuration) {
         isNotNull("domainClass", domainClass);
-        isNotNull("factory", factory);
+        isNotNull("domainName", domainName);
+        isNotNull("configuration", configuration);
         this.domainClass = domainClass;
         this.domainName = domainName;
-        this.instanceFactory = factory;
+        this.configuration = configuration;
+        this.instanceFactory = configuration.getInstanceFactory(domainClass);
     }
     
     @Override
     public T convert(Item item) throws CanNotConvertItemException {
         if(domainAttributes == null) {
-            domainAttributes = newDomainAttributes();
+            domainAttributes = getConfiguration().getDomainAttributes(domainClass, domainName);
         }
         
-        T instance = getInstanceFactory().createInstance(getDomainClass());
+        T instance = instanceFactory.createInstance(getDomainClass());
         for (Attribute attr : item.getAttributes()) {
             String attributeName = attr.getName();
             String attributeValue = attr.getValue();
-            DomainAttribute<?> domainAttribute = domainAttributes.getAttribute(attributeName);
-            
+            @SuppressWarnings("unchecked")
+            DomainAttribute<T> domainAttribute = (DomainAttribute<T>) domainAttributes.getAttribute(attributeName);
             if(domainAttribute != null) {
                 try {
-                    Object convertedValue = domainAttribute.getAttributeConverter().restoreValue(attributeValue);
-                    domainAttributes.writeAttribute(instance, attributeName, convertedValue);
+                    T convertedValue = domainAttribute.getAttributeConverter().restoreValue(attributeValue);
+                    domainAttribute.getAttributeAccessor().write(instance, convertedValue);
                 } catch (CanNotRestoreAttributeException ex) {
                     throw new CanNotConvertItemException("could not write a attribute: " + domainAttribute.getAttributeName() + " for the item: " + item.getName(), ex, item);
-                } catch (CanNotWriteAttributeException ex) {
-                    Throwable cause = ex.getCause();
-                    throw new CanNotConvertItemException("could not write a attribute: " + domainAttribute.getAttributeName() + " for the item: " + item.getName(), cause, item);
                 }
             }
         }
@@ -78,17 +78,12 @@ public class DefaultItemConverter<T> implements ItemConverter<T> {
     }
 
     @Override
-    public InstanceFactory<T> getInstanceFactory() {
-        return this.instanceFactory;
+    public Configuration getConfiguration() {
+        return configuration;
     }
 
     @Override
     public String getDomainName() {
         return domainName;
-    }
-    
-    //Factory method
-    protected DomainAttributes newDomainAttributes() {
-        return new BeanDomainAttributes(getDomainClass(), getDomainName());
     }
 }

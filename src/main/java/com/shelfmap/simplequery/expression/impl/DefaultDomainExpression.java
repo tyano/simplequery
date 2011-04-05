@@ -19,7 +19,6 @@ package com.shelfmap.simplequery.expression.impl;
 import com.amazonaws.services.simpledb.AmazonSimpleDB;
 import com.amazonaws.services.simpledb.util.SimpleDBUtils;
 import com.shelfmap.simplequery.Configuration;
-import com.shelfmap.simplequery.expression.Expression;
 import com.shelfmap.simplequery.expression.LimitExpression;
 import com.shelfmap.simplequery.expression.OrderByExpression;
 import com.shelfmap.simplequery.expression.SelectQuery;
@@ -40,7 +39,7 @@ public class DefaultDomainExpression<T> extends BaseExpression<T> implements Dom
     private Class<T> typeToken;
 
     public DefaultDomainExpression(AmazonSimpleDB simpleDB, Configuration configuration, SelectQuery selectObject, String domainName, Class<T> typeToken) {
-        super(simpleDB, configuration, typeToken);
+        super(simpleDB, configuration, typeToken, domainName);
         isNotNull("selectObject", selectObject);
         isNotNull("domainName", domainName);
         isNotNull("typeToken", typeToken);
@@ -50,13 +49,17 @@ public class DefaultDomainExpression<T> extends BaseExpression<T> implements Dom
     }
     
     @Override
-    public WhereExpression<T> where(Condition expression) {
+    public WhereExpression<T> where(Condition<?> expression) {
         return new DefaultWhereExpression<T>(getAmazonSimpleDB(), getConfiguration(), this, expression);
     }
 
+    private <T> Condition<T> newCondition(String attributeName, Matcher<T> matcher) {
+        return new DefaultCondition<T>(attributeName, matcher);
+    }
+    
     @Override
     public WhereExpression<T> where(String attributeName, Matcher<?> matcher) {
-        Condition condition = new DefaultCondition(attributeName, matcher);
+        Condition<?> condition = newCondition(attributeName, matcher);
         return this.where(condition);
     }
 

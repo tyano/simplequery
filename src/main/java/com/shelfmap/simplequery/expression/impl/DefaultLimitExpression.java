@@ -15,14 +15,12 @@
  */
 package com.shelfmap.simplequery.expression.impl;
 
-import com.shelfmap.simplequery.expression.Expression;
 import static com.shelfmap.simplequery.util.Assertion.*;
 import com.amazonaws.services.simpledb.AmazonSimpleDB;
 import com.shelfmap.simplequery.Configuration;
 import com.shelfmap.simplequery.expression.DomainExpression;
 import com.shelfmap.simplequery.expression.LimitExpression;
 import com.shelfmap.simplequery.expression.OrderByExpression;
-import com.shelfmap.simplequery.expression.SelectQuery;
 import com.shelfmap.simplequery.expression.WhereExpression;
 import com.shelfmap.simplequery.util.Assertion;
 
@@ -37,8 +35,17 @@ public class DefaultLimitExpression<T> extends BaseExpression<T> implements Limi
     private WhereExpression<T> whereExpression;
     private OrderByExpression<T> orderByExpression;
 
-    protected DefaultLimitExpression(AmazonSimpleDB simpleDB, Configuration configuration, DomainExpression<T> domainExpression, WhereExpression<T> whereExpression, OrderByExpression<T> orderByExpression, int limitCount) {
-        super(simpleDB, configuration, domainExpression.getDomainClass());
+    protected DefaultLimitExpression(AmazonSimpleDB simpleDB, Configuration configuration, final DomainExpression<T> domainExpression, WhereExpression<T> whereExpression, OrderByExpression<T> orderByExpression, int limitCount) {
+        super(simpleDB, 
+              configuration, 
+              Assertion.isNotNullAndGet("domainExpression", domainExpression, new Assertion.Accessor<Class<T>>() {
+                @Override
+                public Class<T> get() {
+                    return domainExpression.getDomainClass();
+                }
+              }),
+              domainExpression.getDomainName());
+        
         this.limitCount = limitCount;
         this.domainExpression = domainExpression;
         this.whereExpression = whereExpression;

@@ -21,7 +21,7 @@ package com.shelfmap.simplequery.expression;
  */
 public interface WhereExpression<T> extends Expression<T>, Conjunctive<WhereExpression<T>> {
     DomainExpression<T> getDomainExpression();
-    Condition getCondition();
+    Condition<?> getCondition();
     OrderByExpression<T> orderBy(String attributeName, SortOrder sortOrder);
     LimitExpression<T> limit(int limitCount);
 

@@ -45,7 +45,7 @@ public class DefaultItemConverter<T> implements ItemConverter<T> {
         this.domainClass = domainClass;
         this.domainName = domainName;
         this.configuration = configuration;
-        this.instanceFactory = configuration.getInstanceFactory(domainClass);
+        this.instanceFactory = configuration.getInstanceFactory(domainClass, domainName);
     }
     
     @Override

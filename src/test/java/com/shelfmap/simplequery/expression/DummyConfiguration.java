@@ -26,12 +26,12 @@ import com.shelfmap.simplequery.expression.impl.BeanDomainAttributes;
  */
 public class DummyConfiguration implements Configuration {
     @Override
-    public <T> ItemConverter<T> getItemConverter(Class<T> domainClass) {
+    public <T> ItemConverter<T> getItemConverter(Class<T> domainClass, String domainName) {
         return null;
     }
 
     @Override
-    public <T> InstanceFactory<T> getInstanceFactory(Class<T> domainClass) {
+    public <T> InstanceFactory<T> getInstanceFactory(Class<T> domainClass, String domainName) {
         return null;
     }
 

@@ -39,14 +39,17 @@ public abstract class BaseExpression<T> implements Expression<T> {
     private final Configuration configuration;
     private final AmazonSimpleDB simpleDB;
     private final Class<T> domainClass;
+    private final String domainName;
 
-    public BaseExpression(AmazonSimpleDB simpleDB, Configuration configuration, Class<T> domainClass) {
+    public BaseExpression(AmazonSimpleDB simpleDB, Configuration configuration, Class<T> domainClass, String domainName) {
         isNotNull("simpleDB", simpleDB);
         isNotNull("configuration", configuration);
         isNotNull("domainClass", domainClass);
+        isNotNull("domainName", domainName);
         this.simpleDB = simpleDB;
         this.configuration = configuration;
         this.domainClass = domainClass;
+        this.domainName = domainName;
     }
     
     @Override
@@ -60,7 +63,7 @@ public abstract class BaseExpression<T> implements Expression<T> {
         
         Item first = items.get(0);
         try {
-            return getConfiguration().getItemConverter(domainClass).convert(first);
+            return getConfiguration().getItemConverter(domainClass, domainName).convert(first);
         } catch (CanNotConvertItemException ex) {
             throw new SimpleQueryException("Can not convert an item", ex);
         }
@@ -70,7 +73,7 @@ public abstract class BaseExpression<T> implements Expression<T> {
     public QueryResults<T> getResults() throws SimpleQueryException {
         SelectRequest selectReq = new SelectRequest(describe());
         SelectResult result = simpleDB.select(selectReq);
-        return new DefaultQueryResult<T>(simpleDB, this, result, getConfiguration().getItemConverter(domainClass));
+        return new DefaultQueryResult<T>(simpleDB, this, result, getConfiguration().getItemConverter(domainClass, domainName));
     }
 
     @Override

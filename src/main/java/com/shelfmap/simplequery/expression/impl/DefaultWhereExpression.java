@@ -43,12 +43,13 @@ public class DefaultWhereExpression<T> extends BaseExpression<T> implements Wher
         super(simpleDB,
                 configuration,
                 Assertion.isNotNullAndGet("domainExpression", domainExpression, new Assertion.Accessor<Class<T>>() {
-
-            @Override
-            public Class<T> get() {
-                return domainExpression.getDomainClass();
-            }
-        }));
+                    @Override
+                    public Class<T> get() {
+                        return domainExpression.getDomainClass();
+                    }
+                }),
+                domainExpression.getDomainName());
+        
         isNotNull("condition", condition);
         this.domainExpression = domainExpression;
         this.condition = condition;

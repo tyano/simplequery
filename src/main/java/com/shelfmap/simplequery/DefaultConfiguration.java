@@ -13,18 +13,32 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.shelfmap.simplequery;
 
 import com.shelfmap.simplequery.expression.DomainAttributes;
 import com.shelfmap.simplequery.expression.ItemConverter;
+import com.shelfmap.simplequery.expression.impl.BeanDomainAttributes;
+import com.shelfmap.simplequery.expression.impl.DefaultItemConverter;
 
 /**
  *
  * @author Tsutomu YANO
  */
-public interface Configuration {
-    <T> ItemConverter<T> getItemConverter(Class<T> domainClass, String domainName);
-    <T> InstanceFactory<T> getInstanceFactory(Class<T> domainClass, String domainName);
-    DomainAttributes getDomainAttributes(Class<?> domainClass, String domainName);
+public class DefaultConfiguration implements Configuration {
+
+    @Override
+    public <T> ItemConverter<T> getItemConverter(Class<T> domainClass, String domainName) {
+        return new DefaultItemConverter<T>(domainClass, domainName, this);
+    }
+
+    @Override
+    public <T> InstanceFactory<T> getInstanceFactory(Class<T> domainClass, String domainName) {
+        return new DefaultInstanceFactory<T>();
+    }
+
+    @Override
+    public DomainAttributes getDomainAttributes(Class<?> domainClass, String domainName) {
+        return new BeanDomainAttributes(domainClass, domainName);
+    }
+    
 }

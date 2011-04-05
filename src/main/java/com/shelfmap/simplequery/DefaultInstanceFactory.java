@@ -13,18 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.shelfmap.simplequery;
-
-import com.shelfmap.simplequery.expression.DomainAttributes;
-import com.shelfmap.simplequery.expression.ItemConverter;
 
 /**
  *
  * @author Tsutomu YANO
  */
-public interface Configuration {
-    <T> ItemConverter<T> getItemConverter(Class<T> domainClass, String domainName);
-    <T> InstanceFactory<T> getInstanceFactory(Class<T> domainClass, String domainName);
-    DomainAttributes getDomainAttributes(Class<?> domainClass, String domainName);
+public class DefaultInstanceFactory<T> implements InstanceFactory<T> {
+
+    @Override
+    public T createInstance(Class<T> clazz) {
+        try {
+            return clazz.newInstance();
+        } catch (InstantiationException ex) {
+            throw new IllegalStateException("Could not instanciate the class: " + clazz, ex);
+        } catch (IllegalAccessException ex) {
+            throw new IllegalStateException("Could not access to the default constructor of: " + clazz, ex);
+        }
+    }
+    
 }

@@ -21,13 +21,13 @@ package com.shelfmap.simplequery.expression;
  * @author Tsutomu YANO
  */
 public interface Conjunctive<T> {
-    T and(Condition other);
+    T and(Condition<?> other);
     T and(String attributeName, Matcher<?> matcher);
     <E> T and(String attributeName, Matcher<E> matcher, AttributeConverter<E> attributeInfo);
-    T or(Condition other);
+    T or(Condition<?> other);
     T or(String attributeName, Matcher<?> matcher);
     <E> T or(String attributeName, Matcher<E> matcher, AttributeConverter<E> attributeInfo);
-    T intersection(Condition other);
+    T intersection(Condition<?> other);
     T intersection(String attributeName, Matcher<?> matcher);
     <E> T intersection(String attributeName, Matcher<E> matcher, AttributeConverter<E> attributeInfo);
     T group();

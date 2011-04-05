@@ -24,70 +24,74 @@ import com.shelfmap.simplequery.expression.Operator;
  *
  * @author Tsutomu YANO
  */
-public class ConditionGroup implements Condition {
+public class ConditionGroup implements Condition<Void> {
 
-    private final Condition condition;
-    private Condition parent;
+    private final Condition<?> condition;
+    private Condition<?> parent;
     private Operator operator;
 
-    public ConditionGroup(Condition condition) {
+    public ConditionGroup(Condition<?> condition) {
         this.condition = condition;
         this.parent = NullCondition.INSTANCE;
         this.operator = NullOperator.INSTANCE;
     }
 
-    protected ConditionGroup(Condition condition, Condition parent, Operator operator) {
+    protected ConditionGroup(Condition<?> condition, Condition<?> parent, Operator operator) {
         this.condition = condition;
         this.parent = parent;
         this.operator = operator;
     }
 
     @Override
-    public Condition withParent(Condition parent, Operator operator) {
+    public Condition<Void> withParent(Condition<?> parent, Operator operator) {
         return new ConditionGroup(getCondition(), parent, operator);
     }
 
     @Override
-    public Condition getParent() {
+    public Condition<?> getParent() {
         return this.parent;
     }
 
     @Override
-    public Condition and(Condition other) {
+    public Condition<?> and(Condition<?> other) {
         return other.withParent(this, BasicOperator.AND);
     }
+    
+    private <T> Condition<T> newCondition(String attributeName, Matcher<T> matcher) {
+        return new DefaultCondition<T>(attributeName, matcher);
+    }
 
     @Override
-    public Condition and(String attributeName, Matcher<?> matcher) {
-        Condition other = new DefaultCondition(attributeName, matcher);
+    public Condition<?> and(String attributeName, Matcher<?> matcher) {
+        Condition<?> other = newCondition(attributeName, matcher);
         return this.and(other);
     }
 
     @Override
-    public <E> Condition and(String attributeName, Matcher<E> matcher, AttributeConverter<E> attributeInfo) {
-        Condition other = new DefaultCondition(attributeName, matcher.withAttributeInfo(attributeInfo));
+    public <E> Condition<?> and(String attributeName, Matcher<E> matcher, AttributeConverter<E> attributeInfo) {
+        Condition<?> other = newCondition(attributeName, matcher.withAttributeInfo(attributeInfo));
         return this.and(other);
     }
 
     @Override
-    public Condition or(Condition other) {
+    public Condition<?> or(Condition<?> other) {
         return other.withParent(this, BasicOperator.OR);
     }
 
     @Override
-    public Condition or(String attributeName, Matcher<?> matcher) {
-        Condition other = new DefaultCondition(attributeName, matcher);
+    public Condition<?> or(String attributeName, Matcher<?> matcher) {
+        Condition<?> other = newCondition(attributeName, matcher);
         return this.or(other);
     }
 
     @Override
-    public <E> Condition or(String attributeName, Matcher<E> matcher, AttributeConverter<E> attributeInfo) {
-        Condition other = new DefaultCondition(attributeName, matcher.withAttributeInfo(attributeInfo));
+    public <E> Condition<?> or(String attributeName, Matcher<E> matcher, AttributeConverter<E> attributeInfo) {
+        Condition<?> other = newCondition(attributeName, matcher.withAttributeInfo(attributeInfo));
         return this.or(other);
     }
 
     @Override
-    public Condition group() {
+    public Condition<?> group() {
         return new ConditionGroup(this);
     }
 
@@ -102,7 +106,7 @@ public class ConditionGroup implements Condition {
         return sb.toString();
     }
 
-    public Condition getCondition() {
+    public Condition<?> getCondition() {
         return condition;
     }
 
@@ -112,19 +116,19 @@ public class ConditionGroup implements Condition {
     }
 
     @Override
-    public Condition intersection(Condition other) {
+    public Condition<?> intersection(Condition<?> other) {
         return other.withParent(this, BasicOperator.INTERSECTION);
     }
 
     @Override
-    public Condition intersection(String attributeName, Matcher<?> matcher) {
-        Condition other = new DefaultCondition(attributeName, matcher);
+    public Condition<?> intersection(String attributeName, Matcher<?> matcher) {
+        Condition<?> other = newCondition(attributeName, matcher);
         return this.intersection(other);
     }
 
     @Override
-    public <E> Condition intersection(String attributeName, Matcher<E> matcher, AttributeConverter<E> attributeInfo) {
-        Condition other = new DefaultCondition(attributeName, matcher.withAttributeInfo(attributeInfo));
+    public <E> Condition<?> intersection(String attributeName, Matcher<E> matcher, AttributeConverter<E> attributeInfo) {
+        Condition<?> other = newCondition(attributeName, matcher.withAttributeInfo(attributeInfo));
         return this.intersection(other);
     }
 
@@ -134,17 +138,17 @@ public class ConditionGroup implements Condition {
     }
 
     @Override
-    public Matcher<?> getMatcher() {
+    public Matcher<Void> getMatcher() {
         return null;
     }
 
     @Override
-    public Condition withAttributeName(String attributeName) {
+    public Condition<Void> withAttributeName(String attributeName) {
         return this;
     }
 
     @Override
-    public Condition withMatcher(Matcher<?> matcher) {
+    public Condition<Void> withMatcher(Matcher<Void> matcher) {
         return this;
     }
 }

@@ -22,15 +22,15 @@ package com.shelfmap.simplequery.expression;
     Matcher<T> withAttributeInfo(int maxNumDigits, long offsetValue);
  * @author Tsutomu YANO
  */
-public interface Condition extends Describable, Conjunctive<Condition> {
+public interface Condition<T> extends Describable, Conjunctive<Condition<?>> {
     /* properties (read only) */
-    Condition getParent();
+    Condition<?> getParent();
     Operator getOperator();
     String getAttributeName();
-    Matcher<?> getMatcher();
+    Matcher<T> getMatcher();
 
     /* methods for building new instance with new property value. */
-    Condition withParent(Condition parent, Operator operator);
-    Condition withAttributeName(String attributeName);
-    Condition withMatcher(Matcher<?> matcher);
+    Condition<T> withParent(Condition<?> parent, Operator operator);
+    Condition<T> withAttributeName(String attributeName);
+    Condition<T> withMatcher(Matcher<T> matcher);
 }

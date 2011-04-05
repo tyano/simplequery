@@ -24,7 +24,7 @@ import com.shelfmap.simplequery.expression.Operator;
  *
  * @author Tsutomu YANO
  */
-public final class NullCondition implements Condition {
+public final class NullCondition implements Condition<Object> {
     public static final NullCondition INSTANCE = new NullCondition();
     
     private NullCondition() {
@@ -32,27 +32,31 @@ public final class NullCondition implements Condition {
     }
 
     @Override
-    public Condition and(Condition other) {
+    public Condition<?> and(Condition<?> other) {
+        return other;
+    }
+
+    private <T> Condition<T> newCondition(String attributeName, Matcher<T> matcher) {
+        return new DefaultCondition<T>(attributeName, matcher);
+    }
+    
+    @Override
+    public Condition<?> and(String attributeName, Matcher<?> matcher) {
+        return newCondition(attributeName, matcher);
+    }
+
+    @Override
+    public Condition<?> or(Condition<?> other) {
         return other;
     }
 
     @Override
-    public Condition and(String attributeName, Matcher<?> matcher) {
-        return new DefaultCondition(attributeName, matcher);
+    public Condition<?> or(String attributeName, Matcher<?> matcher) {
+        return newCondition(attributeName, matcher);
     }
 
     @Override
-    public Condition or(Condition other) {
-        return other;
-    }
-
-    @Override
-    public Condition or(String attributeName, Matcher<?> matcher) {
-        return new DefaultCondition(attributeName, matcher);
-    }
-
-    @Override
-    public Condition group() {
+    public Condition<?> group() {
         return this;
     }
 
@@ -62,38 +66,38 @@ public final class NullCondition implements Condition {
     }
 
     @Override
-    public Condition withParent(Condition parent, Operator operator) {
+    public Condition<Object> withParent(Condition<?> parent, Operator operator) {
         return this;
     }
 
     @Override
-    public Condition getParent() {
+    public Condition<?> getParent() {
         return null;
     }
 
     @Override
-    public <E> Condition and(String attributeName, Matcher<E> matcher, AttributeConverter<E> attributeInfo) {
-        return new DefaultCondition(attributeName, matcher.withAttributeInfo(attributeInfo));
+    public <E> Condition<?> and(String attributeName, Matcher<E> matcher, AttributeConverter<E> attributeInfo) {
+        return newCondition(attributeName, matcher.withAttributeInfo(attributeInfo));
     }
 
     @Override
-    public <E> Condition or(String attributeName, Matcher<E> matcher, AttributeConverter<E> attributeInfo) {
-        return new DefaultCondition(attributeName, matcher.withAttributeInfo(attributeInfo));
+    public <E> Condition<?> or(String attributeName, Matcher<E> matcher, AttributeConverter<E> attributeInfo) {
+        return newCondition(attributeName, matcher.withAttributeInfo(attributeInfo));
     }
 
     @Override
-    public Condition intersection(Condition other) {
+    public Condition<?> intersection(Condition<?> other) {
         return other;
     }
 
     @Override
-    public Condition intersection(String attributeName, Matcher<?> matcher) {
-        return new DefaultCondition(attributeName, matcher);
+    public Condition<?> intersection(String attributeName, Matcher<?> matcher) {
+        return newCondition(attributeName, matcher);
     }
 
     @Override
-    public <E> Condition intersection(String attributeName, Matcher<E> matcher, AttributeConverter<E> attributeInfo) {
-        return new DefaultCondition(attributeName, matcher.withAttributeInfo(attributeInfo));
+    public <E> Condition<?> intersection(String attributeName, Matcher<E> matcher, AttributeConverter<E> attributeInfo) {
+        return newCondition(attributeName, matcher.withAttributeInfo(attributeInfo));
     }
 
     @Override
@@ -107,17 +111,17 @@ public final class NullCondition implements Condition {
     }
 
     @Override
-    public Matcher<?> getMatcher() {
+    public Matcher<Object> getMatcher() {
         return null;
     }
 
     @Override
-    public Condition withAttributeName(String attributeName) {
+    public Condition<Object> withAttributeName(String attributeName) {
         return this;
     }
 
     @Override
-    public Condition withMatcher(Matcher<?> matcher) {
+    public Condition<Object> withMatcher(Matcher<Object> matcher) {
         return this;
     }
 }

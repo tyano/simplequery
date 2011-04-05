@@ -37,17 +37,18 @@ import com.shelfmap.simplequery.util.Assertion;
 public class DefaultWhereExpression<T> extends BaseExpression<T> implements WhereExpression<T> {
 
     private DomainExpression<T> domainExpression;
-    private Condition condition;
+    private Condition<?> condition;
 
-    public DefaultWhereExpression(AmazonSimpleDB simpleDB, Configuration configuration, final DomainExpression<T> domainExpression, Condition condition) {
-        super(simpleDB, 
-              configuration, 
-              Assertion.isNotNullAndGet("domainExpression", domainExpression, new Assertion.Accessor<Class<T>>() {
-                    @Override
-                    public Class<T> get() {
-                        return domainExpression.getDomainClass();
-                    }
-              })); 
+    public DefaultWhereExpression(AmazonSimpleDB simpleDB, Configuration configuration, final DomainExpression<T> domainExpression, Condition<?> condition) {
+        super(simpleDB,
+                configuration,
+                Assertion.isNotNullAndGet("domainExpression", domainExpression, new Assertion.Accessor<Class<T>>() {
+
+            @Override
+            public Class<T> get() {
+                return domainExpression.getDomainClass();
+            }
+        }));
         isNotNull("condition", condition);
         this.domainExpression = domainExpression;
         this.condition = condition;
@@ -64,25 +65,11 @@ public class DefaultWhereExpression<T> extends BaseExpression<T> implements Wher
         StringBuilder sb = new StringBuilder();
         Class<T> domainClass = getDomainExpression().getDomainClass();
         String domainName = getDomainExpression().getDomainName();
-        DomainAttributes domainAttribute = new BeanDomainAttributes(domainClass, domainName);
+        DomainAttributes domainAttributes = getConfiguration().getDomainAttributes(domainClass, domainName);
 
-        Condition current = condition;
+        Condition<?> current = condition;
         while (current.getParent() != null) {
-            String attributeName = current.getAttributeName();
-            Matcher<?> matcher = current.getMatcher();
-            if (matcher != null) {
-                if (domainAttribute.isAttributeDefined(attributeName)) {
-                    DomainAttribute<?> attribute = domainAttribute.getAttribute(attributeName);
-                    Class<?> type = attribute.getType();
-                    if (type == Float.class) {
-                        ((Matcher<Float>) matcher).setAttributeInfo((AttributeConverter<Float>)attribute.getAttributeConverter());
-                    } else if (type == Integer.class) {
-                        ((Matcher<Integer>) matcher).setAttributeInfo((AttributeConverter<Integer>)attribute.getAttributeConverter());
-                    } else if (type == Long.class) {
-                        ((Matcher<Long>) matcher).setAttributeInfo((AttributeConverter<Long>)attribute.getAttributeConverter());
-                    }
-                }
-            }
+            configureMatcher(domainAttributes, current);
             current = current.getParent();
         }
 
@@ -92,13 +79,27 @@ public class DefaultWhereExpression<T> extends BaseExpression<T> implements Wher
         return sb.toString();
     }
 
+    private <AT> void configureMatcher(DomainAttributes domainAttributes, Condition<AT> current) {
+        String attributeName = current.getAttributeName();
+        Matcher<AT> matcher = current.getMatcher();
+        if (matcher != null) {
+            
+            //TODO DomainAttributes#getAttribute might return an DomainAttribute whose type parameter don't match with the Condition 'current'.
+            @SuppressWarnings("unchecked")
+            DomainAttribute<AT> attribute = (DomainAttribute<AT>) domainAttributes.getAttribute(attributeName);
+            if(attribute != null) {
+                matcher.setAttributeInfo(attribute.getAttributeConverter());
+            }
+        }
+    }
+
     @Override
     public DomainExpression<T> getDomainExpression() {
         return this.domainExpression;
     }
 
     @Override
-    public Condition getCondition() {
+    public Condition<?> getCondition() {
         return this.condition;
     }
 
@@ -108,53 +109,57 @@ public class DefaultWhereExpression<T> extends BaseExpression<T> implements Wher
     }
 
     @Override
-    public WhereExpression<T> and(Condition other) {
+    public WhereExpression<T> and(Condition<?> other) {
         return new DefaultWhereExpression<T>(getAmazonSimpleDB(), getConfiguration(), this.domainExpression, condition.and(other));
     }
 
     @Override
     public WhereExpression<T> and(String attributeName, Matcher<?> matcher) {
-        Condition other = new DefaultCondition(attributeName, matcher);
+        Condition<?> other = newCondition(attributeName, matcher);
         return this.and(other);
+    }
+    
+    private <T> Condition<T> newCondition(String attributeName, Matcher<T> matcher) {
+        return new DefaultCondition<T>(attributeName, matcher);
     }
 
     @Override
     public <E> WhereExpression<T> and(String attributeName, Matcher<E> matcher, AttributeConverter<E> attributeInfo) {
-        Condition other = new DefaultCondition(attributeName, matcher.withAttributeInfo(attributeInfo));
+        Condition<?> other = newCondition(attributeName, matcher.withAttributeInfo(attributeInfo));
         return this.and(other);
     }
 
     @Override
-    public WhereExpression<T> or(Condition other) {
+    public WhereExpression<T> or(Condition<?> other) {
         return new DefaultWhereExpression<T>(getAmazonSimpleDB(), getConfiguration(), this.domainExpression, condition.or(other));
     }
 
     @Override
     public WhereExpression<T> or(String attributeName, Matcher<?> matcher) {
-        Condition other = new DefaultCondition(attributeName, matcher);
+        Condition<?> other = newCondition(attributeName, matcher);
         return this.or(other);
     }
 
     @Override
     public <E> WhereExpression<T> or(String attributeName, Matcher<E> matcher, AttributeConverter<E> attributeInfo) {
-        Condition other = new DefaultCondition(attributeName, matcher.withAttributeInfo(attributeInfo));
+        Condition<?> other = newCondition(attributeName, matcher.withAttributeInfo(attributeInfo));
         return this.or(other);
     }
 
     @Override
-    public WhereExpression<T> intersection(Condition other) {
+    public WhereExpression<T> intersection(Condition<?> other) {
         return new DefaultWhereExpression<T>(getAmazonSimpleDB(), getConfiguration(), this.domainExpression, condition.intersection(other));
     }
 
     @Override
     public WhereExpression<T> intersection(String attributeName, Matcher<?> matcher) {
-        Condition other = new DefaultCondition(attributeName, matcher);
+        Condition<?> other = newCondition(attributeName, matcher);
         return this.intersection(other);
     }
 
     @Override
     public <E> WhereExpression<T> intersection(String attributeName, Matcher<E> matcher, AttributeConverter<E> attributeInfo) {
-        Condition other = new DefaultCondition(attributeName, matcher.withAttributeInfo(attributeInfo));
+        Condition<?> other = newCondition(attributeName, matcher.withAttributeInfo(attributeInfo));
         return this.intersection(other);
     }
 
@@ -165,9 +170,9 @@ public class DefaultWhereExpression<T> extends BaseExpression<T> implements Wher
 
     @Override
     public WhereExpression<T> rebuildWith(String... attributes) {
-        return new DefaultWhereExpression<T>(getAmazonSimpleDB(), 
-                                             getConfiguration(), 
-                                             domainExpression.rebuildWith(attributes), 
-                                             condition);
+        return new DefaultWhereExpression<T>(getAmazonSimpleDB(),
+                getConfiguration(),
+                domainExpression.rebuildWith(attributes),
+                condition);
     }
 }

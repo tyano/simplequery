@@ -27,11 +27,11 @@ public final class Conditions {
     private Conditions() {
     }
     
-    public static Condition condition(String attributeName, Matcher<?> matcher) {
-        return new DefaultCondition(attributeName, matcher);
+    public static <T> Condition<T> condition(String attributeName, Matcher<T> matcher) {
+        return new DefaultCondition<T>(attributeName, matcher);
     }
     
-    public static Condition condition(Condition first, BasicOperator op, Condition second) {
+    public static Condition<?> condition(Condition<?> first, BasicOperator op, Condition<?> second) {
         switch(op) {
             case AND:
                 return first.group().and(second.group());
@@ -44,7 +44,7 @@ public final class Conditions {
         }
     }
     
-    public static Condition group(Condition condition) {
+    public static Condition<?> group(Condition<?> condition) {
         return condition.group();
     }
 }

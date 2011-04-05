@@ -17,7 +17,7 @@
 package com.shelfmap.simplequery.expression;
 
 import com.amazonaws.services.simpledb.model.Item;
-import com.shelfmap.simplequery.InstanceFactory;
+import com.shelfmap.simplequery.Configuration;
 
 /**
  *
@@ -26,6 +26,6 @@ import com.shelfmap.simplequery.InstanceFactory;
 public interface ItemConverter<T> {
     Class<T> getDomainClass();
     String getDomainName();
-    InstanceFactory<T> getInstanceFactory();
+    Configuration getConfiguration();
     T convert(Item item) throws CanNotConvertItemException;
 }

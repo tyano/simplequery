@@ -18,6 +18,7 @@ package com.shelfmap.simplequery.expression;
 
 import com.shelfmap.simplequery.Configuration;
 import com.shelfmap.simplequery.InstanceFactory;
+import com.shelfmap.simplequery.expression.impl.BeanDomainAttributes;
 
 /**
  *
@@ -32,5 +33,10 @@ public class DummyConfiguration implements Configuration {
     @Override
     public <T> InstanceFactory<T> getInstanceFactory(Class<T> domainClass) {
         return null;
+    }
+
+    @Override
+    public DomainAttributes getDomainAttributes(Class<?> domainClass, String domainName) {
+        return new BeanDomainAttributes(domainClass, domainName);
     }
 }

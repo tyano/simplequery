@@ -16,6 +16,7 @@
 
 package com.shelfmap.simplequery;
 
+import com.shelfmap.simplequery.expression.DomainAttributes;
 import com.shelfmap.simplequery.expression.ItemConverter;
 
 /**
@@ -25,4 +26,5 @@ import com.shelfmap.simplequery.expression.ItemConverter;
 public interface Configuration {
     <T> ItemConverter<T> getItemConverter(Class<T> domainClass);
     <T> InstanceFactory<T> getInstanceFactory(Class<T> domainClass);
+    DomainAttributes getDomainAttributes(Class<?> domainClass, String domainName);
 }

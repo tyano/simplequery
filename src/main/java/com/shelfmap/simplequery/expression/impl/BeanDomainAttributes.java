@@ -53,21 +53,23 @@ public class BeanDomainAttributes implements DomainAttributes {
             BeanInfo info = Introspector.getBeanInfo(domainClass);
             PropertyDescriptor[] descriptors = info.getPropertyDescriptors();
             for (PropertyDescriptor descriptor : descriptors) {
-                @SuppressWarnings("unchecked")
-                Class<T> type = (Class<T>) descriptor.getPropertyType();
+                Class<?> type = descriptor.getPropertyType();
                 String propertyName = descriptor.getName();
                 Method getter = descriptor.getReadMethod();
-                
-                if(getter.isAnnotationPresent(FlatAttribute.class)) {
-                    buildFlatAttribute(type);
-                } else {
-                    DomainAttribute<T> attribute = createAttribute(propertyName, type, getter);
-                    attributeStore.putAttribute(attribute.getAttributeName(), type, attribute);
-                }
+                handleAttributeWithType(type, propertyName, getter);
             }
         } catch (IntrospectionException ex) {
             throw new IllegalStateException("Can not introspect a class object.", ex);
         }
+    }
+    
+    private <T> void handleAttributeWithType(Class<T> type, String propertyName, Method getter) {
+        if(getter.isAnnotationPresent(FlatAttribute.class)) {
+            buildFlatAttribute(type);
+        } else {
+            DomainAttribute<T> attribute = createAttribute(propertyName, type, getter);
+            attributeStore.putAttribute(attribute.getAttributeName(), type, attribute);
+        }        
     }
 
     @SuppressWarnings("unchecked")

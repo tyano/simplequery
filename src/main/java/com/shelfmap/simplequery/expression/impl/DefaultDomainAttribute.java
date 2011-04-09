@@ -20,6 +20,8 @@ import com.shelfmap.simplequery.expression.AttributeAccessor;
 import com.shelfmap.simplequery.expression.AttributeConverter;
 import static com.shelfmap.simplequery.util.Assertion.isNotNull;
 import com.shelfmap.simplequery.expression.DomainAttribute;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -61,8 +63,22 @@ public class DefaultDomainAttribute<T> implements DomainAttribute<T> {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public AttributeAccessor<T> getAttributeAccessor() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        final String findingClassName = "com.shelfmap.simplequery.accessor." + getDomainName() + capitalize(getAttributeName() + "Accessor");
+        try {
+            return Class.forName(findingClassName, true, Thread.currentThread().getContextClassLoader()).asSubclass(AttributeAccessor.class).newInstance();
+        } catch (InstantiationException ex) {
+            throw new IllegalStateException("Could not instantiate the class accessor: " + findingClassName, ex);
+        } catch (IllegalAccessException ex) {
+            throw new IllegalStateException("Could not access to the default constructor of the accessor: " + findingClassName, ex);
+        } catch (ClassNotFoundException ex) {
+            throw new IllegalStateException("the accessor class for the attribute '" + getAttributeName() + "' is not found. You must use our Annotation Processor for generating the class automatically. finding class name: " + findingClassName, ex);
+        }
+    }
+    
+    private String capitalize(String string) {
+        return string.substring(0, 1).toUpperCase() + string.substring(1);
     }
 
     @Override

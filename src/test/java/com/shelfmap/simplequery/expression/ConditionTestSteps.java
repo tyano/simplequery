@@ -32,7 +32,7 @@ import org.jbehave.core.annotations.When;
 @Steps
 public class ConditionTestSteps {
 
-    Condition condition;
+    Condition<?> condition;
 
     @When("a condition is initialized with a attribute name '$attributeName' and a matcher 'is($value)'")
     public void createCondition1(String attributeName, int value) {
@@ -103,8 +103,8 @@ public class ConditionTestSteps {
 
     @When("two grouped condition has been joined with a intersection operator")
     public void join2groupedConditions() {
-        Condition c1 = group(condition("first", is(1)).and("second", is("name")));
-        Condition c2 = group(condition("third", is(2)).or("fourth", is("age")));
+        Condition<?> c1 = group(condition("first", is(1)).and("second", is("name")));
+        Condition<?> c2 = group(condition("third", is(2)).or("fourth", is("age")));
         condition = c1.intersection(c2);
     }
 

@@ -42,13 +42,19 @@ public class BeanDomainAttributes implements DomainAttributes {
     private final AttributeStore attributeStore = new DefaultAttributeStore();
     private final Class<?> domainClass;
     private final String domainName;
+    private final String parentPropertyPath;
 
-    public <T> BeanDomainAttributes(Class<?> domainClass, String domainName) {
+    public BeanDomainAttributes(Class<?> domainClass, String domainName) {
+        this(domainClass, domainName, null);
+    }
+    
+    public BeanDomainAttributes(Class<?> domainClass, String domainName, String parentPropertyPath) {
         isNotNull("domainClass", domainClass);
         isNotNull("domainName", domainName);
         
         this.domainClass = domainClass;
         this.domainName = domainName;
+        this.parentPropertyPath = parentPropertyPath == null ? "" : parentPropertyPath;
         try {
             BeanInfo info = Introspector.getBeanInfo(domainClass);
             PropertyDescriptor[] descriptors = info.getPropertyDescriptors();
@@ -65,7 +71,7 @@ public class BeanDomainAttributes implements DomainAttributes {
     
     private <T> void handleAttributeWithType(Class<T> type, String propertyName, Method getter) {
         if(getter.isAnnotationPresent(FlatAttribute.class)) {
-            buildFlatAttribute(type);
+            buildFlatAttribute(type, propertyName);
         } else {
             DomainAttribute<T> attribute = createAttribute(propertyName, type, getter);
             attributeStore.putAttribute(attribute.getAttributeName(), type, attribute);
@@ -144,8 +150,9 @@ public class BeanDomainAttributes implements DomainAttributes {
      * 
      * @param type the return type of the method on which FlatAttribute annotation is applied.
      */
-    private void buildFlatAttribute(Class<?> type) {
-        BeanDomainAttributes attributes = new BeanDomainAttributes(type, getDomainName());
+    private void buildFlatAttribute(Class<?> type, String propertyName) {
+        String propertyPath = this.parentPropertyPath.isEmpty() ? propertyName : this.parentPropertyPath + "." + propertyName;
+        BeanDomainAttributes attributes = new BeanDomainAttributes(type, getDomainName(), propertyPath);
         copy(attributes, this);
     }
     

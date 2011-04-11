@@ -40,5 +40,4 @@ public class DefaultConfiguration implements Configuration {
     public DomainAttributes getDomainAttributes(Class<?> domainClass, String domainName) {
         return new BeanDomainAttributes(domainClass, domainName);
     }
-    
 }

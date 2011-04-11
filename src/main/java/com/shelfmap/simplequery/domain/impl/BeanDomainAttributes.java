@@ -173,7 +173,7 @@ public class BeanDomainAttributes implements DomainAttributes {
         copy(attributes, this);
     }
     
-    private <T> void copy(BeanDomainAttributes source, BeanDomainAttributes dest) {
+    private void copy(BeanDomainAttributes source, BeanDomainAttributes dest) {
         for (AttributeKey key : source.attributeStore.keySet()) {
             if(dest.attributeStore.isAttributeDefined(key.getAttributeName())) {
                 throw new IllegalArgumentException("Can not retrieve attributes from classes: the name of the attribute '" + key + "' of " + source.getDomainClass().getCanonicalName() + " is duplicated with the parent domainClass '" + dest.getDomainClass().getCanonicalName() + "'.");

@@ -178,10 +178,12 @@ public class BeanDomainAttributes implements DomainAttributes {
             if(dest.attributeStore.isAttributeDefined(key.getAttributeName())) {
                 throw new IllegalArgumentException("Can not retrieve attributes from classes: the name of the attribute '" + key + "' of " + source.getDomainClass().getCanonicalName() + " is duplicated with the parent domainClass '" + dest.getDomainClass().getCanonicalName() + "'.");
             }
-            @SuppressWarnings("unchecked")
-            Class<T> type = (Class<T>) key.getType();
-            dest.attributeStore.putAttribute(key.getAttributeName(), type, source.getAttribute(key.getAttributeName(), type));
+            copyAttribute(dest, source, key.getType(), key.getAttributeName());
         }
+    }
+
+    private <T> void copyAttribute(BeanDomainAttributes dest, BeanDomainAttributes source, Class<T> type, String attributeName) {
+        dest.attributeStore.putAttribute(attributeName, type, source.getAttribute(attributeName, type));
     }
 
     @Override

@@ -60,18 +60,8 @@ public class DefaultDomainAttribute<T> implements DomainAttribute<T> {
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public AttributeAccessor<T> getAttributeAccessor() {
-        final String findingClassName = "com.shelfmap.simplequery.accessor." + getDomainName() + capitalize(getAttributeName() + "Accessor");
-        try {
-            return Class.forName(findingClassName, true, Thread.currentThread().getContextClassLoader()).asSubclass(AttributeAccessor.class).newInstance();
-        } catch (InstantiationException ex) {
-            throw new IllegalStateException("Could not instantiate the class accessor: " + findingClassName, ex);
-        } catch (IllegalAccessException ex) {
-            throw new IllegalStateException("Could not access to the default constructor of the accessor: " + findingClassName, ex);
-        } catch (ClassNotFoundException ex) {
-            throw new IllegalStateException("the accessor class for the attribute '" + getAttributeName() + "' is not found. You must use our Annotation Processor for generating the class automatically. finding class name: " + findingClassName, ex);
-        }
+        return attributeAccessor;
     }
     
     private String capitalize(String string) {

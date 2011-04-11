@@ -16,10 +16,10 @@
 
 package com.shelfmap.simplequery.expression
 
-import com.shelfmap.simplequery.expression.impl.Select
+import Conditions._
+import impl.Select
+import matcher.MatcherFactory._
 import org.scalatest.FlatSpec
-import com.shelfmap.simplequery.expression.Conditions._
-import com.shelfmap.simplequery.expression.MatcherFactory._
 import org.scalatest.matchers.ShouldMatchers
 
 class LimitExpressionSpec extends FlatSpec with ShouldMatchers with AWSSecurityCredential with ConfigurationAware {

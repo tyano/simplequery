@@ -66,7 +66,7 @@ public class PropertyAttributeAccessor<T> implements AttributeAccessor<T> {
                     target = generateNewPropertyValueForNullProperty(descriptor, current);
                 }
             }
-            path = paths[i];
+            path = paths[pathSize - 1];
             PropertyDescriptor descriptor = findPropertyDescriptor(target, path);
             Method writeMethod = descriptor.getWriteMethod();
             writeMethod.invoke(target, value);

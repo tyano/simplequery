@@ -27,7 +27,7 @@ import com.amazonaws.services.simpledb.model.ReplaceableAttribute
 import com.amazonaws.services.simpledb.model.ReplaceableItem
 import com.shelfmap.simplequery.SimpleQueryClient
 import Conditions._
-import MatcherFactory._
+import matcher.MatcherFactory._
 import collection.JavaConversions._
 import org.scalatest.matchers.ShouldMatchers
 import scala.reflect.BeanProperty

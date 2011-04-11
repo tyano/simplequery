@@ -16,19 +16,28 @@
 
 package com.shelfmap.simplequery.expression
 
-import com.shelfmap.simplequery.Configuration
-import com.shelfmap.simplequery.InstanceFactory
-import com.shelfmap.simplequery.expression.impl.DefaultItemConverter
+import _root_.com.shelfmap.simplequery.{Configuration, InstanceFactory, Domain}
+import _root_.com.shelfmap.simplequery.domain.DomainAttributes
+import _root_.com.shelfmap.simplequery.domain.impl.BeanDomainAttributes
+import impl.DefaultItemConverter
 
 trait ConfigurationAware {
   def getConfiguration: Configuration = new DefaultConfiguration
 }
 
 class DefaultConfiguration extends Configuration {
-  override def getItemConverter[T](domainClass: Class[T]): ItemConverter[T] = new DefaultItemConverter[T](domainClass, getInstanceFactory(domainClass))
-  override def getInstanceFactory[T](domainClass: Class[T]): InstanceFactory[T] = {
+  override def getItemConverter[T](domainClass: Class[T], domainName: String): ItemConverter[T] = {
+    val annotation = domainClass.getAnnotation(classOf[Domain])
+    new DefaultItemConverter[T](domainClass, annotation.value(), this)
+  }
+  
+  override def getInstanceFactory[T](domainClass: Class[T], domainName: String): InstanceFactory[T] = {
     new InstanceFactory[T] {
       def createInstance(domainClass: Class[T]): T = domainClass.newInstance
     }
   }  
+  
+  override def getDomainAttributes(domainClass: Class[_], domainName: String): DomainAttributes = {
+    new BeanDomainAttributes(domainClass, domainName, this)
+  }
 }

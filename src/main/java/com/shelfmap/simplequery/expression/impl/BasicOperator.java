@@ -17,7 +17,6 @@
 package com.shelfmap.simplequery.expression.impl;
 
 import com.shelfmap.simplequery.expression.Operator;
-import com.shelfmap.simplequery.expression.Operator;
 
 /**
  *

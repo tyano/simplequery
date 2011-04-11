@@ -20,9 +20,7 @@ import com.amazonaws.services.simpledb.util.SimpleDBUtils;
 import com.shelfmap.simplequery.domain.AttributeConverter;
 import static com.shelfmap.simplequery.util.Assertion.isNotNull;
 import com.shelfmap.simplequery.expression.Condition;
-import com.shelfmap.simplequery.expression.Condition;
 import com.shelfmap.simplequery.expression.matcher.Matcher;
-import com.shelfmap.simplequery.expression.Operator;
 import com.shelfmap.simplequery.expression.Operator;
 
 /**

@@ -16,19 +16,6 @@
 
 package com.shelfmap.simplequery.expression.matcher;
 
-import com.shelfmap.simplequery.expression.matcher.BetweenMatcher;
-import com.shelfmap.simplequery.expression.matcher.GreaterEqualMatcher;
-import com.shelfmap.simplequery.expression.matcher.GreaterThanMatcher;
-import com.shelfmap.simplequery.expression.matcher.InMatcher;
-import com.shelfmap.simplequery.expression.matcher.IsMatcher;
-import com.shelfmap.simplequery.expression.matcher.IsNotMatcher;
-import com.shelfmap.simplequery.expression.matcher.IsNotNullMatcher;
-import com.shelfmap.simplequery.expression.matcher.IsNullMatcher;
-import com.shelfmap.simplequery.expression.matcher.LessEqualMatcher;
-import com.shelfmap.simplequery.expression.matcher.LessThanMatcher;
-import com.shelfmap.simplequery.expression.matcher.LikeMatcher;
-import com.shelfmap.simplequery.expression.matcher.NotLikeMatcher;
-
 /**
  *
  * @author Tsutomu YANO

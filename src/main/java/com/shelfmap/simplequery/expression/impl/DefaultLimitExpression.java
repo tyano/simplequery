@@ -19,12 +19,8 @@ import static com.shelfmap.simplequery.util.Assertion.*;
 import com.amazonaws.services.simpledb.AmazonSimpleDB;
 import com.shelfmap.simplequery.Configuration;
 import com.shelfmap.simplequery.expression.DomainExpression;
-import com.shelfmap.simplequery.expression.DomainExpression;
-import com.shelfmap.simplequery.expression.LimitExpression;
 import com.shelfmap.simplequery.expression.LimitExpression;
 import com.shelfmap.simplequery.expression.OrderByExpression;
-import com.shelfmap.simplequery.expression.OrderByExpression;
-import com.shelfmap.simplequery.expression.WhereExpression;
 import com.shelfmap.simplequery.expression.WhereExpression;
 import com.shelfmap.simplequery.util.Assertion;
 

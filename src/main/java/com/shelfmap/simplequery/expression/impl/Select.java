@@ -19,8 +19,6 @@ import com.amazonaws.services.simpledb.AmazonSimpleDB;
 import com.shelfmap.simplequery.Configuration;
 import com.shelfmap.simplequery.Domain;
 import com.shelfmap.simplequery.expression.DomainExpression;
-import com.shelfmap.simplequery.expression.DomainExpression;
-import com.shelfmap.simplequery.expression.SelectQuery;
 import com.shelfmap.simplequery.expression.SelectQuery;
 import java.util.ArrayList;
 import java.util.Arrays;

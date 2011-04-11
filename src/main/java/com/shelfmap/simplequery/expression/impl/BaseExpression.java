@@ -16,7 +16,6 @@
 
 package com.shelfmap.simplequery.expression.impl;
 
-import com.shelfmap.simplequery.expression.CanNotConvertItemException;
 import static com.shelfmap.simplequery.util.Assertion.isNotNull;
 import com.amazonaws.services.simpledb.AmazonSimpleDB;
 import com.amazonaws.services.simpledb.model.Item;
@@ -25,12 +24,8 @@ import com.amazonaws.services.simpledb.model.SelectResult;
 import com.shelfmap.simplequery.Configuration;
 import com.shelfmap.simplequery.expression.CanNotConvertItemException;
 import com.shelfmap.simplequery.expression.Expression;
-import com.shelfmap.simplequery.expression.Expression;
-import com.shelfmap.simplequery.expression.MultipleResultsExistException;
 import com.shelfmap.simplequery.expression.MultipleResultsExistException;
 import com.shelfmap.simplequery.expression.QueryResults;
-import com.shelfmap.simplequery.expression.QueryResults;
-import com.shelfmap.simplequery.expression.SimpleQueryException;
 import com.shelfmap.simplequery.expression.SimpleQueryException;
 import java.util.List;
 

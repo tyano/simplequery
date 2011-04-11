@@ -16,9 +16,10 @@
 
 package com.shelfmap.simplequery.expression;
 
+import com.shelfmap.simplequery.domain.impl.BeanDomainAttributes;
+import com.shelfmap.simplequery.domain.DomainAttributes;
 import com.shelfmap.simplequery.Configuration;
 import com.shelfmap.simplequery.InstanceFactory;
-import com.shelfmap.simplequery.expression.impl.BeanDomainAttributes;
 
 /**
  *

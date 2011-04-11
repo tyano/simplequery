@@ -13,29 +13,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.shelfmap.simplequery.expression.impl;
+package com.shelfmap.simplequery.domain.impl;
 
-import static com.shelfmap.simplequery.util.Assertion.isNotNull;
 import static com.amazonaws.services.simpledb.util.SimpleDBUtils.*;
-import com.shelfmap.simplequery.expression.AttributeConverter;
+import static com.shelfmap.simplequery.util.Assertion.isNotNull;
+import com.shelfmap.simplequery.domain.AttributeConverter;
+import com.shelfmap.simplequery.domain.AttributeConverter;
 import com.shelfmap.simplequery.expression.CanNotRestoreAttributeException;
 
 /**
  *
  * @author Tsutomu YANO
  */
-public class LongAttributeConverter implements AttributeConverter<Long> {
+public class IntAttributeConverter implements AttributeConverter<Integer> {
 
     private final int maxNumberOfDigits;
-    private final long offset;
+    private final int offset;
 
-    public LongAttributeConverter(int maxNumberOfDigits, long offset) {
+    public IntAttributeConverter(int maxNumberOfDigits, int offset) {
         this.maxNumberOfDigits = maxNumberOfDigits;
         this.offset = offset;
     }
 
     @Override
-    public String convertValue(Long targetValue) {
+    public String convertValue(Integer targetValue) {
         isNotNull("targetValue", targetValue);
         String result = "";
         if (offset > 0) {
@@ -49,10 +50,10 @@ public class LongAttributeConverter implements AttributeConverter<Long> {
     }
 
     @Override
-    public Long restoreValue(String targetValue) throws CanNotRestoreAttributeException {
+    public Integer restoreValue(String targetValue)  throws CanNotRestoreAttributeException {
         isNotNull("targetValue", targetValue);
-        return (offset > 0)
-                ? decodeRealNumberRangeLong(targetValue, offset)
-                : decodeZeroPaddingLong(targetValue);
+        return (offset > 0) 
+            ? decodeRealNumberRangeInt(targetValue, offset)
+            : decodeZeroPaddingInt(targetValue);
     }
 }

@@ -13,20 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.shelfmap.simplequery.expression.impl;
+package com.shelfmap.simplequery.domain.impl;
 
-import com.shelfmap.simplequery.expression.AttributeStore;
+import com.shelfmap.simplequery.domain.AttributeStore;
 import static com.shelfmap.simplequery.util.Assertion.isNotNull;
 import com.shelfmap.simplequery.FlatAttribute;
 import com.shelfmap.simplequery.FloatAttribute;
 import com.shelfmap.simplequery.IntAttribute;
 import com.shelfmap.simplequery.LongAttribute;
 import com.shelfmap.simplequery.SimpleDBAttribute;
-import com.shelfmap.simplequery.expression.AttributeConverter;
-import com.shelfmap.simplequery.expression.AttributeKey;
-import com.shelfmap.simplequery.expression.CanNotWriteAttributeException;
-import com.shelfmap.simplequery.expression.DomainAttributes;
-import com.shelfmap.simplequery.expression.DomainAttribute;
+import com.shelfmap.simplequery.domain.AttributeConverter;
+import com.shelfmap.simplequery.domain.AttributeKey;
+import com.shelfmap.simplequery.domain.CanNotWriteAttributeException;
+import com.shelfmap.simplequery.domain.DomainAttributes;
+import com.shelfmap.simplequery.domain.DomainAttribute;
 import java.beans.BeanInfo;
 import java.beans.IntrospectionException;
 import java.beans.Introspector;

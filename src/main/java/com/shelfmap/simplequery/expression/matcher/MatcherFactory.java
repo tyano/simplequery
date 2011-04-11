@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.shelfmap.simplequery.expression;
+package com.shelfmap.simplequery.expression.matcher;
 
 import com.shelfmap.simplequery.expression.matcher.BetweenMatcher;
 import com.shelfmap.simplequery.expression.matcher.GreaterEqualMatcher;

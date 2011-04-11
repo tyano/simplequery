@@ -13,19 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.shelfmap.simplequery.expression;
-
-import java.util.Set;
+package com.shelfmap.simplequery.domain;
 
 /**
  *
  * @author Tsutomu YANO
  */
-public interface AttributeStore {
-    <T> DomainAttribute<T> putAttribute(String attributeName, Class<T> type, DomainAttribute<T> value);
-    <T> DomainAttribute<T> getAttribute(String attributeName, Class<T> type);
-    DomainAttribute<?> getAttribute(String attributeName);
-    boolean isAttributeDefined(String attributeName);
-    Set<AttributeKey> keySet();
-    Set<DomainAttribute<?>> values();
+public interface AttributeAccessor<T> {
+    void write(Object instance, T value);
+    T read(Object object);
 }

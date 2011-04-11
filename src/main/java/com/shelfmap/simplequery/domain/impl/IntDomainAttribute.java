@@ -13,17 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-package com.shelfmap.simplequery.expression;
+package com.shelfmap.simplequery.domain.impl;
 
 /**
  *
  * @author Tsutomu YANO
  */
-public interface DomainAttribute<T> {
-    String getDomainName();
-    String getAttributeName();
-    Class<T> getType();
-    AttributeConverter<T> getAttributeConverter();
-    AttributeAccessor<T> getAttributeAccessor();
+public class IntDomainAttribute extends DefaultDomainAttribute<Integer> {
+    public IntDomainAttribute(String domainName, String attributeName, int maxNumberOfDigits, int offset) {
+        super(domainName, attributeName, Integer.class, new IntAttributeConverter(maxNumberOfDigits, offset));
+    }
 }

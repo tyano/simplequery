@@ -16,8 +16,8 @@
 
 package com.shelfmap.simplequery;
 
-import com.shelfmap.simplequery.expression.AttributeConverter;
-import com.shelfmap.simplequery.expression.impl.NullAttributeConverter;
+import com.shelfmap.simplequery.domain.AttributeConverter;
+import com.shelfmap.simplequery.domain.impl.NullAttributeConverter;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;

@@ -14,16 +14,16 @@
  * limitations under the License.
  */
 
-package com.shelfmap.simplequery.expression.impl;
+package com.shelfmap.simplequery.domain;
 
 /**
  *
  * @author Tsutomu YANO
  */
-public class LongDomainAttribute extends DefaultDomainAttribute<Long> {
-
-    public LongDomainAttribute(String domainName, String attributeName, int maxNumberOfDigits, long offset) {
-        super(domainName, attributeName, Long.class, new LongAttributeConverter(maxNumberOfDigits, offset));
-    }
-
+public interface DomainAttribute<T> {
+    String getDomainName();
+    String getAttributeName();
+    Class<T> getType();
+    AttributeConverter<T> getAttributeConverter();
+    AttributeAccessor<T> getAttributeAccessor();
 }

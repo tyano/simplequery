@@ -14,7 +14,9 @@
  * limitations under the License.
  */
 
-package com.shelfmap.simplequery.expression;
+package com.shelfmap.simplequery.domain;
+
+import com.shelfmap.simplequery.domain.DomainAttribute;
 
 /**
  *

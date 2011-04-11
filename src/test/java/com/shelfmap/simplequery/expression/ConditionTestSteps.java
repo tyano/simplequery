@@ -15,11 +15,11 @@
  */
 package com.shelfmap.simplequery.expression;
 
-import com.shelfmap.simplequery.expression.impl.IntAttributeConverter;
+import com.shelfmap.simplequery.domain.impl.IntAttributeConverter;
 import static com.shelfmap.simplequery.expression.Conditions.group;
 import static com.shelfmap.simplequery.expression.Conditions.condition;
 import static org.junit.Assert.assertThat;
-import static com.shelfmap.simplequery.expression.MatcherFactory.*;
+import static com.shelfmap.simplequery.expression.matcher.MatcherFactory.*;
 import com.shelfmap.specsfinder.Steps;
 import org.hamcrest.Matchers;
 import org.jbehave.core.annotations.Then;

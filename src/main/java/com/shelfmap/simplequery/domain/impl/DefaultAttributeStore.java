@@ -13,11 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.shelfmap.simplequery.expression.impl;
+package com.shelfmap.simplequery.domain.impl;
 
-import com.shelfmap.simplequery.expression.AttributeKey;
-import com.shelfmap.simplequery.expression.AttributeStore;
-import com.shelfmap.simplequery.expression.DomainAttribute;
+import com.shelfmap.simplequery.domain.AttributeKey;
+import com.shelfmap.simplequery.domain.AttributeKey;
+import com.shelfmap.simplequery.domain.AttributeStore;
+import com.shelfmap.simplequery.domain.AttributeStore;
+import com.shelfmap.simplequery.domain.DomainAttribute;
+import com.shelfmap.simplequery.domain.DomainAttribute;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;

@@ -13,13 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.shelfmap.simplequery.expression;
+
+package com.shelfmap.simplequery.domain.impl;
 
 /**
  *
  * @author Tsutomu YANO
  */
-public interface AttributeAccessor<T> {
-    void write(Object instance, T value);
-    T read(Object object);
+public class LongDomainAttribute extends DefaultDomainAttribute<Long> {
+
+    public LongDomainAttribute(String domainName, String attributeName, int maxNumberOfDigits, long offset) {
+        super(domainName, attributeName, Long.class, new LongAttributeConverter(maxNumberOfDigits, offset));
+    }
+
 }

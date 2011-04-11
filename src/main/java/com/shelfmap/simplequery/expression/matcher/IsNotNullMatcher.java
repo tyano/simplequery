@@ -16,9 +16,8 @@
 
 package com.shelfmap.simplequery.expression.matcher;
 
-import com.shelfmap.simplequery.expression.AttributeConverter;
-import com.shelfmap.simplequery.expression.Matcher;
-import com.shelfmap.simplequery.expression.impl.DefaultAttributeConverter;
+import com.shelfmap.simplequery.domain.AttributeConverter;
+import com.shelfmap.simplequery.domain.impl.DefaultAttributeConverter;
 import java.util.Collection;
 import java.util.Collections;
 

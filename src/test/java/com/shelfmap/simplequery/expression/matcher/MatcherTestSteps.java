@@ -17,8 +17,7 @@ package com.shelfmap.simplequery.expression.matcher;
 
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
-import com.shelfmap.simplequery.expression.Matcher;
-import com.shelfmap.simplequery.expression.impl.IntAttributeConverter;
+import com.shelfmap.simplequery.domain.impl.IntAttributeConverter;
 import com.shelfmap.specsfinder.Steps;
 import org.jbehave.core.annotations.Named;
 import org.jbehave.core.annotations.Then;

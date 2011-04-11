@@ -16,6 +16,9 @@
 
 package com.shelfmap.simplequery.expression;
 
+import com.shelfmap.simplequery.expression.matcher.Matcher;
+import com.shelfmap.simplequery.domain.AttributeConverter;
+
 /**
  *
  * @author Tsutomu YANO

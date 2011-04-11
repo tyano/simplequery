@@ -14,21 +14,17 @@
  * limitations under the License.
  */
 
-package com.shelfmap.simplequery.expression;
-
-import java.util.Collection;
+package com.shelfmap.simplequery.domain;
 
 /**
  *
  * @author Tsutomu YANO
  */
-public interface Matcher<T> extends Describable {
-    /* properties */
-    AttributeConverter<T> getAttributeInfo();
-    void setAttributeInfo(AttributeConverter<T> attributeInfo);
-    Collection<T> getValues();
-    boolean isAttributeInfoApplied();
-    
-    /* methods for building new instance with new property value. */
-    Matcher<T> withAttributeInfo(AttributeConverter<T> attributeInfo);
+public interface DomainAttributes extends Iterable<DomainAttribute<?>> {
+    boolean isAttributeDefined(String attributeName);
+    <T> DomainAttribute<T> getAttribute(String attributeName, Class<T> type);
+    DomainAttribute<?> getAttribute(String attributeName);
+    Class<?> getDomainClass();
+    String getDomainName();
+    <T> void writeAttribute(Object instance, String attributeName, Class<T> type, T value) throws CanNotWriteAttributeException;
 }

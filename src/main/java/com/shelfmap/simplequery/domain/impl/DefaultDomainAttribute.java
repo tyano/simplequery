@@ -14,12 +14,15 @@
  * limitations under the License.
  */
 
-package com.shelfmap.simplequery.expression.impl;
+package com.shelfmap.simplequery.domain.impl;
 
-import com.shelfmap.simplequery.expression.AttributeAccessor;
-import com.shelfmap.simplequery.expression.AttributeConverter;
+import com.shelfmap.simplequery.domain.AttributeAccessor;
+import com.shelfmap.simplequery.domain.AttributeAccessor;
+import com.shelfmap.simplequery.domain.AttributeConverter;
+import com.shelfmap.simplequery.domain.AttributeConverter;
 import static com.shelfmap.simplequery.util.Assertion.isNotNull;
-import com.shelfmap.simplequery.expression.DomainAttribute;
+import com.shelfmap.simplequery.domain.DomainAttribute;
+import com.shelfmap.simplequery.domain.DomainAttribute;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 

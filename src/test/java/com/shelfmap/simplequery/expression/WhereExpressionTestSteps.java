@@ -15,15 +15,15 @@
  */
 package com.shelfmap.simplequery.expression;
 
+import com.shelfmap.simplequery.expression.impl.Select;
 import com.amazonaws.auth.PropertiesCredentials;
 import com.amazonaws.services.simpledb.AmazonSimpleDB;
 import com.amazonaws.services.simpledb.AmazonSimpleDBClient;
 import com.shelfmap.simplequery.Configuration;
 import static org.junit.Assert.*;
-import static com.shelfmap.simplequery.expression.MatcherFactory.*;
+import static com.shelfmap.simplequery.expression.matcher.MatcherFactory.*;
 import com.shelfmap.simplequery.Domain;
 import com.shelfmap.simplequery.IntAttribute;
-import com.shelfmap.simplequery.expression.impl.Select;
 import com.shelfmap.specsfinder.Steps;
 import java.io.File;
 import java.io.IOException;

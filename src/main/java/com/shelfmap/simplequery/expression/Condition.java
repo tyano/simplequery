@@ -16,6 +16,8 @@
 
 package com.shelfmap.simplequery.expression;
 
+import com.shelfmap.simplequery.expression.matcher.Matcher;
+
 /**
  *    Matcher<T> withAttributeInfo(int maxDigitLeft, int maxDigitRight, int offsetValue);
     Matcher<T> withAttributeInfo(int maxNumDigits, int offsetValue);

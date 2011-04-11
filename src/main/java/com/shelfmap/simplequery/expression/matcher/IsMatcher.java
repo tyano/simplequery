@@ -16,7 +16,7 @@
 
 package com.shelfmap.simplequery.expression.matcher;
 
-import com.shelfmap.simplequery.expression.AttributeConverter;
+import com.shelfmap.simplequery.domain.AttributeConverter;
 
 /**
  *

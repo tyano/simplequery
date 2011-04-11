@@ -13,9 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.shelfmap.simplequery.expression.impl;
+package com.shelfmap.simplequery.domain.impl;
 
-import com.shelfmap.simplequery.expression.AttributeKey;
+import com.shelfmap.simplequery.domain.AttributeKey;
+import com.shelfmap.simplequery.domain.AttributeKey;
 
 /**
  *

@@ -23,8 +23,11 @@ import com.amazonaws.services.simpledb.model.Item;
 import com.shelfmap.simplequery.Configuration;
 import com.shelfmap.simplequery.InstanceFactory;
 import com.shelfmap.simplequery.expression.CanNotConvertItemException;
-import com.shelfmap.simplequery.expression.DomainAttribute;
-import com.shelfmap.simplequery.expression.DomainAttributes;
+import com.shelfmap.simplequery.domain.DomainAttribute;
+import com.shelfmap.simplequery.domain.DomainAttributes;
+import com.shelfmap.simplequery.expression.CanNotConvertItemException;
+import com.shelfmap.simplequery.expression.CanNotRestoreAttributeException;
+import com.shelfmap.simplequery.expression.ItemConverter;
 import com.shelfmap.simplequery.expression.ItemConverter;
 
 /**

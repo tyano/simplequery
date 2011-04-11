@@ -18,6 +18,7 @@ package com.shelfmap.simplequery.expression;
 
 import com.shelfmap.simplequery.expression.impl.BasicOperator;
 import com.shelfmap.simplequery.expression.impl.DefaultCondition;
+import com.shelfmap.simplequery.expression.matcher.Matcher;
 
 /**
  *

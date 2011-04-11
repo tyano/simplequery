@@ -16,6 +16,8 @@
 
 package com.shelfmap.simplequery.expression;
 
+import com.shelfmap.simplequery.expression.matcher.Matcher;
+
 /**
  *
  * @author Tsutomu YANO

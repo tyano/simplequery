@@ -15,9 +15,9 @@
  */
 package com.shelfmap.simplequery;
 
-import com.shelfmap.simplequery.expression.DomainAttributes;
+import com.shelfmap.simplequery.domain.DomainAttributes;
 import com.shelfmap.simplequery.expression.ItemConverter;
-import com.shelfmap.simplequery.expression.impl.BeanDomainAttributes;
+import com.shelfmap.simplequery.domain.impl.BeanDomainAttributes;
 import com.shelfmap.simplequery.expression.impl.DefaultItemConverter;
 
 /**

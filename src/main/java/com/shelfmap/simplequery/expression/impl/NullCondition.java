@@ -15,9 +15,11 @@
  */
 package com.shelfmap.simplequery.expression.impl;
 
-import com.shelfmap.simplequery.expression.AttributeConverter;
+import com.shelfmap.simplequery.domain.AttributeConverter;
 import com.shelfmap.simplequery.expression.Condition;
-import com.shelfmap.simplequery.expression.Matcher;
+import com.shelfmap.simplequery.expression.Condition;
+import com.shelfmap.simplequery.expression.matcher.Matcher;
+import com.shelfmap.simplequery.expression.Operator;
 import com.shelfmap.simplequery.expression.Operator;
 
 /**

@@ -38,6 +38,6 @@ public class DefaultConfiguration implements Configuration {
 
     @Override
     public DomainAttributes getDomainAttributes(Class<?> domainClass, String domainName) {
-        return new BeanDomainAttributes(domainClass, domainName);
+        return new BeanDomainAttributes(domainClass, domainName, this);
     }
 }

@@ -16,12 +16,14 @@
 
 package com.shelfmap.simplequery.domain.impl;
 
+import com.shelfmap.simplequery.domain.AttributeAccessor;
+
 /**
  *
  * @author Tsutomu YANO
  */
 public class FloatDomainAttribute extends DefaultDomainAttribute<Float> {
-    public FloatDomainAttribute(String domainName, String attributeName, int maxDigitLeft, int maxDigitRight, int offset) {
-        super(domainName, attributeName, Float.class, new FloatAttributeConverter(maxDigitLeft, maxDigitRight, offset));
+    public FloatDomainAttribute(String domainName, String attributeName, int maxDigitLeft, int maxDigitRight, int offset, AttributeAccessor<Float> accessor) {
+        super(domainName, attributeName, Float.class, new FloatAttributeConverter(maxDigitLeft, maxDigitRight, offset), accessor);
     }
 }

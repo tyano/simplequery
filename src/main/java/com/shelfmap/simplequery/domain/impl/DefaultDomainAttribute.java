@@ -17,37 +17,31 @@
 package com.shelfmap.simplequery.domain.impl;
 
 import com.shelfmap.simplequery.domain.AttributeAccessor;
-import com.shelfmap.simplequery.domain.AttributeAccessor;
-import com.shelfmap.simplequery.domain.AttributeConverter;
 import com.shelfmap.simplequery.domain.AttributeConverter;
 import static com.shelfmap.simplequery.util.Assertion.isNotNull;
 import com.shelfmap.simplequery.domain.DomainAttribute;
-import com.shelfmap.simplequery.domain.DomainAttribute;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
  * @author Tsutomu YANO
  */
 public class DefaultDomainAttribute<T> implements DomainAttribute<T> {
-    private String domainName;
-    private String attributeName;
-    private Class<T> type;
-    private AttributeConverter<T> attributeConverte;
+    private final String domainName;
+    private final String attributeName;
+    private final Class<T> type;
+    private final AttributeConverter<T> attributeConverte;
+    private final AttributeAccessor<T> attributeAccessor;
 
-    public DefaultDomainAttribute(String domainName, String attributeName, Class<T> type, AttributeConverter<T> attributeConverter) {
+    public DefaultDomainAttribute(String domainName, String attributeName, Class<T> type, AttributeConverter<T> attributeConverter, AttributeAccessor<T> attributeAccessor) {
         isNotNull("domainName", domainName);
         isNotNull("attributeName", attributeName);
         isNotNull("type", type);
         isNotNull("attributeInfo", attributeConverter);
+        this.domainName = domainName;
         this.attributeName = attributeName;
         this.type = type;
         this.attributeConverte = attributeConverter;
-    }
-    
-    public DefaultDomainAttribute(String domainName, String attributeName, Class<T> type) {
-        this(domainName, attributeName, type, new DefaultAttributeConverter<T>(type));
+        this.attributeAccessor = attributeAccessor;
     }
     
     @Override

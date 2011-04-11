@@ -15,6 +15,7 @@
  */
 package com.shelfmap.simplequery.domain.impl;
 
+import com.shelfmap.simplequery.Configuration;
 import com.shelfmap.simplequery.domain.AttributeStore;
 import static com.shelfmap.simplequery.util.Assertion.isNotNull;
 import com.shelfmap.simplequery.FlatAttribute;
@@ -22,6 +23,7 @@ import com.shelfmap.simplequery.FloatAttribute;
 import com.shelfmap.simplequery.IntAttribute;
 import com.shelfmap.simplequery.LongAttribute;
 import com.shelfmap.simplequery.SimpleDBAttribute;
+import com.shelfmap.simplequery.domain.AttributeAccessor;
 import com.shelfmap.simplequery.domain.AttributeConverter;
 import com.shelfmap.simplequery.domain.AttributeKey;
 import com.shelfmap.simplequery.domain.CanNotWriteAttributeException;
@@ -43,17 +45,20 @@ public class BeanDomainAttributes implements DomainAttributes {
     private final Class<?> domainClass;
     private final String domainName;
     private final String parentPropertyPath;
+    private final Configuration configuration;
 
-    public BeanDomainAttributes(Class<?> domainClass, String domainName) {
-        this(domainClass, domainName, null);
+    public BeanDomainAttributes(Class<?> domainClass, String domainName, Configuration configuration) {
+        this(domainClass, domainName, configuration, null);
     }
     
-    public BeanDomainAttributes(Class<?> domainClass, String domainName, String parentPropertyPath) {
+    public BeanDomainAttributes(Class<?> domainClass, String domainName, Configuration configuration, String parentPropertyPath) {
         isNotNull("domainClass", domainClass);
         isNotNull("domainName", domainName);
+        isNotNull("configuration", configuration);
         
         this.domainClass = domainClass;
         this.domainName = domainName;
+        this.configuration = configuration;
         this.parentPropertyPath = parentPropertyPath == null ? "" : parentPropertyPath;
         try {
             BeanInfo info = Introspector.getBeanInfo(domainClass);
@@ -97,31 +102,40 @@ public class BeanDomainAttributes implements DomainAttributes {
             SimpleDBAttribute annotation = getter.getAnnotation(SimpleDBAttribute.class);
             result = processSimpleDBAttribute(annotation, propertyName, type, getter);
         } else {
-            result = new DefaultDomainAttribute<C>(getDomainName(), propertyName, type);
+            //No Annotation. the attribute name of this property become same with the property name.
+            result = new DefaultDomainAttribute<C>(getDomainName(), propertyName, type, newAttributeConverter(type), newAttributeAccessor(type, fullPropertyPath(propertyName)));
         }
 
         return result;
+    }
+    
+    protected <C> AttributeAccessor<C> newAttributeAccessor(Class<C> type, String propertyPath) {
+        return new PropertyAttributeAccessor<C>(propertyPath, configuration);
+    }
+    
+    protected <C> AttributeConverter<C> newAttributeConverter(Class<C> type) {
+        return new DefaultAttributeConverter<C>(type);
     }
 
     private DomainAttribute<Float> processFloatAttribute(FloatAttribute annotation, String propertyName, Method getter) {
         String attributeName = annotation.attributeName().isEmpty()
                 ? propertyName
                 : annotation.attributeName();
-        return new FloatDomainAttribute(getDomainName(), attributeName, annotation.maxDigitLeft(), annotation.maxDigitRight(), annotation.offset());
+        return new FloatDomainAttribute(getDomainName(), attributeName, annotation.maxDigitLeft(), annotation.maxDigitRight(), annotation.offset(), newAttributeAccessor(Float.class, fullPropertyPath(propertyName)));
     }
 
     private DomainAttribute<Integer> processIntAttribute(IntAttribute annotation, String propertyName, Method getter) {
         String attributeName = annotation.attributeName().isEmpty()
                 ? propertyName
                 : annotation.attributeName();
-        return new IntDomainAttribute(getDomainName(), attributeName, annotation.padding(), annotation.offset());
+        return new IntDomainAttribute(getDomainName(), attributeName, annotation.padding(), annotation.offset(), newAttributeAccessor(Integer.class, fullPropertyPath(propertyName)));
     }
 
     private DomainAttribute<Long> processLongAttribute(LongAttribute annotation, String propertyName, Method getter) {
         String attributeName = annotation.attributeName().isEmpty()
                 ? propertyName
                 : annotation.attributeName();
-        return new LongDomainAttribute(getDomainName(), attributeName, annotation.padding(), annotation.offset());
+        return new LongDomainAttribute(getDomainName(), attributeName, annotation.padding(), annotation.offset(), newAttributeAccessor(Long.class, fullPropertyPath(propertyName)));
     }
 
     @SuppressWarnings("unchecked")
@@ -136,12 +150,16 @@ public class BeanDomainAttributes implements DomainAttributes {
                     (converterClass.equals(DefaultAttributeConverter.class))
                     ? new DefaultAttributeConverter<C>(type)
                     : converterClass.newInstance();
-            return new DefaultDomainAttribute<C>(getDomainName(), attributeName, type, (AttributeConverter<C>) converter);
+            return new DefaultDomainAttribute<C>(getDomainName(), attributeName, type, (AttributeConverter<C>) converter, newAttributeAccessor(type, fullPropertyPath(propertyName)));
         } catch (InstantiationException ex) {
             throw new IllegalArgumentException("Can not instanciate a converter. possible cause is that the converter class specified in @SimpleDBAttribute do not have a default constructor.", ex);
         } catch (IllegalAccessException ex) {
             throw new IllegalStateException("Can not instanciate a converter, because we could not be able to access the default constructor of the converter class specified in a @SimpleDBAttribute annotation.", ex);
         }
+    }
+    
+    private String fullPropertyPath(String propertyName) {
+        return this.parentPropertyPath.isEmpty() ? propertyName : this.parentPropertyPath + "." + propertyName;
     }
 
     /**
@@ -151,8 +169,7 @@ public class BeanDomainAttributes implements DomainAttributes {
      * @param type the return type of the method on which FlatAttribute annotation is applied.
      */
     private void buildFlatAttribute(Class<?> type, String propertyName) {
-        String propertyPath = this.parentPropertyPath.isEmpty() ? propertyName : this.parentPropertyPath + "." + propertyName;
-        BeanDomainAttributes attributes = new BeanDomainAttributes(type, getDomainName(), propertyPath);
+        BeanDomainAttributes attributes = new BeanDomainAttributes(type, getDomainName(), this.configuration, fullPropertyPath(propertyName));
         copy(attributes, this);
     }
     

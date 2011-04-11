@@ -15,12 +15,14 @@
  */
 package com.shelfmap.simplequery.domain.impl;
 
+import com.shelfmap.simplequery.domain.AttributeAccessor;
+
 /**
  *
  * @author Tsutomu YANO
  */
 public class IntDomainAttribute extends DefaultDomainAttribute<Integer> {
-    public IntDomainAttribute(String domainName, String attributeName, int maxNumberOfDigits, int offset) {
-        super(domainName, attributeName, Integer.class, new IntAttributeConverter(maxNumberOfDigits, offset));
+    public IntDomainAttribute(String domainName, String attributeName, int maxNumberOfDigits, int offset, AttributeAccessor<Integer> accessor) {
+        super(domainName, attributeName, Integer.class, new IntAttributeConverter(maxNumberOfDigits, offset), accessor);
     }
 }

@@ -18,7 +18,7 @@ package com.shelfmap.simplequery.domain.impl;
 import com.shelfmap.simplequery.Configuration;
 import com.shelfmap.simplequery.Domain;
 import com.shelfmap.simplequery.InstanceFactory;
-import static com.shelfmap.simplequery.util.Assertion.isNotNull;
+import static com.shelfmap.simplequery.util.Assertion.*;
 import com.shelfmap.simplequery.domain.AttributeAccessor;
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
@@ -26,6 +26,8 @@ import java.beans.PropertyDescriptor;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This is a implementation-class for AttributeAccessor interface.
@@ -33,12 +35,12 @@ import java.lang.reflect.Method;
  * @author Tsutomu YANO
  */
 public class PropertyAttributeAccessor<T> implements AttributeAccessor<T> {
-
+    private static final Logger LOGGER = LoggerFactory.getLogger(PropertyAttributeAccessor.class);
     private final String propertyPath;
     private final Configuration configuration;
 
     public PropertyAttributeAccessor(String propertyPath, Configuration configuration) {
-        isNotNull("propertyPath", propertyPath);
+        isNotEmpty("propertyPath", propertyPath);
         isNotNull("configuration", configuration);
         this.propertyPath = propertyPath;
         this.configuration = configuration;
@@ -47,7 +49,9 @@ public class PropertyAttributeAccessor<T> implements AttributeAccessor<T> {
     @Override
     public void write(Object instance, T value) {
         isNotNull("instance", instance);
-        String[] paths = propertyPath.split(".");
+        LOGGER.debug("propertyPath = " + propertyPath);
+        
+        String[] paths = propertyPath.split("¥¥.");
         int pathSize = paths.length;
         Object target = instance;
         String path = "";

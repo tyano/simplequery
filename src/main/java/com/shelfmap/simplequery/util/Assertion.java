@@ -31,6 +31,11 @@ public class Assertion {
         if(value == null) throw new IllegalArgumentException("the parameter '" + parameterName + "' must not be null.");
     }
     
+    public static void isNotEmpty(String parameterName, String value) {
+        isNotNull(parameterName, value);
+        if(value.isEmpty()) throw new IllegalArgumentException("the parameter '" + parameterName + "' must not be empty.");
+    }
+    
     public static void isNotEmpty(String parameterName, Collection<?> values) {
         if(values.isEmpty()) throw new IllegalArgumentException("the parameter '" + parameterName + "' must not be empty.");
     }

@@ -80,6 +80,7 @@
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-jdk14</artifactId>
             <version>1.6.1</version>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
     
@@ -172,6 +173,7 @@
                             </args>
                             <jvmArgs>
                                 <jvmArg>-Xmx64m</jvmArg>
+                                <jvmArg>-Djava.util.logging.config.file=${project.home}/logging.properties</jvmArg>
                             </jvmArgs>
                         </launcher>
                         <launcher>
@@ -184,6 +186,7 @@
                             </args>
                             <jvmArgs>
                                 <jvmArg>-Xmx64m</jvmArg>
+                                <jvmArg>-Djava.util.logging.config.file=${project.home}/logging.properties</jvmArg>
                             </jvmArgs>
                         </launcher>                        
                     </launchers>                

@@ -64,10 +64,12 @@ public class BeanDomainAttributes implements DomainAttributes {
             BeanInfo info = Introspector.getBeanInfo(domainClass);
             PropertyDescriptor[] descriptors = info.getPropertyDescriptors();
             for (PropertyDescriptor descriptor : descriptors) {
-                Class<?> type = descriptor.getPropertyType();
-                String propertyName = descriptor.getName();
-                Method getter = descriptor.getReadMethod();
-                handleAttributeWithType(type, propertyName, getter);
+                if(!descriptor.getName().equals("class")) {
+                    Class<?> type = descriptor.getPropertyType();
+                    String propertyName = descriptor.getName();
+                    Method getter = descriptor.getReadMethod();
+                    handleAttributeWithType(type, propertyName, getter);
+                }
             }
         } catch (IntrospectionException ex) {
             throw new IllegalStateException("Can not introspect a class object.", ex);
@@ -170,13 +172,13 @@ public class BeanDomainAttributes implements DomainAttributes {
      */
     private void buildFlatAttribute(Class<?> type, String propertyName) {
         BeanDomainAttributes attributes = new BeanDomainAttributes(type, getDomainName(), this.configuration, fullPropertyPath(propertyName));
-        copy(attributes, this);
+        copy(this, attributes);
     }
     
-    private void copy(BeanDomainAttributes source, BeanDomainAttributes dest) {
+    private void copy(BeanDomainAttributes dest, BeanDomainAttributes source) {
         for (AttributeKey key : source.attributeStore.keySet()) {
             if(dest.attributeStore.isAttributeDefined(key.getAttributeName())) {
-                throw new IllegalArgumentException("Can not retrieve attributes from classes: the name of the attribute '" + key + "' of " + source.getDomainClass().getCanonicalName() + " is duplicated with the parent domainClass '" + dest.getDomainClass().getCanonicalName() + "'.");
+                throw new IllegalArgumentException("The name of the attribute '" + key.getAttributeName() + "' of " + source.getDomainClass().getCanonicalName() + " is duplicated with the parent domainClass '" + dest.getDomainClass().getCanonicalName() + "'.");
             }
             copyAttribute(dest, source, key.getType(), key.getAttributeName());
         }

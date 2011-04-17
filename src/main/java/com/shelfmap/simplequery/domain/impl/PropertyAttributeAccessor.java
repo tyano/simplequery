@@ -51,7 +51,7 @@ public class PropertyAttributeAccessor<T> implements AttributeAccessor<T> {
         isNotNull("instance", instance);
         LOGGER.debug("propertyPath = " + propertyPath);
         
-        String[] paths = propertyPath.split("¥¥.");
+        String[] paths = propertyPath.split("\\.");
         int pathSize = paths.length;
         Object target = instance;
         String path = "";

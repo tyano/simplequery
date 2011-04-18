@@ -22,7 +22,7 @@ import com.shelfmap.simplequery.FlatAttribute;
 import com.shelfmap.simplequery.FloatAttribute;
 import com.shelfmap.simplequery.IntAttribute;
 import com.shelfmap.simplequery.LongAttribute;
-import com.shelfmap.simplequery.SimpleDBAttribute;
+import com.shelfmap.simplequery.Attribute;
 import com.shelfmap.simplequery.domain.AttributeAccessor;
 import com.shelfmap.simplequery.domain.AttributeConverter;
 import com.shelfmap.simplequery.domain.AttributeKey;
@@ -100,8 +100,8 @@ public class BeanDomainAttributes implements DomainAttributes {
             LongAttribute annotation = getter.getAnnotation(LongAttribute.class);
             result = (DomainAttribute<C>) processLongAttribute(annotation, propertyName, getter);
 
-        } else if (getter.isAnnotationPresent(SimpleDBAttribute.class)) {
-            SimpleDBAttribute annotation = getter.getAnnotation(SimpleDBAttribute.class);
+        } else if (getter.isAnnotationPresent(Attribute.class)) {
+            Attribute annotation = getter.getAnnotation(Attribute.class);
             result = processSimpleDBAttribute(annotation, propertyName, type, getter);
         } else {
             //No Annotation. the attribute name of this property become same with the property name.
@@ -141,7 +141,7 @@ public class BeanDomainAttributes implements DomainAttributes {
     }
 
     @SuppressWarnings("unchecked")
-    private <C> DomainAttribute<C> processSimpleDBAttribute(SimpleDBAttribute annotation, String propertyName, Class<C> type, Method getter) {
+    private <C> DomainAttribute<C> processSimpleDBAttribute(Attribute annotation, String propertyName, Class<C> type, Method getter) {
         try {
             String attributeName = annotation.attributeName().isEmpty()
                     ? propertyName

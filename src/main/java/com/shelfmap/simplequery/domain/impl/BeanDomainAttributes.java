@@ -64,6 +64,8 @@ public class BeanDomainAttributes implements DomainAttributes {
             BeanInfo info = Introspector.getBeanInfo(domainClass);
             PropertyDescriptor[] descriptors = info.getPropertyDescriptors();
             for (PropertyDescriptor descriptor : descriptors) {
+                //do not handle the properties of Object class.
+                //(Object class have only one property 'getClass()')
                 if(!descriptor.getName().equals("class")) {
                     Class<?> type = descriptor.getPropertyType();
                     String propertyName = descriptor.getName();

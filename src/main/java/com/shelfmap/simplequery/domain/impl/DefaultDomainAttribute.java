@@ -29,7 +29,7 @@ public class DefaultDomainAttribute<T> implements DomainAttribute<T> {
     private final String domainName;
     private final String attributeName;
     private final Class<T> type;
-    private final AttributeConverter<T> attributeConverte;
+    private final AttributeConverter<T> attributeConverter;
     private final AttributeAccessor<T> attributeAccessor;
 
     public DefaultDomainAttribute(String domainName, String attributeName, Class<T> type, AttributeConverter<T> attributeConverter, AttributeAccessor<T> attributeAccessor) {
@@ -40,7 +40,7 @@ public class DefaultDomainAttribute<T> implements DomainAttribute<T> {
         this.domainName = domainName;
         this.attributeName = attributeName;
         this.type = type;
-        this.attributeConverte = attributeConverter;
+        this.attributeConverter = attributeConverter;
         this.attributeAccessor = attributeAccessor;
     }
     
@@ -56,7 +56,7 @@ public class DefaultDomainAttribute<T> implements DomainAttribute<T> {
 
     @Override
     public AttributeConverter<T> getAttributeConverter() {
-        return attributeConverte;
+        return attributeConverter;
     }
 
     @Override

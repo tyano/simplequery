@@ -29,8 +29,8 @@ public class LikeMatcher<T> extends BaseMatcher<T> {
         super(value);
     }
 
-    public LikeMatcher(AttributeConverter<T> attributeInfo, T[] values) {
-        super(attributeInfo, values);
+    public LikeMatcher(AttributeConverter<T> attributeConverter, T[] values) {
+        super(attributeConverter, values);
     }
 
     @Override
@@ -39,7 +39,7 @@ public class LikeMatcher<T> extends BaseMatcher<T> {
     }
 
     @Override
-    protected LikeMatcher<T> newMatcher(AttributeConverter<T> attributeInfo, T... values) {
-        return new LikeMatcher<T>(attributeInfo, values);
+    protected LikeMatcher<T> newMatcher(AttributeConverter<T> attributeConverter, T... values) {
+        return new LikeMatcher<T>(attributeConverter, values);
     }
 }

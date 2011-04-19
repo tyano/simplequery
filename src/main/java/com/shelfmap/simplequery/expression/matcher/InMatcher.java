@@ -28,8 +28,8 @@ public class InMatcher<T> extends BaseMatcher<T> {
         super(values);
     }
 
-    protected InMatcher(AttributeConverter<T> attributeInfo, T[] values) {
-        super(attributeInfo, values);
+    protected InMatcher(AttributeConverter<T> attributeConverter, T[] values) {
+        super(attributeConverter, values);
     }
 
     @Override
@@ -45,7 +45,7 @@ public class InMatcher<T> extends BaseMatcher<T> {
         StringBuilder parameters = new StringBuilder();
         for (T value : getValues()) {
             if(parameters.length() > 0) parameters.append(", ");
-            parameters.append(getAttributeInfo().convertValue(value));
+            parameters.append(getAttributeConverter().convertValue(value));
         }
         sb.append(parameters.toString());
         sb.append(")");
@@ -53,7 +53,7 @@ public class InMatcher<T> extends BaseMatcher<T> {
     }
 
     @Override
-    protected InMatcher<T> newMatcher(AttributeConverter<T> attributeInfo, T... values) {
-        return new InMatcher<T>(attributeInfo, values);
+    protected InMatcher<T> newMatcher(AttributeConverter<T> attributeConverter, T... values) {
+        return new InMatcher<T>(attributeConverter, values);
     }
 }

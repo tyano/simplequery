@@ -29,8 +29,8 @@ public class IsNotMatcher<T> extends BaseMatcher<T> {
         super(value);
     }
 
-    protected IsNotMatcher(AttributeConverter<T> attributeInfo, T[] values) {
-        super(attributeInfo, values);
+    protected IsNotMatcher(AttributeConverter<T> attributeConverter, T[] values) {
+        super(attributeConverter, values);
     }
 
     @Override
@@ -39,7 +39,7 @@ public class IsNotMatcher<T> extends BaseMatcher<T> {
     }
 
     @Override
-    protected IsNotMatcher<T> newMatcher(AttributeConverter<T> attributeInfo, T... values) {
-        return new IsNotMatcher<T>(attributeInfo, values);
+    protected IsNotMatcher<T> newMatcher(AttributeConverter<T> attributeConverter, T... values) {
+        return new IsNotMatcher<T>(attributeConverter, values);
     }
 }

@@ -29,8 +29,8 @@ public class LessThanMatcher<T> extends BaseMatcher<T> {
         super(value);
     }
 
-    protected LessThanMatcher(AttributeConverter<T> attributeInfo, T[] values) {
-        super(attributeInfo, values);
+    protected LessThanMatcher(AttributeConverter<T> attributeConverter, T[] values) {
+        super(attributeConverter, values);
     }
 
     @Override
@@ -39,7 +39,7 @@ public class LessThanMatcher<T> extends BaseMatcher<T> {
     }
 
     @Override
-    protected LessThanMatcher<T> newMatcher(AttributeConverter<T> attributeInfo, T... values) {
-        return new LessThanMatcher<T>(attributeInfo, values);
+    protected LessThanMatcher<T> newMatcher(AttributeConverter<T> attributeConverter, T... values) {
+        return new LessThanMatcher<T>(attributeConverter, values);
     }
 }

@@ -26,12 +26,12 @@ import com.shelfmap.simplequery.domain.AttributeConverter;
 public interface Conjunctive<T> {
     T and(Condition<?> other);
     T and(String attributeName, Matcher<?> matcher);
-    <E> T and(String attributeName, Matcher<E> matcher, AttributeConverter<E> attributeInfo);
+    <E> T and(String attributeName, Matcher<E> matcher, AttributeConverter<E> attributeConverter);
     T or(Condition<?> other);
     T or(String attributeName, Matcher<?> matcher);
-    <E> T or(String attributeName, Matcher<E> matcher, AttributeConverter<E> attributeInfo);
+    <E> T or(String attributeName, Matcher<E> matcher, AttributeConverter<E> attributeConverter);
     T intersection(Condition<?> other);
     T intersection(String attributeName, Matcher<?> matcher);
-    <E> T intersection(String attributeName, Matcher<E> matcher, AttributeConverter<E> attributeInfo);
+    <E> T intersection(String attributeName, Matcher<E> matcher, AttributeConverter<E> attributeConverter);
     T group();
 }

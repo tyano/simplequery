@@ -29,8 +29,8 @@ public class GreaterEqualMatcher<T> extends BaseMatcher<T> {
         super(value);
     }
 
-    protected GreaterEqualMatcher(AttributeConverter<T> attributeInfo, T[] values) {
-        super(attributeInfo, values);
+    protected GreaterEqualMatcher(AttributeConverter<T> attributeConverter, T[] values) {
+        super(attributeConverter, values);
     }
 
     @Override
@@ -39,7 +39,7 @@ public class GreaterEqualMatcher<T> extends BaseMatcher<T> {
     }
 
     @Override
-    protected GreaterEqualMatcher<T> newMatcher(AttributeConverter<T> attributeInfo, T... values) {
-        return new GreaterEqualMatcher<T>(attributeInfo, values);
+    protected GreaterEqualMatcher<T> newMatcher(AttributeConverter<T> attributeConverter, T... values) {
+        return new GreaterEqualMatcher<T>(attributeConverter, values);
     }
 }

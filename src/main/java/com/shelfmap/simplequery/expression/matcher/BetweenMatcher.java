@@ -31,8 +31,8 @@ public class BetweenMatcher<T> extends BaseMatcher<T> {
     }
 
     @SuppressWarnings("unchecked")
-    protected BetweenMatcher(AttributeConverter<T> attributeInfo, T... value) {
-        super(attributeInfo, value);
+    protected BetweenMatcher(AttributeConverter<T> attributeConverter, T... value) {
+        super(attributeConverter, value);
     }
     
     public BetweenMatcher<T> and(T value) {
@@ -48,17 +48,17 @@ public class BetweenMatcher<T> extends BaseMatcher<T> {
     @Override
     public String describe() {
         if(second == null) throw new IllegalStateException("the second argument not found. You need pass a second argument by the 'and()' method.");
-        return super.describe() + " and " + getAttributeInfo().convertValue(second);
+        return super.describe() + " and " + getAttributeConverter().convertValue(second);
     }
 
     @Override
-    protected BetweenMatcher<T> newMatcher(AttributeConverter<T> attributeInfo, T... values) {
-        return new BetweenMatcher<T>(attributeInfo, values);
+    protected BetweenMatcher<T> newMatcher(AttributeConverter<T> attributeConverter, T... values) {
+        return new BetweenMatcher<T>(attributeConverter, values);
     }
 
     @Override
-    public Matcher<T> withAttributeInfo(AttributeConverter<T> attributeInfo) {
-        BetweenMatcher<T> newMatcher = newMatcher(attributeInfo, values());
+    public Matcher<T> withAttributeConverter(AttributeConverter<T> attributeConverter) {
+        BetweenMatcher<T> newMatcher = newMatcher(attributeConverter, values());
         newMatcher.second = this.second;
         return newMatcher;
     }

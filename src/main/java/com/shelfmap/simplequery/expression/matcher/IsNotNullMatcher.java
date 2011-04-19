@@ -26,13 +26,13 @@ import java.util.Collections;
  * @author Tsutomu YANO
  */
 public class IsNotNullMatcher implements Matcher<Void> {
-    private final AttributeConverter<Void> attributeInfo = new DefaultAttributeConverter<Void>(Void.class);
+    private final AttributeConverter<Void> attributeConverter = new DefaultAttributeConverter<Void>(Void.class);
     
     public IsNotNullMatcher() {
     }
 
     @Override
-    public Matcher<Void> withAttributeInfo(AttributeConverter<Void> attributeInfo) {
+    public Matcher<Void> withAttributeConverter(AttributeConverter<Void> attributeConverter) {
         return this;
     }
 
@@ -53,11 +53,11 @@ public class IsNotNullMatcher implements Matcher<Void> {
     }
 
     @Override
-    public void setAttributeInfo(AttributeConverter<Void> attributeInfo) {
+    public void setAttributeConverter(AttributeConverter<Void> attributeConverter) {
     }
 
     @Override
-    public AttributeConverter<Void> getAttributeInfo() {
-        return this.attributeInfo;
+    public AttributeConverter<Void> getAttributeConverter() {
+        return this.attributeConverter;
     }
 }

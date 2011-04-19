@@ -28,44 +28,44 @@ import java.util.Collection;
 public abstract class BaseMatcher<T> implements Matcher<T> {
 
     private T[] values;
-    private AttributeConverter<T> attributeInfo;
+    private AttributeConverter<T> attributeConverter;
 
     public BaseMatcher(T... values) {
         this(new DefaultAttributeConverter<T>(values[0]), values);
     }
     
-    protected BaseMatcher(AttributeConverter<T> attributeInfo, T... values) {
-        isNotNull("attributeInfo", attributeInfo);
+    protected BaseMatcher(AttributeConverter<T> attributeConverter, T... values) {
+        isNotNull("attributeConverter", attributeConverter);
         isNotNull("values", values);
         isNotEmpty("values", values);
         
-        this.attributeInfo = attributeInfo;
+        this.attributeConverter = attributeConverter;
         this.values = values;
     }
 
-    protected abstract BaseMatcher<T> newMatcher(AttributeConverter<T> attributeInfo, T... values);
+    protected abstract BaseMatcher<T> newMatcher(AttributeConverter<T> attributeConverter, T... values);
 
     @Override
     public String describe() {
         StringBuilder sb = new StringBuilder();
         sb.append(expression()).append(" ");
-        sb.append(attributeInfo.convertValue(values[0]));
+        sb.append(attributeConverter.convertValue(values[0]));
         return sb.toString();
     }
 
     @Override
-    public Matcher<T> withAttributeInfo(AttributeConverter<T> attributeInfo) {
-        return newMatcher(attributeInfo, values);
+    public Matcher<T> withAttributeConverter(AttributeConverter<T> attributeConverter) {
+        return newMatcher(attributeConverter, values);
     }
     
     @Override
-    public AttributeConverter<T> getAttributeInfo() {
-        return this.attributeInfo;
+    public AttributeConverter<T> getAttributeConverter() {
+        return this.attributeConverter;
     }
     
     @Override 
-    public void setAttributeInfo(AttributeConverter<T> attributeInfo) {
-        this.attributeInfo = attributeInfo;
+    public void setAttributeConverter(AttributeConverter<T> attributeConverter) {
+        this.attributeConverter = attributeConverter;
     }
 
     protected abstract String expression();
@@ -81,6 +81,6 @@ public abstract class BaseMatcher<T> implements Matcher<T> {
 
     @Override
     public boolean isAttributeInfoApplied() {
-        return (this.attributeInfo instanceof DefaultAttributeConverter);
+        return (this.attributeConverter instanceof DefaultAttributeConverter);
     }
 }

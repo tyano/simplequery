@@ -49,12 +49,12 @@ public class MatcherTestSteps {
 
     @When("the padding size is <paddingSize> and the int value is <targetValue>,")
     public void convertIntWithPadding(@Named("paddingSize") int padding, @Named("targetValue") int value) {
-        matcher = new IsMatcher<Integer>(value).withAttributeInfo(new IntAttributeConverter(padding, 0));
+        matcher = new IsMatcher<Integer>(value).withAttributeConverter(new IntAttributeConverter(padding, 0));
     }
 
     @When("the padding size is <paddingSize>, the offset is <offset> and the int value is <targetValue>,")
     public void convertIntWithOffsetAndPadding(@Named("paddingSize") int padding, @Named("offset") int offset, @Named("targetValue") int value) {
-        matcher = new IsMatcher<Integer>(value).withAttributeInfo(new IntAttributeConverter(padding, offset));
+        matcher = new IsMatcher<Integer>(value).withAttributeConverter(new IntAttributeConverter(padding, offset));
     }
 
     @When("a IsNullMatcher is described")
@@ -89,6 +89,6 @@ public class MatcherTestSteps {
 
     @When("a InMatcher's parameters are $arg1 and $arg2, and padding = $padding, offset = $offset")
     public void createInMatcherWithPaddingOffset(int arg1, int arg2, int padding, int offset) {
-        matcher = new InMatcher<Integer>(arg1, arg2).withAttributeInfo(new IntAttributeConverter(padding, offset));
+        matcher = new InMatcher<Integer>(arg1, arg2).withAttributeConverter(new IntAttributeConverter(padding, offset));
     }
 }

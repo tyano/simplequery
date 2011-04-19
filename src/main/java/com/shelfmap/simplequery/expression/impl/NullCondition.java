@@ -76,13 +76,13 @@ public final class NullCondition implements Condition<Object> {
     }
 
     @Override
-    public <E> Condition<?> and(String attributeName, Matcher<E> matcher, AttributeConverter<E> attributeInfo) {
-        return newCondition(attributeName, matcher.withAttributeInfo(attributeInfo));
+    public <E> Condition<?> and(String attributeName, Matcher<E> matcher, AttributeConverter<E> attributeConverter) {
+        return newCondition(attributeName, matcher.withAttributeConverter(attributeConverter));
     }
 
     @Override
-    public <E> Condition<?> or(String attributeName, Matcher<E> matcher, AttributeConverter<E> attributeInfo) {
-        return newCondition(attributeName, matcher.withAttributeInfo(attributeInfo));
+    public <E> Condition<?> or(String attributeName, Matcher<E> matcher, AttributeConverter<E> attributeConverter) {
+        return newCondition(attributeName, matcher.withAttributeConverter(attributeConverter));
     }
 
     @Override
@@ -96,8 +96,8 @@ public final class NullCondition implements Condition<Object> {
     }
 
     @Override
-    public <E> Condition<?> intersection(String attributeName, Matcher<E> matcher, AttributeConverter<E> attributeInfo) {
-        return newCondition(attributeName, matcher.withAttributeInfo(attributeInfo));
+    public <E> Condition<?> intersection(String attributeName, Matcher<E> matcher, AttributeConverter<E> attributeConverter) {
+        return newCondition(attributeName, matcher.withAttributeConverter(attributeConverter));
     }
 
     @Override

@@ -68,8 +68,8 @@ public class ConditionGroup implements Condition<Void> {
     }
 
     @Override
-    public <E> Condition<?> and(String attributeName, Matcher<E> matcher, AttributeConverter<E> attributeInfo) {
-        Condition<?> other = newCondition(attributeName, matcher.withAttributeInfo(attributeInfo));
+    public <E> Condition<?> and(String attributeName, Matcher<E> matcher, AttributeConverter<E> attributeConverter) {
+        Condition<?> other = newCondition(attributeName, matcher.withAttributeConverter(attributeConverter));
         return this.and(other);
     }
 
@@ -85,8 +85,8 @@ public class ConditionGroup implements Condition<Void> {
     }
 
     @Override
-    public <E> Condition<?> or(String attributeName, Matcher<E> matcher, AttributeConverter<E> attributeInfo) {
-        Condition<?> other = newCondition(attributeName, matcher.withAttributeInfo(attributeInfo));
+    public <E> Condition<?> or(String attributeName, Matcher<E> matcher, AttributeConverter<E> attributeConverter) {
+        Condition<?> other = newCondition(attributeName, matcher.withAttributeConverter(attributeConverter));
         return this.or(other);
     }
 
@@ -127,8 +127,8 @@ public class ConditionGroup implements Condition<Void> {
     }
 
     @Override
-    public <E> Condition<?> intersection(String attributeName, Matcher<E> matcher, AttributeConverter<E> attributeInfo) {
-        Condition<?> other = newCondition(attributeName, matcher.withAttributeInfo(attributeInfo));
+    public <E> Condition<?> intersection(String attributeName, Matcher<E> matcher, AttributeConverter<E> attributeConverter) {
+        Condition<?> other = newCondition(attributeName, matcher.withAttributeConverter(attributeConverter));
         return this.intersection(other);
     }
 

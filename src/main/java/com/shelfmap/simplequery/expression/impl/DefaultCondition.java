@@ -119,14 +119,14 @@ public class DefaultCondition<T> implements Condition<T> {
     }
 
     @Override
-    public <E> Condition<?> and(String attributeName, Matcher<E> matcher, AttributeConverter<E> attributeInfo) {
-        Condition<?> other = newCondition(attributeName, matcher.withAttributeInfo(attributeInfo));
+    public <E> Condition<?> and(String attributeName, Matcher<E> matcher, AttributeConverter<E> attributeConverter) {
+        Condition<?> other = newCondition(attributeName, matcher.withAttributeConverter(attributeConverter));
         return this.and(other);
     }
 
     @Override
-    public <E> Condition<?> or(String attributeName, Matcher<E> matcher, AttributeConverter<E> attributeInfo) {
-        Condition<?> other = newCondition(attributeName, matcher.withAttributeInfo(attributeInfo));
+    public <E> Condition<?> or(String attributeName, Matcher<E> matcher, AttributeConverter<E> attributeConverter) {
+        Condition<?> other = newCondition(attributeName, matcher.withAttributeConverter(attributeConverter));
         return this.or(other);
     }
 
@@ -142,8 +142,8 @@ public class DefaultCondition<T> implements Condition<T> {
     }
 
     @Override
-    public <E> Condition<?> intersection(String attributeName, Matcher<E> matcher, AttributeConverter<E> attributeInfo) {
-        Condition<?> other = newCondition(attributeName, matcher.withAttributeInfo(attributeInfo));
+    public <E> Condition<?> intersection(String attributeName, Matcher<E> matcher, AttributeConverter<E> attributeConverter) {
+        Condition<?> other = newCondition(attributeName, matcher.withAttributeConverter(attributeConverter));
         return this.intersection(other);
     }
 

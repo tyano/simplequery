@@ -127,7 +127,7 @@ public class BeanDomainAttributes implements DomainAttributes {
                 : annotation.attributeName();
         return new FloatDomainAttribute(getDomainName(), attributeName, annotation.maxDigitLeft(), annotation.maxDigitRight(), annotation.offset(), newAttributeAccessor(Float.class, fullPropertyPath(propertyName)));
     }
-
+    
     private DomainAttribute<Integer> processIntAttribute(IntAttribute annotation, String propertyName, Method getter) {
         String attributeName = annotation.attributeName().isEmpty()
                 ? propertyName
@@ -224,5 +224,10 @@ public class BeanDomainAttributes implements DomainAttributes {
     public <T> void writeAttribute(Object instance, String attributeName, Class<T> type, T value) throws CanNotWriteAttributeException {
         DomainAttribute<T> attribute = attributeStore.getAttribute(attributeName, type);
         attribute.getAttributeAccessor().write(instance, value);
+    }
+
+    @Override
+    public Class<?> getType(String attributeName) {
+        return attributeStore.getType(attributeName);
     }
 }

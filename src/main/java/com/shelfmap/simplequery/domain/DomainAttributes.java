@@ -23,6 +23,7 @@ package com.shelfmap.simplequery.domain;
 public interface DomainAttributes extends Iterable<DomainAttribute<?>> {
     boolean isAttributeDefined(String attributeName);
     <T> DomainAttribute<T> getAttribute(String attributeName, Class<T> type);
+    Class<?> getType(String attributeName);
     DomainAttribute<?> getAttribute(String attributeName);
     Class<?> getDomainClass();
     String getDomainName();

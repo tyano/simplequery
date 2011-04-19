@@ -16,10 +16,7 @@
 package com.shelfmap.simplequery.domain.impl;
 
 import com.shelfmap.simplequery.domain.AttributeKey;
-import com.shelfmap.simplequery.domain.AttributeKey;
 import com.shelfmap.simplequery.domain.AttributeStore;
-import com.shelfmap.simplequery.domain.AttributeStore;
-import com.shelfmap.simplequery.domain.DomainAttribute;
 import com.shelfmap.simplequery.domain.DomainAttribute;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -33,11 +30,12 @@ import java.util.Set;
 @SuppressWarnings("unchecked")
 public class DefaultAttributeStore implements AttributeStore {
     private final Map<AttributeKey, DomainAttribute<?>> attributeMap = new HashMap<AttributeKey, DomainAttribute<?>>();
-    private final Map<String, DomainAttribute<?>> stringAttributeMap = new HashMap<String, DomainAttribute<?>>();
+    private final Map<String, Class<?>> typeMap = new HashMap<String, Class<?>>();
+    
     @Override
     public <T> DomainAttribute<T> putAttribute(String attributeName, Class<T> type, DomainAttribute<T> value) {
         DomainAttribute<T> result = (DomainAttribute<T>) attributeMap.put(new DefaultAttributeKey(attributeName, type), value);
-        stringAttributeMap.put(attributeName, value);
+        typeMap.put(attributeName, type);
         return result;
     }
 
@@ -58,11 +56,17 @@ public class DefaultAttributeStore implements AttributeStore {
 
     @Override
     public DomainAttribute<?> getAttribute(String attributeName) {
-        return stringAttributeMap.get(attributeName);
+        Class<?> type = getType(attributeName);
+        return getAttribute(attributeName, type);
     }
 
     @Override
     public boolean isAttributeDefined(String attributeName) {
         return getAttribute(attributeName) != null;
+    }
+
+    @Override
+    public Class<?> getType(String attributeName) {
+        return typeMap.get(attributeName);
     }
 }

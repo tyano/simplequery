@@ -24,6 +24,7 @@ import java.util.Set;
 public interface AttributeStore {
     <T> DomainAttribute<T> putAttribute(String attributeName, Class<T> type, DomainAttribute<T> value);
     <T> DomainAttribute<T> getAttribute(String attributeName, Class<T> type);
+    Class<?> getType(String attributeName);
     DomainAttribute<?> getAttribute(String attributeName);
     boolean isAttributeDefined(String attributeName);
     Set<AttributeKey> keySet();

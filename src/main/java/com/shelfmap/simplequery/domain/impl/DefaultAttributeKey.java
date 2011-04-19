@@ -16,7 +16,6 @@
 package com.shelfmap.simplequery.domain.impl;
 
 import com.shelfmap.simplequery.domain.AttributeKey;
-import com.shelfmap.simplequery.domain.AttributeKey;
 
 /**
  *
@@ -24,11 +23,13 @@ import com.shelfmap.simplequery.domain.AttributeKey;
  */
 public class DefaultAttributeKey implements AttributeKey {
     private final String attributeName;
-    private final Class<?> type;
+    private final Class<?> valueType;
+    private final Class<?> containerType;
 
-    public DefaultAttributeKey(String attributeName, Class<?> type) {
+    public DefaultAttributeKey(String attributeName, Class<?> valueType, Class<?> containerType) {
         this.attributeName = attributeName;
-        this.type = type;
+        this.valueType = valueType;
+        this.containerType = containerType;
     }
 
     @Override
@@ -37,8 +38,13 @@ public class DefaultAttributeKey implements AttributeKey {
     }
 
     @Override
-    public Class<?> getType() {
-        return type;
+    public Class<?> getValueType() {
+        return valueType;
+    }
+    
+    @Override
+    public Class<?> getContainerType() {
+        return containerType;
     }
 
     @Override
@@ -53,7 +59,10 @@ public class DefaultAttributeKey implements AttributeKey {
         if ((this.attributeName == null) ? (other.attributeName != null) : !this.attributeName.equals(other.attributeName)) {
             return false;
         }
-        if (this.type != other.type && (this.type == null || !this.type.equals(other.type))) {
+        if (this.valueType != other.valueType && (this.valueType == null || !this.valueType.equals(other.valueType))) {
+            return false;
+        }
+        if (this.containerType != other.containerType && (this.containerType == null || !this.containerType.equals(other.containerType))) {
             return false;
         }
         return true;
@@ -61,14 +70,15 @@ public class DefaultAttributeKey implements AttributeKey {
 
     @Override
     public int hashCode() {
-        int hash = 7;
-        hash = 37 * hash + (this.attributeName != null ? this.attributeName.hashCode() : 0);
-        hash = 37 * hash + (this.type != null ? this.type.hashCode() : 0);
+        int hash = 3;
+        hash = 53 * hash + (this.attributeName != null ? this.attributeName.hashCode() : 0);
+        hash = 53 * hash + (this.valueType != null ? this.valueType.hashCode() : 0);
+        hash = 53 * hash + (this.containerType != null ? this.containerType.hashCode() : 0);
         return hash;
     }
 
     @Override
     public String toString() {
-        return "DefaultAttributeKey{" + "attributeName=" + attributeName + ", type=" + type + '}';
+        return "DefaultAttributeKey{" + "attributeName=" + attributeName + ", valueType=" + valueType.getCanonicalName() + ", containerType=" + containerType.getCanonicalName() + "}";
     }
 }

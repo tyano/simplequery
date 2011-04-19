@@ -87,9 +87,9 @@ public class DefaultWhereExpression<T> extends BaseExpression<T> implements Wher
             
             //TODO DomainAttributes#getAttribute might return an DomainAttribute whose type parameter don't match with the Condition 'current'.
             @SuppressWarnings("unchecked")
-            DomainAttribute<AT> attribute = (DomainAttribute<AT>) domainAttributes.getAttribute(attributeName);
+            DomainAttribute<AT,?> attribute = (DomainAttribute<AT,?>) domainAttributes.getAttribute(attributeName);
             if(attribute != null) {
-                matcher.setAttributeInfo(attribute.getAttributeConverter());
+                matcher.setAttributeConverter(attribute.getAttributeConverter());
             }
         }
     }
@@ -125,8 +125,8 @@ public class DefaultWhereExpression<T> extends BaseExpression<T> implements Wher
     }
 
     @Override
-    public <E> WhereExpression<T> and(String attributeName, Matcher<E> matcher, AttributeConverter<E> attributeInfo) {
-        Condition<?> other = newCondition(attributeName, matcher.withAttributeInfo(attributeInfo));
+    public <E> WhereExpression<T> and(String attributeName, Matcher<E> matcher, AttributeConverter<E> attributeConverter) {
+        Condition<?> other = newCondition(attributeName, matcher.withAttributeConverter(attributeConverter));
         return this.and(other);
     }
 
@@ -142,8 +142,8 @@ public class DefaultWhereExpression<T> extends BaseExpression<T> implements Wher
     }
 
     @Override
-    public <E> WhereExpression<T> or(String attributeName, Matcher<E> matcher, AttributeConverter<E> attributeInfo) {
-        Condition<?> other = newCondition(attributeName, matcher.withAttributeInfo(attributeInfo));
+    public <E> WhereExpression<T> or(String attributeName, Matcher<E> matcher, AttributeConverter<E> attributeConverter) {
+        Condition<?> other = newCondition(attributeName, matcher.withAttributeConverter(attributeConverter));
         return this.or(other);
     }
 
@@ -159,8 +159,8 @@ public class DefaultWhereExpression<T> extends BaseExpression<T> implements Wher
     }
 
     @Override
-    public <E> WhereExpression<T> intersection(String attributeName, Matcher<E> matcher, AttributeConverter<E> attributeInfo) {
-        Condition<?> other = newCondition(attributeName, matcher.withAttributeInfo(attributeInfo));
+    public <E> WhereExpression<T> intersection(String attributeName, Matcher<E> matcher, AttributeConverter<E> attributeConverter) {
+        Condition<?> other = newCondition(attributeName, matcher.withAttributeConverter(attributeConverter));
         return this.intersection(other);
     }
 

@@ -29,19 +29,21 @@ import java.util.Set;
  */
 @SuppressWarnings("unchecked")
 public class DefaultAttributeStore implements AttributeStore {
-    private final Map<AttributeKey, DomainAttribute<?>> attributeMap = new HashMap<AttributeKey, DomainAttribute<?>>();
-    private final Map<String, Class<?>> typeMap = new HashMap<String, Class<?>>();
+    private final Map<AttributeKey, DomainAttribute<?,?>> attributeMap = new HashMap<AttributeKey, DomainAttribute<?,?>>();
+    private final Map<String, Class<?>> valueTypeMap = new HashMap<String, Class<?>>();
+    private final Map<String, Class<?>> containerTypeMap = new HashMap<String, Class<?>>();
     
     @Override
-    public <T> DomainAttribute<T> putAttribute(String attributeName, Class<T> type, DomainAttribute<T> value) {
-        DomainAttribute<T> result = (DomainAttribute<T>) attributeMap.put(new DefaultAttributeKey(attributeName, type), value);
-        typeMap.put(attributeName, type);
+    public <VT,CT> DomainAttribute<VT, CT> putAttribute(String attributeName, Class<VT> valueType, Class<CT> containerType, DomainAttribute<VT,CT> value) {
+        DomainAttribute<VT, CT> result = (DomainAttribute<VT, CT>) attributeMap.put(new DefaultAttributeKey(attributeName, valueType, containerType), value);
+        valueTypeMap.put(attributeName, valueType);
+        containerTypeMap.put(attributeName, containerType);
         return result;
     }
 
     @Override
-    public <T> DomainAttribute<T> getAttribute(String attributeName, Class<T> type) {
-        return (DomainAttribute<T>) attributeMap.get(new DefaultAttributeKey(attributeName, type));
+    public <VT,CT> DomainAttribute<VT,CT> getAttribute(String attributeName, Class<VT> valueType, Class<CT> containerType) {
+        return (DomainAttribute<VT,CT>) attributeMap.get(new DefaultAttributeKey(attributeName, valueType, containerType));
     }
 
     @Override
@@ -50,14 +52,15 @@ public class DefaultAttributeStore implements AttributeStore {
     }
 
     @Override
-    public Set<DomainAttribute<?>> values() {
-        return new HashSet<DomainAttribute<?>>(attributeMap.values());
+    public Set<DomainAttribute<?,?>> values() {
+        return new HashSet<DomainAttribute<?,?>>(attributeMap.values());
     }
 
     @Override
-    public DomainAttribute<?> getAttribute(String attributeName) {
-        Class<?> type = getType(attributeName);
-        return getAttribute(attributeName, type);
+    public DomainAttribute<?,?> getAttribute(String attributeName) {
+        Class<?> valueType = getValueType(attributeName);
+        Class<?> containerType = getContainerType(attributeName);
+        return getAttribute(attributeName, valueType, containerType);
     }
 
     @Override
@@ -66,7 +69,12 @@ public class DefaultAttributeStore implements AttributeStore {
     }
 
     @Override
-    public Class<?> getType(String attributeName) {
-        return typeMap.get(attributeName);
+    public Class<?> getValueType(String attributeName) {
+        return valueTypeMap.get(attributeName);
+    }
+
+    @Override
+    public Class<?> getContainerType(String attributeName) {
+        return containerTypeMap.get(attributeName);
     }
 }

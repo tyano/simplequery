@@ -16,30 +16,34 @@
 
 package com.shelfmap.simplequery.domain.impl;
 
+import com.shelfmap.simplequery.domain.DomainAttribute;
 import com.shelfmap.simplequery.domain.AttributeAccessor;
 import com.shelfmap.simplequery.domain.AttributeConverter;
 import static com.shelfmap.simplequery.util.Assertion.isNotNull;
-import com.shelfmap.simplequery.domain.DomainAttribute;
 
 /**
  *
  * @author Tsutomu YANO
  */
-public class DefaultDomainAttribute<T> implements DomainAttribute<T> {
+public class DefaultDomainAttribute<VT,CT> implements DomainAttribute<VT,CT> {
     private final String domainName;
     private final String attributeName;
-    private final Class<T> type;
-    private final AttributeConverter<T> attributeConverter;
-    private final AttributeAccessor<T> attributeAccessor;
+    private final Class<VT> valueType;
+    private final Class<CT> containerType;
+    private final AttributeConverter<VT> attributeConverter;
+    private final AttributeAccessor<CT> attributeAccessor;
 
-    public DefaultDomainAttribute(String domainName, String attributeName, Class<T> type, AttributeConverter<T> attributeConverter, AttributeAccessor<T> attributeAccessor) {
+    public DefaultDomainAttribute(String domainName, String attributeName, Class<VT> valueType, Class<CT> containerType, AttributeConverter<VT> attributeConverter, AttributeAccessor<CT> attributeAccessor) {
         isNotNull("domainName", domainName);
         isNotNull("attributeName", attributeName);
-        isNotNull("type", type);
-        isNotNull("attributeInfo", attributeConverter);
+        isNotNull("valueType", valueType);
+        isNotNull("containerType", containerType);
+        isNotNull("attributeConverter", attributeConverter);
+        isNotNull("attributeAccessor", attributeAccessor);
         this.domainName = domainName;
         this.attributeName = attributeName;
-        this.type = type;
+        this.valueType = valueType;
+        this.containerType = containerType;
         this.attributeConverter = attributeConverter;
         this.attributeAccessor = attributeAccessor;
     }
@@ -50,22 +54,27 @@ public class DefaultDomainAttribute<T> implements DomainAttribute<T> {
     }
 
     @Override
-    public Class<T> getType() {
-        return type;
+    public Class<VT> getValueType() {
+        return valueType;
     }
 
     @Override
-    public AttributeConverter<T> getAttributeConverter() {
+    public AttributeConverter<VT> getAttributeConverter() {
         return attributeConverter;
     }
 
     @Override
-    public AttributeAccessor<T> getAttributeAccessor() {
+    public AttributeAccessor<CT> getAttributeAccessor() {
         return attributeAccessor;
     }
     
     @Override
     public String getDomainName() {
         return domainName;
+    }
+
+    @Override
+    public Class<CT> getContainerType() {
+        return containerType;
     }
 }

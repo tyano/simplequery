@@ -20,10 +20,11 @@ package com.shelfmap.simplequery.domain;
  *
  * @author Tsutomu YANO
  */
-public interface DomainAttribute<T> {
+public interface DomainAttribute<VT, CT> {
     String getDomainName();
     String getAttributeName();
-    Class<T> getType();
-    AttributeConverter<T> getAttributeConverter();
-    AttributeAccessor<T> getAttributeAccessor();
+    Class<VT> getValueType();
+    Class<CT> getContainerType();
+    AttributeConverter<VT> getAttributeConverter();
+    AttributeAccessor<CT> getAttributeAccessor();
 }

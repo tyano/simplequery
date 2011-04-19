@@ -23,6 +23,7 @@ import com.shelfmap.simplequery.FloatAttribute;
 import com.shelfmap.simplequery.IntAttribute;
 import com.shelfmap.simplequery.LongAttribute;
 import com.shelfmap.simplequery.Attribute;
+import com.shelfmap.simplequery.Container;
 import com.shelfmap.simplequery.domain.AttributeAccessor;
 import com.shelfmap.simplequery.domain.AttributeConverter;
 import com.shelfmap.simplequery.domain.AttributeKey;
@@ -34,6 +35,7 @@ import java.beans.IntrospectionException;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.Method;
+import java.util.Collection;
 import java.util.Iterator;
 
 /**
@@ -67,10 +69,17 @@ public class BeanDomainAttributes implements DomainAttributes {
                 //do not handle the properties of Object class.
                 //(Object class have only one property 'getClass()')
                 if(!descriptor.getName().equals("class")) {
-                    Class<?> type = descriptor.getPropertyType();
+                    Class<?> containerType = descriptor.getPropertyType();
                     String propertyName = descriptor.getName();
                     Method getter = descriptor.getReadMethod();
-                    handleAttributeWithType(type, propertyName, getter);
+                    
+                    Class<?> valueType = containerType; 
+                    if(Collection.class.isAssignableFrom(containerType) || containerType.isArray()) {
+                        Container container = getter.getAnnotation(Container.class);
+                        if(container == null) throw new IllegalStateException("Collection property must have a @Container annotation.");
+                        valueType = container.valueType();
+                    }
+                    handleAttributeWithType(valueType, containerType, propertyName, getter);
                 }
             }
         } catch (IntrospectionException ex) {
@@ -78,38 +87,39 @@ public class BeanDomainAttributes implements DomainAttributes {
         }
     }
     
-    private <T> void handleAttributeWithType(Class<T> type, String propertyName, Method getter) {
+    private <VT,CT> void handleAttributeWithType(Class<VT> valueType, Class<CT> containerType, String propertyName, Method getter) {
         if(getter.isAnnotationPresent(FlatAttribute.class)) {
-            buildFlatAttribute(type, propertyName);
+            buildFlatAttribute(valueType, propertyName);
         } else {
-            DomainAttribute<T> attribute = createAttribute(propertyName, type, getter);
-            attributeStore.putAttribute(attribute.getAttributeName(), type, attribute);
+            DomainAttribute<VT,CT> attribute = createAttribute(propertyName, valueType, containerType, getter);
+            attributeStore.putAttribute(attribute.getAttributeName(), valueType, containerType, attribute);
         }        
     }
-
+    
     @SuppressWarnings("unchecked")
-    private <C> DomainAttribute<C> createAttribute(String propertyName, Class<C> type, Method getter) {
-        DomainAttribute<C> result = null;
-        if (getter.isAnnotationPresent(FloatAttribute.class) && (type.equals(Float.class) || type.equals(float.class))) {
+    private <VT,CT> DomainAttribute<VT,CT> createAttribute(String propertyName, Class<VT> valueType, Class<CT> containerType, Method getter) {
+        DomainAttribute<VT,CT> result = null;
+
+        if (getter.isAnnotationPresent(FloatAttribute.class) && (valueType.equals(Float.class) || valueType.equals(float.class))) {
             FloatAttribute annotation = getter.getAnnotation(FloatAttribute.class);
-            result = (DomainAttribute<C>) processFloatAttribute(annotation, propertyName, getter);
+            result = (DomainAttribute<VT,CT>) processFloatAttribute(annotation, propertyName, containerType, getter);
 
-        } else if (getter.isAnnotationPresent(IntAttribute.class) && (type.equals(Integer.class) || type.equals(int.class))) {
+        } else if (getter.isAnnotationPresent(IntAttribute.class) && (valueType.equals(Integer.class) || valueType.equals(int.class))) {
             IntAttribute annotation = getter.getAnnotation(IntAttribute.class);
-            result = (DomainAttribute<C>) processIntAttribute(annotation, propertyName, getter);
+            result = (DomainAttribute<VT,CT>) processIntAttribute(annotation, propertyName, containerType, getter);
 
-        } else if (getter.isAnnotationPresent(LongAttribute.class) && (type.equals(Long.class) || type.equals(long.class))) {
+        } else if (getter.isAnnotationPresent(LongAttribute.class) && (valueType.equals(Long.class) || valueType.equals(long.class))) {
             LongAttribute annotation = getter.getAnnotation(LongAttribute.class);
-            result = (DomainAttribute<C>) processLongAttribute(annotation, propertyName, getter);
+            result = (DomainAttribute<VT,CT>) processLongAttribute(annotation, propertyName, containerType, getter);
 
         } else if (getter.isAnnotationPresent(Attribute.class)) {
             Attribute annotation = getter.getAnnotation(Attribute.class);
-            result = processSimpleDBAttribute(annotation, propertyName, type, getter);
+            result = processAttribute(annotation, propertyName, valueType, containerType, getter);
         } else {
             //No Annotation. the attribute name of this property become same with the property name.
-            result = new DefaultDomainAttribute<C>(getDomainName(), propertyName, type, newAttributeConverter(type), newAttributeAccessor(type, fullPropertyPath(propertyName)));
+            result = new DefaultDomainAttribute<VT,CT>(getDomainName(), propertyName, valueType, containerType, newAttributeConverter(valueType), newAttributeAccessor(containerType, fullPropertyPath(propertyName)));
         }
-
+        
         return result;
     }
     
@@ -120,30 +130,39 @@ public class BeanDomainAttributes implements DomainAttributes {
     protected <C> AttributeConverter<C> newAttributeConverter(Class<C> type) {
         return new DefaultAttributeConverter<C>(type);
     }
-
-    private DomainAttribute<Float> processFloatAttribute(FloatAttribute annotation, String propertyName, Method getter) {
+    
+    private <CT> DomainAttribute<Float,CT> processFloatAttribute(FloatAttribute annotation, String propertyName, Class<CT> containerType, Method getter) {
         String attributeName = annotation.attributeName().isEmpty()
                 ? propertyName
                 : annotation.attributeName();
-        return new FloatDomainAttribute(getDomainName(), attributeName, annotation.maxDigitLeft(), annotation.maxDigitRight(), annotation.offset(), newAttributeAccessor(Float.class, fullPropertyPath(propertyName)));
+        
+        AttributeConverter<Float> converter = new FloatAttributeConverter(annotation.maxDigitLeft(), annotation.maxDigitRight(), annotation.offset());
+        AttributeAccessor<CT> accessor = newAttributeAccessor(containerType, fullPropertyPath(propertyName));
+        return new DefaultDomainAttribute<Float, CT>(getDomainName(), attributeName, Float.class, containerType, converter, accessor);
     }
     
-    private DomainAttribute<Integer> processIntAttribute(IntAttribute annotation, String propertyName, Method getter) {
+    private <CT> DomainAttribute<Integer,CT> processIntAttribute(IntAttribute annotation, String propertyName, Class<CT> containerType, Method getter) {
         String attributeName = annotation.attributeName().isEmpty()
                 ? propertyName
                 : annotation.attributeName();
-        return new IntDomainAttribute(getDomainName(), attributeName, annotation.padding(), annotation.offset(), newAttributeAccessor(Integer.class, fullPropertyPath(propertyName)));
+        
+        AttributeConverter<Integer> converter = new IntAttributeConverter(annotation.padding(), annotation.offset());
+        AttributeAccessor<CT> accessor = newAttributeAccessor(containerType, fullPropertyPath(propertyName));
+        return new DefaultDomainAttribute<Integer, CT>(getDomainName(), attributeName, Integer.class, containerType, converter, accessor);
     }
 
-    private DomainAttribute<Long> processLongAttribute(LongAttribute annotation, String propertyName, Method getter) {
+    private <CT> DomainAttribute<Long,CT> processLongAttribute(LongAttribute annotation, String propertyName, Class<CT> containerType, Method getter) {
         String attributeName = annotation.attributeName().isEmpty()
                 ? propertyName
                 : annotation.attributeName();
-        return new LongDomainAttribute(getDomainName(), attributeName, annotation.padding(), annotation.offset(), newAttributeAccessor(Long.class, fullPropertyPath(propertyName)));
+        
+        AttributeConverter<Long> converter = new LongAttributeConverter(annotation.padding(), annotation.offset());
+        AttributeAccessor<CT> accessor = newAttributeAccessor(containerType, fullPropertyPath(propertyName));
+        return new DefaultDomainAttribute<Long, CT>(getDomainName(), attributeName, Long.class, containerType, converter, accessor);
     }
 
     @SuppressWarnings("unchecked")
-    private <C> DomainAttribute<C> processSimpleDBAttribute(Attribute annotation, String propertyName, Class<C> type, Method getter) {
+    private <VT,CT> DomainAttribute<VT,CT> processAttribute(Attribute annotation, String propertyName, Class<VT> valueType, Class<CT> containerType, Method getter) {
         try {
             String attributeName = annotation.attributeName().isEmpty()
                     ? propertyName
@@ -152,9 +171,9 @@ public class BeanDomainAttributes implements DomainAttributes {
 
             AttributeConverter<?> converter =
                     (converterClass.equals(DefaultAttributeConverter.class))
-                    ? new DefaultAttributeConverter<C>(type)
+                    ? new DefaultAttributeConverter<VT>(valueType)
                     : converterClass.newInstance();
-            return new DefaultDomainAttribute<C>(getDomainName(), attributeName, type, (AttributeConverter<C>) converter, newAttributeAccessor(type, fullPropertyPath(propertyName)));
+            return new DefaultDomainAttribute<VT,CT>(getDomainName(), attributeName, valueType, containerType, (AttributeConverter<VT>) converter, newAttributeAccessor(containerType, fullPropertyPath(propertyName)));
         } catch (InstantiationException ex) {
             throw new IllegalArgumentException("Can not instanciate a converter. possible cause is that the converter class specified in @SimpleDBAttribute do not have a default constructor.", ex);
         } catch (IllegalAccessException ex) {
@@ -182,12 +201,12 @@ public class BeanDomainAttributes implements DomainAttributes {
             if(dest.attributeStore.isAttributeDefined(key.getAttributeName())) {
                 throw new IllegalArgumentException("The name of the attribute '" + key.getAttributeName() + "' of " + source.getDomainClass().getCanonicalName() + " is duplicated with the parent domainClass '" + dest.getDomainClass().getCanonicalName() + "'.");
             }
-            copyAttribute(dest, source, key.getType(), key.getAttributeName());
+            copyAttribute(dest, source, key.getValueType(), key.getContainerType(), key.getAttributeName());
         }
     }
 
-    private <T> void copyAttribute(BeanDomainAttributes dest, BeanDomainAttributes source, Class<T> type, String attributeName) {
-        dest.attributeStore.putAttribute(attributeName, type, source.getAttribute(attributeName, type));
+    private <VT,CT> void copyAttribute(BeanDomainAttributes dest, BeanDomainAttributes source, Class<VT> valueType, Class<CT> containerType, String attributeName) {
+        dest.attributeStore.putAttribute(attributeName, valueType, containerType, source.getAttribute(attributeName, valueType, containerType));
     }
 
     @Override
@@ -196,12 +215,12 @@ public class BeanDomainAttributes implements DomainAttributes {
     }
 
     @Override
-    public <T> DomainAttribute<T> getAttribute(String attributeName, Class<T> type) {
-        return attributeStore.getAttribute(attributeName, type);
+    public <VT,CT> DomainAttribute<VT,CT> getAttribute(String attributeName, Class<VT> valueType, Class<CT> containerType) {
+        return attributeStore.getAttribute(attributeName, valueType, containerType);
     }
     
     @Override
-    public DomainAttribute<?> getAttribute(String attributeName) {
+    public DomainAttribute<?,?> getAttribute(String attributeName) {
         return attributeStore.getAttribute(attributeName);
     }    
 
@@ -216,18 +235,23 @@ public class BeanDomainAttributes implements DomainAttributes {
     }
     
     @Override
-    public Iterator<DomainAttribute<?>> iterator() {
+    public Iterator<DomainAttribute<?,?>> iterator() {
         return attributeStore.values().iterator();
     }
 
     @Override
-    public <T> void writeAttribute(Object instance, String attributeName, Class<T> type, T value) throws CanNotWriteAttributeException {
-        DomainAttribute<T> attribute = attributeStore.getAttribute(attributeName, type);
+    public <VT,CT> void writeAttribute(Object instance, String attributeName, Class<VT> valueType, Class<CT> containerType, CT value) throws CanNotWriteAttributeException {
+        DomainAttribute<VT,CT> attribute = attributeStore.getAttribute(attributeName, valueType, containerType);
         attribute.getAttributeAccessor().write(instance, value);
     }
 
     @Override
-    public Class<?> getType(String attributeName) {
-        return attributeStore.getType(attributeName);
+    public Class<?> getValueType(String attributeName) {
+        return attributeStore.getValueType(attributeName);
+    }
+
+    @Override
+    public Class<?> getContainerType(String attributeName) {
+        return attributeStore.getContainerType(attributeName);
     }
 }

@@ -16,32 +16,30 @@
 
 package com.shelfmap.simplequery.domain;
 
-import com.shelfmap.simplequery.domain.DomainAttribute;
-
 /**
  *
  * @author Tsutomu YANO
  */
 public class CanNotWriteAttributeException extends Exception {
     private static final long serialVersionUID = 1L;
-    private final DomainAttribute<?> attribute;
+    private final DomainAttribute<?,?> attribute;
 
-    public CanNotWriteAttributeException(Throwable thrwbl, DomainAttribute<?> attribute) {
+    public CanNotWriteAttributeException(Throwable thrwbl, DomainAttribute<?,?> attribute) {
         super(thrwbl);
         this.attribute = attribute;
     }
 
-    public CanNotWriteAttributeException(String string, Throwable thrwbl, DomainAttribute<?> attribute) {
+    public CanNotWriteAttributeException(String string, Throwable thrwbl, DomainAttribute<?,?> attribute) {
         super(string, thrwbl);
         this.attribute = attribute;
     }
 
-    public CanNotWriteAttributeException(String string, DomainAttribute<?> attribute) {
+    public CanNotWriteAttributeException(String string, DomainAttribute<?,?> attribute) {
         super(string);
         this.attribute = attribute;
     }
 
-    public CanNotWriteAttributeException(DomainAttribute<?> attribute) {
+    public CanNotWriteAttributeException(DomainAttribute<?,?> attribute) {
         this.attribute = attribute;
     }
 }

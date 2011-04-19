@@ -22,11 +22,12 @@ import java.util.Set;
  * @author Tsutomu YANO
  */
 public interface AttributeStore {
-    <T> DomainAttribute<T> putAttribute(String attributeName, Class<T> type, DomainAttribute<T> value);
-    <T> DomainAttribute<T> getAttribute(String attributeName, Class<T> type);
-    Class<?> getType(String attributeName);
-    DomainAttribute<?> getAttribute(String attributeName);
+    <VT,CT> DomainAttribute<VT, CT> putAttribute(String attributeName, Class<VT> valueType, Class<CT> containerType, DomainAttribute<VT,CT> value);
+    <VT,CT> DomainAttribute<VT, CT> getAttribute(String attributeName, Class<VT> valueType, Class<CT> containerType);
+    Class<?> getValueType(String attributeName);
+    Class<?> getContainerType(String attributeName);
+    DomainAttribute<?,?> getAttribute(String attributeName);
     boolean isAttributeDefined(String attributeName);
     Set<AttributeKey> keySet();
-    Set<DomainAttribute<?>> values();
+    Set<DomainAttribute<?,?>> values();
 }

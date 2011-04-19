@@ -136,7 +136,7 @@ public class PropertyAttributeAccessor<T> implements AttributeAccessor<T> {
     @SuppressWarnings("unchecked")
     public T read(Object instance) {
         isNotNull("instance", instance);
-        String[] paths = propertyPath.split(".");
+        String[] paths = propertyPath.split("\\.");
         int pathSize = paths.length;
         Object target = instance;
         String path = "";

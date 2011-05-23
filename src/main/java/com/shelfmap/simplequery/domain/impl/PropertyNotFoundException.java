@@ -13,20 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.shelfmap.simplequery;
-
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+package com.shelfmap.simplequery.domain.impl;
 
 /**
  *
  * @author Tsutomu YANO
  */
-@Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.METHOD)
-public @interface Container {
-    Class<?> valueType();
-    Class<?> containerType();
+public class PropertyNotFoundException extends Exception {
+    private static final long serialVersionUID = 1L;
+
+    public PropertyNotFoundException(Throwable thrwbl) {
+    }
+
+    public PropertyNotFoundException(String string, Throwable thrwbl) {
+    }
+
+    public PropertyNotFoundException(String string) {
+    }
+
+    public PropertyNotFoundException() {
+    }
+    
 }

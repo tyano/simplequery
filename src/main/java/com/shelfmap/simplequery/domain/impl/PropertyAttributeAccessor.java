@@ -159,24 +159,4 @@ public class PropertyAttributeAccessor<T> implements AttributeAccessor<T> {
             return null;
         }
     }
-
-    static class PropertyNotFoundException extends Exception {
-
-        private static final long serialVersionUID = 1L;
-
-        public PropertyNotFoundException(Throwable thrwbl) {
-            super(thrwbl);
-        }
-
-        public PropertyNotFoundException(String string, Throwable thrwbl) {
-            super(string, thrwbl);
-        }
-
-        public PropertyNotFoundException(String string) {
-            super(string);
-        }
-
-        public PropertyNotFoundException() {
-        }
-    }
 }

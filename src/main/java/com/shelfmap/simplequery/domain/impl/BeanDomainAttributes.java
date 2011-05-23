@@ -69,7 +69,7 @@ public class BeanDomainAttributes implements DomainAttributes {
                 //do not handle the properties of Object class.
                 //(Object class have only one property 'getClass()')
                 if(!descriptor.getName().equals("class")) {
-                    Class<?> containerType = descriptor.getPropertyType();
+                    Class<?> containerType = primitiveToObject(descriptor.getPropertyType());
                     String propertyName = descriptor.getName();
                     Method getter = descriptor.getReadMethod();
                     
@@ -87,6 +87,17 @@ public class BeanDomainAttributes implements DomainAttributes {
         }
     }
     
+    private Class<?> primitiveToObject(Class<?> type) {
+        if(int.class.isAssignableFrom(type)) 
+            return Integer.class;
+        else if(long.class.isAssignableFrom(type))
+            return Long.class;
+        else if(float.class.isAssignableFrom(type))
+            return Float.class;
+        else
+            return type;
+    }
+    
     private <VT,CT> void handleAttributeWithType(Class<VT> valueType, Class<CT> containerType, String propertyName, Method getter) {
         if(getter.isAnnotationPresent(FlatAttribute.class)) {
             buildFlatAttribute(valueType, propertyName);
@@ -100,28 +111,64 @@ public class BeanDomainAttributes implements DomainAttributes {
     private <VT,CT> DomainAttribute<VT,CT> createAttribute(String propertyName, Class<VT> valueType, Class<CT> containerType, Method getter) {
         DomainAttribute<VT,CT> result = null;
 
-        if (getter.isAnnotationPresent(FloatAttribute.class) && (valueType.equals(Float.class) || valueType.equals(float.class))) {
-            FloatAttribute annotation = getter.getAnnotation(FloatAttribute.class);
-            result = (DomainAttribute<VT,CT>) processFloatAttribute(annotation, propertyName, containerType, getter);
+//        if(Collection.class.isAssignableFrom(containerType) && getter.isAnnotationPresent(Container.class)) {
+//            Class<? extends Collection> collectionType = containerType.asSubclass(Collection.class);
+//            result = createCollectionAttribute(propertyName, valueType, collectionType, getter);
+//            if (getter.isAnnotationPresent(FloatAttribute.class) && (valueType.equals(Float.class) || valueType.equals(float.class))) {
+//                
+//            } else if (getter.isAnnotationPresent(IntAttribute.class) && (valueType.equals(Integer.class) || valueType.equals(int.class))) {
+//            } else if (getter.isAnnotationPresent(LongAttribute.class) && (valueType.equals(Long.class) || valueType.equals(long.class))) {
+//            } else if (getter.isAnnotationPresent(Attribute.class)) {
+//            } else {
+//                
+//            }
+//        } else {
+            if (getter.isAnnotationPresent(FloatAttribute.class) && (valueType.equals(Float.class) || valueType.equals(float.class))) {
+                FloatAttribute annotation = getter.getAnnotation(FloatAttribute.class);
+                result = (DomainAttribute<VT,CT>) processFloatAttribute(annotation, propertyName, containerType, getter);
 
-        } else if (getter.isAnnotationPresent(IntAttribute.class) && (valueType.equals(Integer.class) || valueType.equals(int.class))) {
-            IntAttribute annotation = getter.getAnnotation(IntAttribute.class);
-            result = (DomainAttribute<VT,CT>) processIntAttribute(annotation, propertyName, containerType, getter);
+            } else if (getter.isAnnotationPresent(IntAttribute.class) && (valueType.equals(Integer.class) || valueType.equals(int.class))) {
+                IntAttribute annotation = getter.getAnnotation(IntAttribute.class);
+                result = (DomainAttribute<VT,CT>) processIntAttribute(annotation, propertyName, containerType, getter);
 
-        } else if (getter.isAnnotationPresent(LongAttribute.class) && (valueType.equals(Long.class) || valueType.equals(long.class))) {
-            LongAttribute annotation = getter.getAnnotation(LongAttribute.class);
-            result = (DomainAttribute<VT,CT>) processLongAttribute(annotation, propertyName, containerType, getter);
+            } else if (getter.isAnnotationPresent(LongAttribute.class) && (valueType.equals(Long.class) || valueType.equals(long.class))) {
+                LongAttribute annotation = getter.getAnnotation(LongAttribute.class);
+                result = (DomainAttribute<VT,CT>) processLongAttribute(annotation, propertyName, containerType, getter);
 
-        } else if (getter.isAnnotationPresent(Attribute.class)) {
-            Attribute annotation = getter.getAnnotation(Attribute.class);
-            result = processAttribute(annotation, propertyName, valueType, containerType, getter);
-        } else {
-            //No Annotation. the attribute name of this property become same with the property name.
-            result = new DefaultDomainAttribute<VT,CT>(getDomainName(), propertyName, valueType, containerType, newAttributeConverter(valueType), newAttributeAccessor(containerType, fullPropertyPath(propertyName)));
-        }
+            } else if (getter.isAnnotationPresent(Attribute.class)) {
+                Attribute annotation = getter.getAnnotation(Attribute.class);
+                result = processAttribute(annotation, propertyName, valueType, containerType, getter);
+            } else {
+                //No Annotation. the attribute name of this property become same with the property name.
+                result = new DefaultDomainAttribute<VT,CT>(getDomainName(), propertyName, valueType, containerType, newAttributeConverter(valueType), newAttributeAccessor(containerType, fullPropertyPath(propertyName)));
+            }
+//        }
+        
         
         return result;
     }
+    
+//    private <VT, CT extends Collection<VT>> DomainAttribute<VT,CT> createCollectionAttribute(String propertyName, Class<VT> valueType, Class<CT> containerType, Method getter) {
+//        DomainAttribute<VT,CT> result = null;
+//        Container containerAnnotation = getter.getAnnotation(Container.class);
+//        if (getter.isAnnotationPresent(FloatAttribute.class) && (valueType.equals(Float.class) || valueType.equals(float.class))) {
+//            FloatAttribute annotation = getter.getAnnotation(FloatAttribute.class);
+//            CollectionAttributeAccessor<VT,CT> accessor = new CollectionPropertyAttributeAccessor<VT, CT>(fullPropertyPath(propertyName), configuration, valueType);
+//            
+//            String attributeName = annotation.attributeName().isEmpty()
+//                    ? propertyName
+//                    : annotation.attributeName();
+//
+//            AttributeConverter<Float> converter = createFloatConverter(annotation);
+//            result = (DomainAttribute<VT,CT>)new DefaultDomainAttribute<Float, CT>(getDomainName(), attributeName, Float.class, containerType, converter, accessor);
+//        } else if (getter.isAnnotationPresent(IntAttribute.class) && (valueType.equals(Integer.class) || valueType.equals(int.class))) {
+//        } else if (getter.isAnnotationPresent(LongAttribute.class) && (valueType.equals(Long.class) || valueType.equals(long.class))) {
+//        } else if (getter.isAnnotationPresent(Attribute.class)) {
+//        } else {
+//
+//        }
+//        return result;
+//    }
     
     protected <C> AttributeAccessor<C> newAttributeAccessor(Class<C> type, String propertyPath) {
         return new PropertyAttributeAccessor<C>(propertyPath, configuration);
@@ -136,9 +183,13 @@ public class BeanDomainAttributes implements DomainAttributes {
                 ? propertyName
                 : annotation.attributeName();
         
-        AttributeConverter<Float> converter = new FloatAttributeConverter(annotation.maxDigitLeft(), annotation.maxDigitRight(), annotation.offset());
+        AttributeConverter<Float> converter = createFloatConverter(annotation);
         AttributeAccessor<CT> accessor = newAttributeAccessor(containerType, fullPropertyPath(propertyName));
         return new DefaultDomainAttribute<Float, CT>(getDomainName(), attributeName, Float.class, containerType, converter, accessor);
+    }
+    
+    private AttributeConverter<Float> createFloatConverter(FloatAttribute annotation) {
+        return new FloatAttributeConverter(annotation.maxDigitLeft(), annotation.maxDigitRight(), annotation.offset());
     }
     
     private <CT> DomainAttribute<Integer,CT> processIntAttribute(IntAttribute annotation, String propertyName, Class<CT> containerType, Method getter) {
@@ -146,9 +197,13 @@ public class BeanDomainAttributes implements DomainAttributes {
                 ? propertyName
                 : annotation.attributeName();
         
-        AttributeConverter<Integer> converter = new IntAttributeConverter(annotation.padding(), annotation.offset());
+        AttributeConverter<Integer> converter = createIntConverter(annotation);
         AttributeAccessor<CT> accessor = newAttributeAccessor(containerType, fullPropertyPath(propertyName));
         return new DefaultDomainAttribute<Integer, CT>(getDomainName(), attributeName, Integer.class, containerType, converter, accessor);
+    }
+    
+    private AttributeConverter<Integer> createIntConverter(IntAttribute annotation) {
+        return new IntAttributeConverter(annotation.padding(), annotation.offset());
     }
 
     private <CT> DomainAttribute<Long,CT> processLongAttribute(LongAttribute annotation, String propertyName, Class<CT> containerType, Method getter) {
@@ -156,9 +211,13 @@ public class BeanDomainAttributes implements DomainAttributes {
                 ? propertyName
                 : annotation.attributeName();
         
-        AttributeConverter<Long> converter = new LongAttributeConverter(annotation.padding(), annotation.offset());
+        AttributeConverter<Long> converter = createLongConverter(annotation);
         AttributeAccessor<CT> accessor = newAttributeAccessor(containerType, fullPropertyPath(propertyName));
         return new DefaultDomainAttribute<Long, CT>(getDomainName(), attributeName, Long.class, containerType, converter, accessor);
+    }
+    
+    private AttributeConverter<Long> createLongConverter(LongAttribute annotation) {
+        return new LongAttributeConverter(annotation.padding(), annotation.offset());
     }
 
     @SuppressWarnings("unchecked")
@@ -196,6 +255,7 @@ public class BeanDomainAttributes implements DomainAttributes {
         copy(this, attributes);
     }
     
+    @SuppressWarnings("AccessingNonPublicFieldOfAnotherObject")
     private void copy(BeanDomainAttributes dest, BeanDomainAttributes source) {
         for (AttributeKey key : source.attributeStore.keySet()) {
             if(dest.attributeStore.isAttributeDefined(key.getAttributeName())) {
@@ -205,6 +265,7 @@ public class BeanDomainAttributes implements DomainAttributes {
         }
     }
 
+    @SuppressWarnings("AccessingNonPublicFieldOfAnotherObject")
     private <VT,CT> void copyAttribute(BeanDomainAttributes dest, BeanDomainAttributes source, Class<VT> valueType, Class<CT> containerType, String attributeName) {
         dest.attributeStore.putAttribute(attributeName, valueType, containerType, source.getAttribute(attributeName, valueType, containerType));
     }

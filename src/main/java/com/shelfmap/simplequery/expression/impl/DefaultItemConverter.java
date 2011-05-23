@@ -83,6 +83,8 @@ public class DefaultItemConverter<T> implements ItemConverter<T> {
             
             VT convertedValue = domainAttribute.getAttributeConverter().restoreValue(attributeValue);
             AttributeAccessor<CT> accessor = domainAttribute.getAttributeAccessor();
+            LOGGER.debug("valueType: " + valueType.getCanonicalName());
+            LOGGER.debug("containerType: " + containerType.getCanonicalName());
             if(valueType.equals(containerType)) {
                 accessor.write(instance, containerType.cast(convertedValue));
             } else if(containerType.isArray()) {
@@ -97,7 +99,9 @@ public class DefaultItemConverter<T> implements ItemConverter<T> {
                 accessor.write(instance, containerType.cast(newArray));
             } else if(Collection.class.isAssignableFrom(containerType)) {
                 try {
+                    @SuppressWarnings("unchecked")
                     Collection<VT> prev = (Collection<VT>) accessor.read(instance);
+                    @SuppressWarnings("unchecked")
                     Collection<VT> newCol = (Collection<VT>) containerType.newInstance();
                     newCol.addAll(prev);
                     newCol.add(convertedValue);

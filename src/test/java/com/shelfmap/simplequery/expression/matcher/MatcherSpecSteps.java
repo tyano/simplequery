@@ -28,7 +28,7 @@ import org.jbehave.core.annotations.When;
  * @author Tsutomu YANO
  */
 @Steps
-public class MatcherTestSteps {
+public class MatcherSpecSteps {
 
     private Matcher<?> matcher;
 

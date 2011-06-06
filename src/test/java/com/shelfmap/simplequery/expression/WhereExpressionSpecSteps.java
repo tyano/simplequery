@@ -37,7 +37,7 @@ import org.jbehave.core.annotations.When;
  * @author Tsutomu YANO
  */
 @Steps
-public class WhereExpressionTestSteps {
+public class WhereExpressionSpecSteps {
 
     Expression<?> expression;
     AmazonSimpleDB simpleDB;

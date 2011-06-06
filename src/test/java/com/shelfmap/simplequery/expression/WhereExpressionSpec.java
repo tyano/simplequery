@@ -17,16 +17,13 @@
 package com.shelfmap.simplequery.expression;
 
 import com.shelfmap.specsfinder.StoryRunner;
-import java.io.IOException;
-import java.net.URISyntaxException;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
 
 /**
  *
  * @author Tsutomu YANO
  */
-public class WhereExpressionTest extends StoryRunner {
-
-    public WhereExpressionTest() throws IOException, URISyntaxException, InstantiationException, IllegalAccessException {
-    }
-
+@RunWith(JUnit4.class)
+public class WhereExpressionSpec extends StoryRunner {
 }

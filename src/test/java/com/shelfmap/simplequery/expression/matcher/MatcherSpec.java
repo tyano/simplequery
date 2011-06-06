@@ -14,18 +14,16 @@
  * limitations under the License.
  */
 
-package com.shelfmap.simplequery.expression;
+package com.shelfmap.simplequery.expression.matcher;
 
 import com.shelfmap.specsfinder.StoryRunner;
-import java.io.IOException;
-import java.net.URISyntaxException;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
 
 /**
  *
  * @author Tsutomu YANO
  */
-public class ConditionTest extends StoryRunner{
-    public ConditionTest() throws IOException, URISyntaxException, InstantiationException, IllegalAccessException {
-        super();
-    }
+@RunWith(JUnit4.class)
+public class MatcherSpec extends StoryRunner {
 }

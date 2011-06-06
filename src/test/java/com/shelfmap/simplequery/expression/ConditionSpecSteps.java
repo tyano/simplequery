@@ -30,7 +30,7 @@ import org.jbehave.core.annotations.When;
  * @author Tsutomu YANO
  */
 @Steps
-public class ConditionTestSteps {
+public class ConditionSpecSteps {
 
     Condition<?> condition;
 

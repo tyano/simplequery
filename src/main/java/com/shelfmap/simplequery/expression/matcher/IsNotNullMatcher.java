@@ -48,7 +48,7 @@ public class IsNotNullMatcher implements Matcher<Void> {
     }
 
     @Override
-    public boolean isAttributeInfoApplied() {
+    public boolean isAttributeConverterApplied() {
         return true;
     }
 

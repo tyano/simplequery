@@ -29,7 +29,7 @@ public interface Matcher<T> extends Describable {
     AttributeConverter<T> getAttributeConverter();
     void setAttributeConverter(AttributeConverter<T> attributeConverter);
     Collection<T> getValues();
-    boolean isAttributeInfoApplied();
+    boolean isAttributeConverterApplied();
     
     /* methods for building new instance with new property value. */
     Matcher<T> withAttributeConverter(AttributeConverter<T> attributeConverter);

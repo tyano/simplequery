@@ -80,7 +80,7 @@ public abstract class BaseMatcher<T> implements Matcher<T> {
     }
 
     @Override
-    public boolean isAttributeInfoApplied() {
+    public boolean isAttributeConverterApplied() {
         return (this.attributeConverter instanceof DefaultAttributeConverter);
     }
 }

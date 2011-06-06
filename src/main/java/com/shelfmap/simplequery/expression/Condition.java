@@ -19,9 +19,6 @@ package com.shelfmap.simplequery.expression;
 import com.shelfmap.simplequery.expression.matcher.Matcher;
 
 /**
- *    Matcher<T> withAttributeInfo(int maxDigitLeft, int maxDigitRight, int offsetValue);
-    Matcher<T> withAttributeInfo(int maxNumDigits, int offsetValue);
-    Matcher<T> withAttributeInfo(int maxNumDigits, long offsetValue);
  * @author Tsutomu YANO
  */
 public interface Condition<T> extends Describable, Conjunctive<Condition<?>> {

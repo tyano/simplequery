@@ -195,30 +195,6 @@
                         </launcher>                        
                     </launchers>                
                 </configuration>
-                <executions>
-                    <execution>
-                        <id>scala-compile-first</id>
-                        <phase>process-resources</phase>
-                        <goals>
-                            <goal>add-source</goal>
-                            <goal>compile</goal>
-                        </goals>
-                    </execution>									
-                    <execution>
-                        <id>scala-test-compile</id>
-                        <phase>process-test-resources</phase>
-                        <goals>
-                            <goal>testCompile</goal>
-                        </goals>
-                    </execution>
-                    <execution>
-                        <id>scalatest-run</id>
-                        <phase>test</phase>
-                        <goals>
-                            <goal>run</goal>
-                        </goals>
-                    </execution>
-                </executions>
             </plugin>
             
             <plugin>
@@ -229,7 +205,7 @@
                     <useFile>false</useFile>
                     <includes>
                         <include>**/*Test.class</include>
-<!--                        <include>**/*Spec.class</include>-->
+                        <include>**/*Runner.class</include>
                     </includes>
                 </configuration>
             </plugin>            

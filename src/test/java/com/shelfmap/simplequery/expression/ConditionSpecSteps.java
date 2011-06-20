@@ -87,7 +87,7 @@ public class ConditionSpecSteps {
 
     @Then("two conditions will be joined with a intersection operator.")
     public void assertIntersection() {
-        Condition intersection = condition.intersection("second", greaterEqual(30));
+        Condition<?> intersection = condition.intersection("second", greaterEqual(30));
         assertThat(intersection.describe(), Matchers.is("`first` = '1' intersection `second` >= '30'"));
     }
 

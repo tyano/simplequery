@@ -41,7 +41,7 @@ public class WhereExpressionSpecSteps {
 
     Expression<?> expression;
     AmazonSimpleDB simpleDB;
-    Configuration configuration = new DummyConfiguration();
+    Configuration configuration = new com.shelfmap.simplequery.DefaultConfiguration();
     
     private String getSecurityCredentialPath() {
         return "/Users/t_yano/aws.credential.properties";
@@ -57,7 +57,7 @@ public class WhereExpressionSpecSteps {
         expression = new Select(simpleDB, configuration).from(DomainWithoutAttribute.class).where("saving", greaterThan(100000));
     }
 
-    @Then("WhereExpression will generate a simple expression with no padding and no offset.")
+    @Then("WhereExpression will generate a simple expression with no padding nor offset.")
     public void assertExpression() {
         assertThat(expression.describe(), Matchers.is("select * from `testdomain` where `saving` > '100000'"));
     }

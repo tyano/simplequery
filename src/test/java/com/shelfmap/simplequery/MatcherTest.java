@@ -14,8 +14,9 @@
  * limitations under the License.
  */
 
-package com.shelfmap.simplequery.expression.matcher;
+package com.shelfmap.simplequery;
 
+import com.shelfmap.stepsfinder.StoryPath;
 import com.shelfmap.stepsfinder.StoryRunner;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
@@ -25,5 +26,6 @@ import org.junit.runners.JUnit4;
  * @author Tsutomu YANO
  */
 @RunWith(JUnit4.class)
-public class MatcherSpec extends StoryRunner {
+@StoryPath("stories/MatcherSpec.story")
+public class MatcherTest extends StoryRunner {
 }

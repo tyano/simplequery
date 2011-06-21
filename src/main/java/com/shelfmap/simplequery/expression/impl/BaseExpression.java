@@ -53,9 +53,9 @@ public abstract class BaseExpression<T> implements Expression<T> {
     }
     
     @Override
-    public T getSingleResult() throws SimpleQueryException, MultipleResultsExistException {
+    public T getSingleResult(boolean consistent) throws SimpleQueryException, MultipleResultsExistException {
         String expression = describe();
-        SelectRequest selectReq = new SelectRequest(expression);
+        SelectRequest selectReq = new SelectRequest(expression, consistent);
         SelectResult result = simpleDB.select(selectReq);
         List<Item> items = result.getItems();
         if(items.size() > 1) throw new MultipleResultsExistException("more than 1 results returned by the expression: " + expression);
@@ -70,8 +70,8 @@ public abstract class BaseExpression<T> implements Expression<T> {
     }
 
     @Override
-    public QueryResults<T> getResults() throws SimpleQueryException {
-        SelectRequest selectReq = new SelectRequest(describe());
+    public QueryResults<T> getResults(boolean consistent) throws SimpleQueryException {
+        SelectRequest selectReq = new SelectRequest(describe(), consistent);
         SelectResult result = simpleDB.select(selectReq);
         return new DefaultQueryResult<T>(simpleDB, this, result, getConfiguration().getItemConverter(domainClass, domainName));
     }

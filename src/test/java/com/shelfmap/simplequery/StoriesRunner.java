@@ -16,14 +16,13 @@
 package com.shelfmap.simplequery;
 
 import com.shelfmap.stepsfinder.CandidateStepsFactory;
-import static com.shelfmap.stepsfinder.CandidateStepsFactory.codeLocationFromParentPackage;
-import static com.shelfmap.stepsfinder.CandidateStepsFactory.packagePath;
 import com.shelfmap.stepsfinder.MyDateConverter;
 import static java.util.Arrays.asList;
 import static org.apache.commons.collections.CollectionUtils.transform;
 import java.util.List;
 import org.apache.commons.collections.Transformer;
 import org.jbehave.core.configuration.MostUsefulConfiguration;
+import org.jbehave.core.io.CodeLocations;
 import org.jbehave.core.io.StoryFinder;
 import org.jbehave.core.junit.JUnitStories;
 import org.jbehave.core.reporters.Format;
@@ -58,19 +57,20 @@ public class StoriesRunner extends JUnitStories {
         return configuration;
     }    
     
+    protected String getStoryPathInClasspath() {
+        return "stories";
+    }
+    
     @Override
     protected List<String> storyPaths() {
-        final String classPath = packagePath(this.getClass());
-        List<String> paths = new StoryFinder().findPaths(
-                codeLocationFromParentPackage(this.getClass()).getFile(),
-                asList("**/*.story"),
-                null);
+        final String directory = CodeLocations.codeLocationFromClass(getClass()).getFile() + getStoryPathInClasspath();
+        List<String> paths = new StoryFinder().findPaths(directory, asList("**/*.story"), null);
 
         transform(paths, new Transformer() {
 
             @Override
             public Object transform(Object input) {
-                return classPath + input;
+                return getStoryPathInClasspath() + "/" + input;
             }
         });
 

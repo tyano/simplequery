@@ -204,8 +204,7 @@
                 <configuration>
                     <useFile>false</useFile>
                     <includes>
-                        <include>**/*Test.class</include>
-                        <include>**/*Runner.class</include>
+                        <include>**/StoriesRunner.class</include>
                     </includes>
                 </configuration>
             </plugin>            

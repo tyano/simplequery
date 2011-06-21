@@ -16,7 +16,7 @@
 
 package com.shelfmap.simplequery.expression;
 
-import com.shelfmap.specsfinder.StoryRunner;
+import com.shelfmap.stepsfinder.StoryRunner;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 

@@ -24,7 +24,7 @@ import static org.junit.Assert.*;
 import static com.shelfmap.simplequery.expression.matcher.MatcherFactory.*;
 import com.shelfmap.simplequery.Domain;
 import com.shelfmap.simplequery.IntAttribute;
-import com.shelfmap.specsfinder.Steps;
+import com.shelfmap.stepsfinder.Steps;
 import java.io.File;
 import java.io.IOException;
 import org.hamcrest.Matchers;

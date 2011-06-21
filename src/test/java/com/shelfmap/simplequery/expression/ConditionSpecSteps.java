@@ -20,7 +20,7 @@ import static com.shelfmap.simplequery.expression.Conditions.group;
 import static com.shelfmap.simplequery.expression.Conditions.condition;
 import static org.junit.Assert.assertThat;
 import static com.shelfmap.simplequery.expression.matcher.MatcherFactory.*;
-import com.shelfmap.specsfinder.Steps;
+import com.shelfmap.stepsfinder.Steps;
 import org.hamcrest.Matchers;
 import org.jbehave.core.annotations.Then;
 import org.jbehave.core.annotations.When;

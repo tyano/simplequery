@@ -16,7 +16,7 @@
 
 package com.shelfmap.simplequery.expression;
 
-import com.shelfmap.specsfinder.StoryRunner;
+import com.shelfmap.stepsfinder.StoryRunner;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
@@ -25,5 +25,5 @@ import org.junit.runners.JUnit4;
  * @author Tsutomu YANO
  */
 @RunWith(JUnit4.class)
-public class ConditionSpec extends StoryRunner{
+public class ConditionSpec extends StoryRunner {
 }

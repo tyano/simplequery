@@ -53,7 +53,8 @@ public abstract class BaseStoryRunner extends JUnitStory {
                         .withDefaultFormats())
                 .useParameterConverters(new ParameterConverters().addConverters(new MyDateConverter()))
                 .useStoryPathResolver(storyPathResolver)
-                .useStepFinder(new StepFinder(new StepFinder.ByLevenshteinDistance()));
+                .useStepFinder(new StepFinder(new StepFinder.ByLevenshteinDistance()))
+                .useStoryLoader(new EncodingAppliableStoryLoader("UTF-8"));
 
         useConfiguration(configuration);
         configuredEmbedder().embedderControls()

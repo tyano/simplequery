@@ -7,7 +7,7 @@
     <version>1.0-SNAPSHOT</version>
     <name>simplequery</name>
     <url>http://maven.apache.org</url>
-    
+
     <licenses>
         <license>
             <name>The Apache Software License, Version 2.0</name>
@@ -15,20 +15,7 @@
             <distribution>repo</distribution>
         </license>
     </licenses>
-    <repositories>
-        <repository>
-            <id>scala-tools-repo</id>
-            <name>scala-tools.org</name>
-            <url>http://www.scala-tools.org/repo-releases/</url>
-        </repository>
-    </repositories>
-    <pluginRepositories>
-        <pluginRepository>
-            <id>scala-tools-plugin-repo</id>
-            <name>scala-tools.org</name>
-            <url>http://www.scala-tools.org/repo-releases/</url>
-        </pluginRepository>
-    </pluginRepositories>
+
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
@@ -39,13 +26,6 @@
             <version>4.8.2</version>
             <scope>test</scope>
         </dependency>
-        
-        <dependency>
-            <groupId>com.amazonaws</groupId>
-            <artifactId>aws-java-sdk</artifactId>
-            <version>1.1.5</version>
-            <type>jar</type>
-        </dependency>
         <dependency>
             <groupId>org.hamcrest</groupId>
             <artifactId>hamcrest-all</artifactId>
@@ -54,27 +34,16 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>com.shelfmap</groupId>
-            <artifactId>jbehave-stepsfinder</artifactId>
-            <version>3.4.5-SNAPSHOT</version>
+            <groupId>org.jbehave</groupId>
+            <artifactId>jbehave-core</artifactId>
+            <version>3.4.5</version>
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.scala-lang</groupId>
-            <artifactId>scala-library</artifactId>
-            <version>2.8.1</version>
+            <groupId>org.jbehave</groupId>
+            <artifactId>jbehave-guice</artifactId>
+            <version>3.4.5</version>
             <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.scalatest</groupId>
-            <artifactId>scalatest</artifactId>
-            <version>1.3</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-            <version>1.6.1</version>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
@@ -82,8 +51,21 @@
             <version>1.6.1</version>
             <scope>test</scope>
         </dependency>
+
+
+        <dependency>
+            <groupId>com.amazonaws</groupId>
+            <artifactId>aws-java-sdk</artifactId>
+            <version>1.1.5</version>
+            <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>1.6.1</version>
+        </dependency>
     </dependencies>
-    
+
     <build>
         <resources>
             <resource>
@@ -98,16 +80,6 @@
                 </includes>
                 <excludes>
                     <exclude>**/*.java</exclude>
-                </excludes>
-            </resource>
-            <resource>
-                <filtering>false</filtering>
-                <directory>src/main/scala</directory>
-                <includes>
-                    <include>**</include>
-                </includes>
-                <excludes>
-                    <exclude>**/.scala</exclude>
                 </excludes>
             </resource>
         </resources>
@@ -126,18 +98,8 @@
                     <exclude>**/*.java</exclude>
                 </excludes>
             </testResource>
-            <testResource>
-                <filtering>false</filtering>
-                <directory>src/test/scala</directory>
-                <includes>
-                    <include>**</include>
-                </includes>
-                <excludes>
-                    <exclude>**/*.scala</exclude>
-                </excludes>
-            </testResource>
         </testResources>
-        
+
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -149,7 +111,7 @@
                     <encoding>${project.build.sourceEncoding}</encoding>
                 </configuration>
             </plugin>
-            
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-resources-plugin</artifactId>
@@ -158,57 +120,13 @@
                     <encoding>${project.build.sourceEncoding}</encoding>
                 </configuration>
             </plugin>
-            
-            <plugin>
-                <groupId>org.scala-tools</groupId>
-                <artifactId>maven-scala-plugin</artifactId>
-                <version>2.15.2</version>
-                <configuration>
-                    <launchers>
-                        <launcher>
-                            <id>testing</id>
-                            <mainClass>org.scalatest.tools.Runner</mainClass>
-                            <args>
-                                <arg>-p</arg>
-                                <arg>target/test-classes</arg>
-                                <arg>-o</arg>
-                                <arg>-w</arg>
-                                <arg>com.shelfmap</arg>
-                            </args>
-                            <jvmArgs>
-                                <jvmArg>-Xmx64m</jvmArg>
-                                <jvmArg>-Djava.util.logging.config.file=${project.home}/logging.properties</jvmArg>
-                            </jvmArgs>
-                        </launcher>
-                        <launcher>
-                            <id>filetest</id>
-                            <mainClass>org.scalatest.tools.Runner</mainClass>
-                            <args>
-                                <arg>-p</arg>
-                                <arg>target/test-classes</arg>
-                                <arg>-o</arg>
-                            </args>
-                            <jvmArgs>
-                                <jvmArg>-Xmx64m</jvmArg>
-                                <jvmArg>-Djava.util.logging.config.file=${project.home}/logging.properties</jvmArg>
-                            </jvmArgs>
-                        </launcher>                        
-                    </launchers>                
-                </configuration>
-            </plugin>
-            
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>2.7.2</version>
-                <configuration>
-                    <useFile>false</useFile>
-                    <includes>
-                        <include>**/StoriesRunner.class</include>
-                    </includes>
-                </configuration>
-            </plugin>            
+            </plugin>
         </plugins>
     </build>
-    
+
 </project>

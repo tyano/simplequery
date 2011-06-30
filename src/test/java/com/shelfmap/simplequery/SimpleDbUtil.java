@@ -15,13 +15,24 @@
  */
 package com.shelfmap.simplequery;
 
-import com.shelfmap.stepsfinder.StoryPath;
-import com.shelfmap.stepsfinder.StoryRunner;
+import com.amazonaws.services.simpledb.model.ReplaceableAttribute;
+import com.amazonaws.services.simpledb.model.ReplaceableItem;
+import java.util.List;
 
 /**
  *
  * @author Tsutomu YANO
  */
-@StoryPath("stories/FlatAttributeSpec.story")
-public class FlatAttributeTest extends StoryRunner {
+public class SimpleDbUtil {
+
+    public SimpleDbUtil() {
+    }
+    
+    public static ReplaceableAttribute attr(String name, String value, boolean replace) {
+        return new ReplaceableAttribute(name, value, replace);
+    }
+
+    public static ReplaceableItem item(String itemName, List<ReplaceableAttribute> attrs) {
+        return new ReplaceableItem(itemName, attrs);
+    }
 }

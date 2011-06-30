@@ -13,12 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.shelfmap.simplequery.expression.matcher;
 
-import static org.hamcrest.Matchers.is;
+import com.shelfmap.simplequery.BaseStoryRunner;
+import com.shelfmap.simplequery.StoryPath;
 import static org.junit.Assert.assertThat;
 import com.shelfmap.simplequery.domain.impl.IntAttributeConverter;
-import com.shelfmap.stepsfinder.Steps;
+import org.hamcrest.Matchers;
 import org.jbehave.core.annotations.Named;
 import org.jbehave.core.annotations.Then;
 import org.jbehave.core.annotations.When;
@@ -27,8 +29,8 @@ import org.jbehave.core.annotations.When;
  *
  * @author Tsutomu YANO
  */
-@Steps
-public class MatcherSpecSteps {
+@StoryPath("stories/MatcherSpec.story")
+public class MatcherTest extends BaseStoryRunner {
 
     private Matcher<?> matcher;
 
@@ -39,7 +41,7 @@ public class MatcherSpecSteps {
 
     @Then("the converted value must be \"<resultValue>\".")
     public void assertConvertedValue(@Named("resultValue") String expected) {
-        assertThat(matcher.describe(), is(expected));
+        assertThat(matcher.describe(), Matchers.is(expected));
     }
 
     @When("the int value is <targetValue>,")
@@ -64,7 +66,7 @@ public class MatcherSpecSteps {
 
     @Then("the result string must be 'is null'")
     public void assertIsNull() {
-        assertThat(matcher.describe(), is("is null"));
+        assertThat(matcher.describe(), Matchers.is("is null"));
     }
 
     @When("a IsNotNullMatcher is described")
@@ -74,7 +76,7 @@ public class MatcherSpecSteps {
 
     @Then("the result string must be 'is not null'")
     public void assertIsNotNull() {
-        assertThat(matcher.describe(), is("is not null"));
+        assertThat(matcher.describe(), Matchers.is("is not null"));
     }
 
     @When("a InMatcher with parameters '$arg1' and '$arg2' is described")
@@ -84,7 +86,7 @@ public class MatcherSpecSteps {
 
     @Then("the result string must be like '$result'")
     public void assertInMatcherResult(String result) {
-        assertThat(matcher.describe(), is(result));
+        assertThat(matcher.describe(), Matchers.is(result));
     }
 
     @When("a InMatcher's parameters are $arg1 and $arg2, and padding = $padding, offset = $offset")

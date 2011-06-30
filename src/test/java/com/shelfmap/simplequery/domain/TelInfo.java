@@ -13,15 +13,38 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.shelfmap.simplequery.domain;
 
-package com.shelfmap.simplequery.expression
+/**
+ *
+ * @author Tsutomu YANO
+ */
+public class TelInfo {
+    private String telNo;
+    private String faxNo;
 
-import com.amazonaws.auth.PropertiesCredentials
-import com.amazonaws.services.simpledb.AmazonSimpleDB
-import com.amazonaws.services.simpledb.AmazonSimpleDBClient
-import java.io.{File => JFile}
+    public TelInfo(String telNo, String faxNo) {
+        this.telNo = telNo;
+        this.faxNo = faxNo;
+    }
 
-trait AWSSecurityCredential {
-    def getSecurityCredentialPath: String = "/Users/t_yano/aws.credential.properties"
-    def getAmazonSimpleDB: AmazonSimpleDB = new AmazonSimpleDBClient(new PropertiesCredentials(new JFile(getSecurityCredentialPath)))
+    public TelInfo() {
+    }
+
+    public String getFaxNo() {
+        return faxNo;
+    }
+
+    public void setFaxNo(String faxNo) {
+        this.faxNo = faxNo;
+    }
+
+    public String getTelNo() {
+        return telNo;
+    }
+
+    public void setTelNo(String telNo) {
+        this.telNo = telNo;
+    }
+
 }

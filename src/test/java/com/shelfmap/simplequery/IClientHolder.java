@@ -13,19 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.shelfmap.simplequery;
 
-import com.shelfmap.stepsfinder.StoryPath;
-import com.shelfmap.stepsfinder.StoryRunner;
-import org.junit.runner.RunWith;
-import org.junit.runners.JUnit4;
+import com.amazonaws.services.simpledb.AmazonSimpleDB;
 
 /**
  *
  * @author Tsutomu YANO
  */
-@RunWith(JUnit4.class)
-@StoryPath("stories/MatcherSpec.story")
-public class MatcherTest extends StoryRunner {
+public interface IClientHolder {
+    AmazonSimpleDB getSimpleDb();
+    void setSimpleDb(AmazonSimpleDB client);
+
+    Client getClient();
+    void setClient(Client client);
+
+    Configuration getConfiguration();
+    void setConfiguration(Configuration configuration);
 }

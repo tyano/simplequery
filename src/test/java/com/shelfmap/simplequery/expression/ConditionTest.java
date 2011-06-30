@@ -15,22 +15,25 @@
  */
 package com.shelfmap.simplequery.expression;
 
-import com.shelfmap.simplequery.domain.impl.IntAttributeConverter;
-import static com.shelfmap.simplequery.expression.Conditions.group;
-import static com.shelfmap.simplequery.expression.Conditions.condition;
-import static org.junit.Assert.assertThat;
+import com.shelfmap.simplequery.BaseStoryRunner;
+import com.shelfmap.simplequery.StoryPath;
+import static com.shelfmap.simplequery.expression.Conditions.*;
 import static com.shelfmap.simplequery.expression.matcher.MatcherFactory.*;
-import com.shelfmap.stepsfinder.Steps;
+import static org.junit.Assert.assertThat;
+import com.shelfmap.simplequery.domain.impl.IntAttributeConverter;
 import org.hamcrest.Matchers;
 import org.jbehave.core.annotations.Then;
 import org.jbehave.core.annotations.When;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
 
 /**
  *
  * @author Tsutomu YANO
  */
-@Steps
-public class ConditionSpecSteps {
+@RunWith(JUnit4.class)
+@StoryPath("stories/ConditionSpec.story")
+public class ConditionTest extends BaseStoryRunner {
 
     Condition<?> condition;
 

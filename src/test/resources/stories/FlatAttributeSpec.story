@@ -1,5 +1,5 @@
 Given a SimpleQuery client
-Given initialized domains
+Given initialized domains for FlatAttribute test
 
 When select an item whose name is 'test-1'
 Then the user should have an Address object whose postalCode is 1640011

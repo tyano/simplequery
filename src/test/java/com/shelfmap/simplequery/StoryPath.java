@@ -13,19 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.shelfmap.simplequery;
 
-import com.shelfmap.stepsfinder.StoryPath;
-import com.shelfmap.stepsfinder.StoryRunner;
-import org.junit.runner.RunWith;
-import org.junit.runners.JUnit4;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
  *
  * @author Tsutomu YANO
  */
-@RunWith(JUnit4.class)
-@StoryPath("stories/WhereExpressionSpec.story")
-public class WhereExpressionTest extends StoryRunner {
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.TYPE)
+public @interface StoryPath {
+    String value();
 }

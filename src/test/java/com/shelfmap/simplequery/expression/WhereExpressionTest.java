@@ -13,18 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.shelfmap.simplequery.expression;
 
-import com.shelfmap.simplequery.expression.impl.Select;
+import static com.shelfmap.simplequery.expression.matcher.MatcherFactory.greaterThan;
+import static org.junit.Assert.assertThat;
 import com.amazonaws.auth.PropertiesCredentials;
 import com.amazonaws.services.simpledb.AmazonSimpleDB;
 import com.amazonaws.services.simpledb.AmazonSimpleDBClient;
+import com.shelfmap.simplequery.BaseStoryRunner;
 import com.shelfmap.simplequery.Configuration;
-import static org.junit.Assert.*;
-import static com.shelfmap.simplequery.expression.matcher.MatcherFactory.*;
 import com.shelfmap.simplequery.Domain;
 import com.shelfmap.simplequery.IntAttribute;
-import com.shelfmap.stepsfinder.Steps;
+import com.shelfmap.simplequery.StoryPath;
+import com.shelfmap.simplequery.expression.impl.Select;
 import java.io.File;
 import java.io.IOException;
 import org.hamcrest.Matchers;
@@ -36,22 +38,21 @@ import org.jbehave.core.annotations.When;
  *
  * @author Tsutomu YANO
  */
-@Steps
-public class WhereExpressionSpecSteps {
-
+@StoryPath("stories/WhereExpressionSpec.story")
+public class WhereExpressionTest extends BaseStoryRunner {
     Expression<?> expression;
     AmazonSimpleDB simpleDB;
     Configuration configuration = new com.shelfmap.simplequery.DefaultConfiguration();
-    
+
     private String getSecurityCredentialPath() {
         return "/Users/t_yano/aws.credential.properties";
     }
-    
+
     @Given("a AmazonSimpleDB client")
     public void createClient() throws IOException {
         simpleDB = new AmazonSimpleDBClient(new PropertiesCredentials(new File(getSecurityCredentialPath())));
     }
-    
+
     @When("TestDomain don't have any @SimpleDBAttribute annotation on it's properties,")
     public void createExpression() {
         expression = new Select(simpleDB, configuration).from(DomainWithoutAttribute.class).where("saving", greaterThan(100000));
@@ -82,7 +83,7 @@ public class WhereExpressionSpecSteps {
         assertThat(expression.describe(), Matchers.is("select * from `without-attributename` where `saving` > '0200500'"));
     }
 
-    
+
     @Domain("testdomain")
     public static interface DomainWithoutAttribute {
 
@@ -95,11 +96,10 @@ public class WhereExpressionSpecSteps {
         @IntAttribute(attributeName = "saving", padding = 8, offset = 1000000)
         int getAccountSaving();
     }
-    
+
     @Domain("without-attributename")
     public static interface DomainWithoutAttributeName {
         @IntAttribute(padding=7, offset=200000)
         int getSaving();
     }
-
 }

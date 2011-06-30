@@ -15,6 +15,7 @@
  */
 package com.shelfmap.simplequery.expression;
 
+import com.shelfmap.simplequery.AWSTestBase;
 import com.amazonaws.services.simpledb.AmazonSimpleDB;
 import com.amazonaws.services.simpledb.model.Attribute;
 import com.amazonaws.services.simpledb.model.CreateDomainRequest;
@@ -27,48 +28,51 @@ import com.amazonaws.services.simpledb.util.SimpleDBUtils;
 import java.util.Arrays;
 import java.util.List;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
 
 /**
  *
  * @author Tsutomu YANO
  */
+@RunWith(JUnit4.class)
 public class CollectionValueTest extends AWSTestBase {
 
     private final AmazonSimpleDB simpleDB = getAmazonSimpleDB();
     private final String domainName = "collectionvalue";
     private final String itemName = "item1";
 
-    
+
     @Test
     public void AmazonSimpleDBにおける多値の扱いについて調べるテスト() throws Exception {
         simpleDB.deleteDomain(new DeleteDomainRequest(domainName));
         simpleDB.createDomain(new CreateDomainRequest(domainName));
-    
+
         ReplaceableAttribute attr1 = new ReplaceableAttribute("color", "blue", false);
         ReplaceableAttribute attr2 = new ReplaceableAttribute("color", "red", false);
-        
+
         PutAttributesRequest req = new PutAttributesRequest()
                                         .withDomainName(domainName)
                                         .withItemName(itemName)
                                         .withAttributes(attr1, attr2);
-        
-        
+
+
         simpleDB.putAttributes(req);
-        
+
         GetAttributesRequest getReq = new GetAttributesRequest(domainName, itemName).withConsistentRead(true);
         GetAttributesResult result = simpleDB.getAttributes(getReq);
-        
+
         for (Attribute attr : result.getAttributes()) {
             System.out.println("name: " + attr.getName() + "\tvalue: " + attr.getValue());
         }
     }
-    
+
     @Test
     public void コレクションのクオートの動作をテスト() throws Exception {
         List<String> values = Arrays.asList("test1", "test2", "test3");
         System.out.println("コレクションのクォート: " + SimpleDBUtils.quoteValues(values));
     }
-    
+
     @Test
     public void クォートしたコレクションをValueに設定するとどうなるか() throws Exception {
         List<String> values = Arrays.asList("test1", "test2", "test3");
@@ -82,15 +86,15 @@ public class CollectionValueTest extends AWSTestBase {
                                         .withDomainName(domainName)
                                         .withItemName(itemName)
                                         .withAttributes(attr1);
-        
-        
+
+
         simpleDB.putAttributes(req);
-        
+
         GetAttributesRequest getReq = new GetAttributesRequest(domainName, itemName).withConsistentRead(true);
         GetAttributesResult result = simpleDB.getAttributes(getReq);
-        
+
         for (Attribute attr : result.getAttributes()) {
             System.out.println("name: " + attr.getName() + "\tvalue: " + attr.getValue());
-        }        
+        }
     }
 }

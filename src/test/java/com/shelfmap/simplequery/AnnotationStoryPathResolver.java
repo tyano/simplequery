@@ -13,19 +13,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.shelfmap.simplequery;
 
-import com.shelfmap.stepsfinder.StoryPath;
-import com.shelfmap.stepsfinder.StoryRunner;
-import org.junit.runner.RunWith;
-import org.junit.runners.JUnit4;
+import org.jbehave.core.Embeddable;
+import org.jbehave.core.io.StoryPathResolver;
 
 /**
  *
  * @author Tsutomu YANO
  */
-@RunWith(JUnit4.class)
-@StoryPath("stories/ConditionSpec.story")
-public class ConditionTest extends StoryRunner {
+public class AnnotationStoryPathResolver implements StoryPathResolver {
+
+    public AnnotationStoryPathResolver() {
+        super();
+    }
+
+    @Override
+    public String resolve(Class<? extends Embeddable> embeddableClass) {
+        StoryPath storyPath = embeddableClass.getAnnotation(StoryPath.class);
+        if(storyPath == null) {
+            throw new IllegalStateException("You must put @StoryPath annotation on your Embedder for assigning the path for your story file.");
+        }
+        
+        return storyPath.value();
+    }
 }

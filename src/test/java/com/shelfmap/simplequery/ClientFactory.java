@@ -13,23 +13,44 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.shelfmap.simplequery.expression;
+package com.shelfmap.simplequery;
 
 import com.amazonaws.auth.PropertiesCredentials;
 import com.amazonaws.services.simpledb.AmazonSimpleDB;
 import com.amazonaws.services.simpledb.AmazonSimpleDBClient;
+import com.google.inject.Inject;
 import java.io.File;
 import java.io.IOException;
+import org.jbehave.core.annotations.Given;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
  * @author Tsutomu YANO
  */
-public class AWSTestBase {
+public class ClientFactory {
+    private static final Logger LOGGER = LoggerFactory.getLogger(ClientFactory.class);
+
+    @Inject
+    IClientHolder holder;
+
+    @Given("a SimpleQuery client")
+    public void createClinet() {
+        LOGGER.debug("create client.");
+
+        AmazonSimpleDB simpleDb = getAmazonSimpleDB();
+        Configuration conf = new com.shelfmap.simplequery.DefaultConfiguration();
+
+        holder.setSimpleDb(getAmazonSimpleDB());
+        holder.setClient(new SimpleQueryClient(simpleDb, conf));
+        holder.setConfiguration(conf);
+    }
+
     public String getSecurityCredentialPath() {
         return "/Users/t_yano/aws.credential.properties";
     }
-    
+
     public AmazonSimpleDB getAmazonSimpleDB() {
         try {
             return new AmazonSimpleDBClient(new PropertiesCredentials(new File(getSecurityCredentialPath())));

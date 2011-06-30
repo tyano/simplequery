@@ -38,7 +38,7 @@ import org.slf4j.LoggerFactory;
  */
 public class DefaultItemConverter<T> implements ItemConverter<T> {
     private static final Logger LOGGER = LoggerFactory.getLogger(DefaultItemConverter.class);
-    
+
     private final Class<T> domainClass;
     private final String domainName;
     private final Configuration configuration;
@@ -54,13 +54,13 @@ public class DefaultItemConverter<T> implements ItemConverter<T> {
         this.configuration = configuration;
         this.instanceFactory = configuration.getInstanceFactory(domainClass, domainName);
     }
-    
+
     @Override
     public T convert(Item item) throws CanNotConvertItemException {
         if(domainAttributes == null) {
             domainAttributes = getConfiguration().getDomainAttributes(domainClass, domainName);
         }
-        
+
         T instance = instanceFactory.createInstance(getDomainClass());
         for (Attribute attr : item.getAttributes()) {
             DomainAttribute<?,?> domainAttribute = null;
@@ -75,16 +75,16 @@ public class DefaultItemConverter<T> implements ItemConverter<T> {
         }
         return instance;
     }
-    
+
     private <VT,CT> void writeValueToDomain(DomainAttribute<VT,CT> domainAttribute, T instance, String attributeValue) throws CanNotRestoreAttributeException, CanNotConvertItemException {
         if(domainAttribute != null) {
             Class<VT> valueType = domainAttribute.getValueType();
             Class<CT> containerType = domainAttribute.getContainerType();
-            
+
             VT convertedValue = domainAttribute.getAttributeConverter().restoreValue(attributeValue);
             AttributeAccessor<CT> accessor = domainAttribute.getAttributeAccessor();
-            LOGGER.debug("valueType: " + valueType.getCanonicalName());
-            LOGGER.debug("containerType: " + containerType.getCanonicalName());
+            LOGGER.trace("valueType: " + valueType.getCanonicalName());
+            LOGGER.trace("containerType: " + containerType.getCanonicalName());
             if(valueType.equals(containerType)) {
                 accessor.write(instance, containerType.cast(convertedValue));
             } else if(containerType.isArray()) {

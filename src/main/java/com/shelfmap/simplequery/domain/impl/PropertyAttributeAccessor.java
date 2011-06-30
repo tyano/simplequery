@@ -49,8 +49,8 @@ public class PropertyAttributeAccessor<T> implements AttributeAccessor<T> {
     @Override
     public void write(Object instance, T value) {
         isNotNull("instance", instance);
-        LOGGER.debug("propertyPath = " + propertyPath);
-        
+        LOGGER.trace("propertyPath = " + propertyPath);
+
         String[] paths = propertyPath.split("\\.");
         int pathSize = paths.length;
         Object target = instance;
@@ -63,7 +63,7 @@ public class PropertyAttributeAccessor<T> implements AttributeAccessor<T> {
                 Method readMethod = descriptor.getReadMethod();
                 Object current = target;
                 target = readMethod.invoke(current, new Object[]{});
-                
+
                 //if a property's value is null, we must create a new instance for the property automatically
                 //and put it into the property.
                 if(target == null) {
@@ -97,12 +97,12 @@ public class PropertyAttributeAccessor<T> implements AttributeAccessor<T> {
         target = newInstance;
         return target;
     }
-    
+
     private <T> T newDomainInstance(Class<T> domainClass, String domainName) {
         InstanceFactory<T> factory = configuration.getInstanceFactory(domainClass, domainName);
         return factory.createInstance(domainClass);
     }
-    
+
     private <T> T newObjectInstance(Class<T> clazz) {
         try {
             Constructor<T> constructor = clazz.getConstructor(new Class<?>[0]);

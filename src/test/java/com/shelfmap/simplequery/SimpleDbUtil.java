@@ -17,6 +17,7 @@ package com.shelfmap.simplequery;
 
 import com.amazonaws.services.simpledb.model.ReplaceableAttribute;
 import com.amazonaws.services.simpledb.model.ReplaceableItem;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -35,4 +36,8 @@ public class SimpleDbUtil {
     public static ReplaceableItem item(String itemName, List<ReplaceableAttribute> attrs) {
         return new ReplaceableItem(itemName, attrs);
     }
+    
+    public static ReplaceableItem item(String itemName, ReplaceableAttribute... attrs) {
+        return new ReplaceableItem(itemName, Arrays.asList(attrs));
+    }    
 }

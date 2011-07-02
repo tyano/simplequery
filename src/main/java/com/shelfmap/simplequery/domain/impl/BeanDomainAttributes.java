@@ -229,14 +229,14 @@ public class BeanDomainAttributes implements DomainAttributes {
             Class<? extends AttributeConverter<?>> converterClass = annotation.attributeConverter();
 
             AttributeConverter<?> converter =
-                    (converterClass.equals(DefaultAttributeConverter.class))
+                    (converterClass.equals(NullAttributeConverter.class))
                     ? new DefaultAttributeConverter<VT>(valueType)
                     : converterClass.newInstance();
             return new DefaultDomainAttribute<VT,CT>(getDomainName(), attributeName, valueType, containerType, (AttributeConverter<VT>) converter, newAttributeAccessor(containerType, fullPropertyPath(propertyName)));
         } catch (InstantiationException ex) {
-            throw new IllegalArgumentException("Can not instanciate a converter. possible cause is that the converter class specified in @SimpleDBAttribute do not have a default constructor.", ex);
+            throw new IllegalArgumentException("Can not instanciate a converter. possible cause is that the converter class specified in @Attribute do not have a default constructor.", ex);
         } catch (IllegalAccessException ex) {
-            throw new IllegalStateException("Can not instanciate a converter, because we could not be able to access the default constructor of the converter class specified in a @SimpleDBAttribute annotation.", ex);
+            throw new IllegalStateException("Can not instanciate a converter, because we could not be able to access the default constructor of the converter class specified in a @Attribute annotation.", ex);
         }
     }
     

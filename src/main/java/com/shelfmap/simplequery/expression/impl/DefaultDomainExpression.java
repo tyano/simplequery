@@ -28,6 +28,7 @@ import com.shelfmap.simplequery.expression.SelectQuery;
 import com.shelfmap.simplequery.expression.SortOrder;
 import com.shelfmap.simplequery.expression.matcher.Matcher;
 import com.shelfmap.simplequery.expression.WhereExpression;
+import com.shelfmap.simplequery.expression.matcher.MatcherFactory;
 
 /**
  *
@@ -61,6 +62,11 @@ public class DefaultDomainExpression<T> extends BaseExpression<T> implements Dom
     public WhereExpression<T> where(String attributeName, Matcher<?> matcher) {
         Condition<?> condition = newCondition(attributeName, matcher);
         return this.where(condition);
+    }
+    
+    @Override
+    public WhereExpression<T> whereItemName(Matcher<?> matcher) {
+        return this.where("itemName()", matcher);
     }
 
     @Override

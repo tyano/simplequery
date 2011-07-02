@@ -53,7 +53,7 @@ public class WhereExpressionTest extends BaseStoryRunner {
         simpleDB = new AmazonSimpleDBClient(new PropertiesCredentials(new File(getSecurityCredentialPath())));
     }
 
-    @When("TestDomain don't have any @SimpleDBAttribute annotation on it's properties,")
+    @When("TestDomain don't have any @Attribute annotation on it's properties,")
     public void createExpression() {
         expression = new Select(simpleDB, configuration).from(DomainWithoutAttribute.class).where("saving", greaterThan(100000));
     }
@@ -63,7 +63,7 @@ public class WhereExpressionTest extends BaseStoryRunner {
         assertThat(expression.describe(), Matchers.is("select * from `testdomain` where `saving` > '100000'"));
     }
 
-    @When("TestDomain have a @SimpleDBAttribute on a property whose name is same with the attribute specified in a expression")
+    @When("TestDomain have a @Attribute on a property whose name is same with the attribute specified in a expression")
     public void createExpressionWithAnnotation() {
         expression = new Select(simpleDB, configuration).from(DomainWithAttribute.class).where("saving", greaterThan(100000));
     }
@@ -73,7 +73,7 @@ public class WhereExpressionTest extends BaseStoryRunner {
         assertThat(expression.describe(), Matchers.is("select * from `with-attribute` where `saving` > '01100000'"));
     }
 
-    @When("a property have a @SimpleDBAttribute annotation, but the annotation don't have attributeName,")
+    @When("a property have a @Attribute annotation, but the annotation don't have attributeName,")
     public void createExpressionWithoutAttributeName() {
         expression = new Select(simpleDB, configuration).from(DomainWithoutAttributeName.class).where("saving", greaterThan(500));
     }

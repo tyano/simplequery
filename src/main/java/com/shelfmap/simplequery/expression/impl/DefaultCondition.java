@@ -22,6 +22,8 @@ import static com.shelfmap.simplequery.util.Assertion.isNotNull;
 import com.shelfmap.simplequery.expression.Condition;
 import com.shelfmap.simplequery.expression.matcher.Matcher;
 import com.shelfmap.simplequery.expression.Operator;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  *
@@ -33,6 +35,9 @@ public class DefaultCondition<T> implements Condition<T> {
     private Operator operator;
     private String attributeName;
     private Matcher<T> matcher;
+    
+    public static final List<String> SIMPLEDB_FUNCTION_LIST = Arrays.asList("itemName()");
+    
 
     public DefaultCondition(String attributeName, Matcher<T> matcher) {
         isNotNull("attributeName", attributeName);
@@ -98,7 +103,9 @@ public class DefaultCondition<T> implements Condition<T> {
         
         sb.append(getParent().describe());
         sb.append(getOperator().describe());
-        sb.append(SimpleDBUtils.quoteName(getAttributeName())).append(" ").append(getMatcher().describe());
+        
+        final String attributeName = SIMPLEDB_FUNCTION_LIST.contains(getAttributeName()) ? getAttributeName() : SimpleDBUtils.quoteName(getAttributeName());
+        sb.append(attributeName).append(" ").append(getMatcher().describe());
         
         return sb.toString();
     }

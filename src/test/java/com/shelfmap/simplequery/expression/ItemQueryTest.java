@@ -15,13 +15,14 @@
  */
 package com.shelfmap.simplequery.expression;
 
+import static org.junit.Assert.assertThat;
+import static com.shelfmap.simplequery.expression.matcher.MatcherFactory.is;
 import static java.util.Arrays.asList;
 import static com.shelfmap.simplequery.SimpleDbUtil.*;
 import com.amazonaws.services.simpledb.AmazonSimpleDB;
 import com.amazonaws.services.simpledb.model.BatchPutAttributesRequest;
 import com.amazonaws.services.simpledb.model.CreateDomainRequest;
 import com.amazonaws.services.simpledb.model.DeleteDomainRequest;
-import com.amazonaws.services.simpledb.model.PutAttributesRequest;
 import com.amazonaws.services.simpledb.model.ReplaceableItem;
 import com.google.inject.Binder;
 import com.google.inject.Inject;
@@ -33,9 +34,13 @@ import com.shelfmap.simplequery.Domain;
 import com.shelfmap.simplequery.IClientHolder;
 import com.shelfmap.simplequery.StoryPath;
 import com.shelfmap.simplequery.TestContext;
+import com.shelfmap.simplequery.expression.impl.Select;
+import com.shelfmap.simplequery.expression.matcher.MatcherFactory;
 import java.util.Arrays;
 import java.util.List;
+import org.hamcrest.Matchers;
 import org.jbehave.core.annotations.Given;
+import org.jbehave.core.annotations.Pending;
 import org.jbehave.core.annotations.Then;
 import org.jbehave.core.annotations.When;
 
@@ -45,11 +50,11 @@ import org.jbehave.core.annotations.When;
  */
 @StoryPath("stories/ItemQuery.story")
 public class ItemQueryTest extends BaseStoryRunner {
+
     private static final String DOMAIN_NAME = "item-test-domain";
-    
     @Inject
     private TestContext ctx;
-    
+
     @Override
     protected void configureTestContext(Binder binder) {
         binder.bind(IClientHolder.class).to(TestContext.class).in(Scopes.SINGLETON);
@@ -67,31 +72,54 @@ public class ItemQueryTest extends BaseStoryRunner {
         AmazonSimpleDB simpleDb = ctx.getSimpleDb();
         simpleDb.deleteDomain(new DeleteDomainRequest(DOMAIN_NAME));
         simpleDb.createDomain(new CreateDomainRequest(DOMAIN_NAME));
-        
+
         List<ReplaceableItem> items = asList(
-                    item("firstItem", attr("sample-value", "this is sample.", true)));
-        
+                item("firstItem", attr("sample-value", "this is sample.", true)));
+
         simpleDb.batchPutAttributes(new BatchPutAttributesRequest(DOMAIN_NAME, items));
     }
 
+    @Pending
     @When("querying with the item name from a test domain")
     public void selectByItemName() {
     }
 
+    @Pending
     @Then("we can get the only one record from the test domain")
     public void assertResultItem() {
     }
 
+    @Pending
     @When("there is no record matching the specified item's name")
     public void selectNonExistingItem() {
     }
 
+    @Pending
     @Then("the return value must be a null")
     public void assertResultIsNull() {
     }
+
     
+    private Expression<ItemTestDomain> exp;
+    
+    @When("the expression is created with 'is' matcher")
+    public void createItemQueryWithIs() {
+        exp = new Select(ctx.getSimpleDb(), ctx.getConfiguration(), "*").from(ItemTestDomain.class).whereItemName(is("firstItem"));
+    }
+
+    @Then("the result string must be -> $resultExp")
+    public void assertExpression(String resultExp) {
+        assertThat(exp.describe(), Matchers.is(resultExp));
+    }
+
+    @When("the expression is created with 'in' matcher")
+    public void createItemQueryWithIn() {
+        exp = new Select(ctx.getSimpleDb(), ctx.getConfiguration(), "*").from(ItemTestDomain.class).whereItemName(MatcherFactory.in("firstItem", "secondItem"));
+    }
+
     @Domain(DOMAIN_NAME)
     private static class ItemTestDomain {
+
         private String itemName;
         private String sampleValue;
 
@@ -103,7 +131,7 @@ public class ItemQueryTest extends BaseStoryRunner {
             this.itemName = itemName;
         }
 
-        @Attribute(attributeName="sample-value")
+        @Attribute(attributeName = "sample-value")
         public String getSampleValue() {
             return sampleValue;
         }

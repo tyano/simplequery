@@ -13,8 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.shelfmap.simplequery;
 
+package com.shelfmap.simplequery.annotation;
+
+import com.shelfmap.simplequery.domain.AttributeConverter;
+import com.shelfmap.simplequery.domain.impl.NullAttributeConverter;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -26,6 +29,7 @@ import java.lang.annotation.Target;
  */
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface FlatAttribute {
-
+public @interface Attribute {
+    String attributeName() default "";
+    Class<? extends AttributeConverter<?>> attributeConverter() default NullAttributeConverter.class;
 }

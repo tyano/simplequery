@@ -14,10 +14,8 @@
  * limitations under the License.
  */
 
-package com.shelfmap.simplequery;
+package com.shelfmap.simplequery.annotation;
 
-import com.shelfmap.simplequery.domain.AttributeConverter;
-import com.shelfmap.simplequery.domain.impl.NullAttributeConverter;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -29,7 +27,9 @@ import java.lang.annotation.Target;
  */
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface Attribute {
+public @interface FloatAttribute {
     String attributeName() default "";
-    Class<? extends AttributeConverter<?>> attributeConverter() default NullAttributeConverter.class;
+    int maxDigitLeft() default 0;
+    int maxDigitRight() default 0;
+    int offset() default 0;
 }

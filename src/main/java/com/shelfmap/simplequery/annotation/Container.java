@@ -13,8 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-package com.shelfmap.simplequery;
+package com.shelfmap.simplequery.annotation;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -25,11 +24,9 @@ import java.lang.annotation.Target;
  *
  * @author Tsutomu YANO
  */
-@Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface FloatAttribute {
-    String attributeName() default "";
-    int maxDigitLeft() default 0;
-    int maxDigitRight() default 0;
-    int offset() default 0;
+@Target(ElementType.METHOD)
+public @interface Container {
+    Class<?> valueType();
+    Class<?> containerType();
 }

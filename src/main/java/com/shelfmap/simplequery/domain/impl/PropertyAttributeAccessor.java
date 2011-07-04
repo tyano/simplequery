@@ -16,7 +16,7 @@
 package com.shelfmap.simplequery.domain.impl;
 
 import com.shelfmap.simplequery.Configuration;
-import com.shelfmap.simplequery.Domain;
+import com.shelfmap.simplequery.annotation.Domain;
 import com.shelfmap.simplequery.InstanceFactory;
 import static com.shelfmap.simplequery.util.Assertion.*;
 import com.shelfmap.simplequery.domain.AttributeAccessor;

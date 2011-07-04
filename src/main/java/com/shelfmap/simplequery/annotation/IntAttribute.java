@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.shelfmap.simplequery;
+package com.shelfmap.simplequery.annotation;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

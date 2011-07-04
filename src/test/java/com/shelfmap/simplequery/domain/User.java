@@ -15,9 +15,9 @@
  */
 package com.shelfmap.simplequery.domain;
 
-import com.shelfmap.simplequery.Domain;
-import com.shelfmap.simplequery.FlatAttribute;
-import com.shelfmap.simplequery.IntAttribute;
+import com.shelfmap.simplequery.annotation.Domain;
+import com.shelfmap.simplequery.annotation.FlatAttribute;
+import com.shelfmap.simplequery.annotation.IntAttribute;
 
 /**
  *

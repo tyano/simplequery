@@ -1,7 +1,7 @@
 package com.shelfmap.simplequery.expression;
 
-import com.shelfmap.simplequery.Domain;
-import com.shelfmap.simplequery.IntAttribute;
+import com.shelfmap.simplequery.annotation.Domain;
+import com.shelfmap.simplequery.annotation.IntAttribute;
 
 /*
  * Copyright 2011 Tsutomu YANO.

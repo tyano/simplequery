@@ -13,8 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.shelfmap.simplequery;
 
+package com.shelfmap.simplequery.annotation;
+
+import com.shelfmap.simplequery.AttributeType;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -24,9 +26,9 @@ import java.lang.annotation.Target;
  *
  * @author Tsutomu YANO
  */
+@Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.METHOD)
-public @interface Container {
-    Class<?> valueType();
-    Class<?> containerType();
+public @interface Domain {
+    String value();
+    AttributeType attributeType() default AttributeType.PROPERTY;
 }

@@ -15,6 +15,7 @@
  */
 package com.shelfmap.simplequery;
 
+import com.shelfmap.simplequery.annotation.Domain;
 import com.amazonaws.services.simpledb.AmazonSimpleDB;
 import com.amazonaws.services.simpledb.model.BatchPutAttributesRequest;
 import com.amazonaws.services.simpledb.model.CreateDomainRequest;

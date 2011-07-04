@@ -74,6 +74,20 @@ public class DefaultItemConverter<T> implements ItemConverter<T> {
             }
         }
         
+        //Fill all collection properties with empty collection
+        for (DomainAttribute<?,?> domainAttribute : domainAttributes) {
+            if(domainAttribute.getContainerType().isArray() || Collection.class.isAssignableFrom(domainAttribute.getContainerType())) {
+                Object value = domainAttribute.getAttributeAccessor().read(instance);
+                if(value == null) {
+                    try {
+                        writeValueToDomain(domainAttribute, instance, null);
+                    } catch (CanNotRestoreAttributeException ex) {
+                        throw new CanNotConvertItemException("could not write a attribute: " + domainAttribute.getAttributeName() + " for the item: " + item.getName(), ex, item);
+                    }
+                }
+            }
+        }
+        
         DomainAttribute<String,String> itemNameAttribute = domainAttributes.getItemNameAttribute();
         String itemNameValue = item.getName();
         if(itemNameAttribute != null) {
@@ -96,22 +110,34 @@ public class DefaultItemConverter<T> implements ItemConverter<T> {
                 accessor.write(instance, containerType.cast(convertedValue));
             } else if(containerType.isArray()) {
                 CT prev = accessor.read(instance);
-                int prevLength = Array.getLength(prev);
-                Object newArray = Array.newInstance(containerType, prevLength+1);
-                for(int i = 0; i < prevLength; i++) {
-                    Object o = Array.get(prev, i);
-                    Array.set(newArray, i, o);
+                if(attributeValue == null) {
+                    if(prev == null) {
+                        Object newArray = Array.newInstance(containerType, 0);
+                        accessor.write(instance, containerType.cast(newArray));
+                    }
+                } else {
+                    int prevLength = prev == null ? 0 : Array.getLength(prev);
+                    Object newArray = Array.newInstance(containerType, prevLength+1);
+                    for(int i = 0; i < prevLength; i++) {
+                        Object o = Array.get(prev, i);
+                        Array.set(newArray, i, o);
+                    }
+                    Array.set(newArray, prevLength, convertedValue);
+                    accessor.write(instance, containerType.cast(newArray));
                 }
-                Array.set(newArray, prevLength+1, convertedValue);
-                accessor.write(instance, containerType.cast(newArray));
             } else if(Collection.class.isAssignableFrom(containerType)) {
                 try {
                     @SuppressWarnings("unchecked")
                     Collection<VT> prev = (Collection<VT>) accessor.read(instance);
+                    
                     @SuppressWarnings("unchecked")
                     Collection<VT> newCol = (Collection<VT>) containerType.newInstance();
-                    newCol.addAll(prev);
-                    newCol.add(convertedValue);
+                    if(prev != null) {
+                        newCol.addAll(prev);
+                    }
+                    if(attributeValue != null) {
+                        newCol.add(convertedValue);
+                    }
                     accessor.write(instance, containerType.cast(newCol));
                 } catch (InstantiationException ex) {
                     throw new IllegalStateException("Could not instantiate a collection: " + containerType.getCanonicalName(), ex);

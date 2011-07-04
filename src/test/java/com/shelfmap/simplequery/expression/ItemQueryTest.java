@@ -15,10 +15,14 @@
  */
 package com.shelfmap.simplequery.expression;
 
-import static org.junit.Assert.assertThat;
-import static com.shelfmap.simplequery.expression.matcher.MatcherFactory.is;
-import static java.util.Arrays.asList;
-import static com.shelfmap.simplequery.SimpleDbUtil.*;
+import java.util.Arrays;
+import java.util.List;
+
+import org.hamcrest.Matchers;
+import org.jbehave.core.annotations.Given;
+import org.jbehave.core.annotations.Then;
+import org.jbehave.core.annotations.When;
+
 import com.amazonaws.services.simpledb.AmazonSimpleDB;
 import com.amazonaws.services.simpledb.model.BatchPutAttributesRequest;
 import com.amazonaws.services.simpledb.model.CreateDomainRequest;
@@ -27,22 +31,26 @@ import com.amazonaws.services.simpledb.model.ReplaceableItem;
 import com.google.inject.Binder;
 import com.google.inject.Inject;
 import com.google.inject.Scopes;
-import com.shelfmap.simplequery.Attribute;
+
 import com.shelfmap.simplequery.BaseStoryRunner;
 import com.shelfmap.simplequery.ClientFactory;
-import com.shelfmap.simplequery.Domain;
 import com.shelfmap.simplequery.IClientHolder;
 import com.shelfmap.simplequery.StoryPath;
 import com.shelfmap.simplequery.TestContext;
+import com.shelfmap.simplequery.annotation.Attribute;
+import com.shelfmap.simplequery.annotation.Domain;
+import com.shelfmap.simplequery.annotation.ItemName;
 import com.shelfmap.simplequery.expression.impl.Select;
 import com.shelfmap.simplequery.expression.matcher.MatcherFactory;
-import java.util.Arrays;
-import java.util.List;
-import org.hamcrest.Matchers;
-import org.jbehave.core.annotations.Given;
-import org.jbehave.core.annotations.Pending;
-import org.jbehave.core.annotations.Then;
-import org.jbehave.core.annotations.When;
+
+import static java.util.Arrays.asList;
+
+import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.nullValue;
+import static org.junit.Assert.assertThat;
+
+import static com.shelfmap.simplequery.SimpleDbUtil.*;
+import static com.shelfmap.simplequery.expression.matcher.MatcherFactory.is;
 
 /**
  *
@@ -79,26 +87,29 @@ public class ItemQueryTest extends BaseStoryRunner {
         simpleDb.batchPutAttributes(new BatchPutAttributesRequest(DOMAIN_NAME, items));
     }
 
-    @Pending
+    ItemTestDomain result;
+    
     @When("querying with the item name from a test domain")
-    public void selectByItemName() {
+    public void selectByItemName() throws SimpleQueryException, MultipleResultsExistException {
+        result = ctx.getClient().select().from(ItemTestDomain.class).whereItemName(is("firstItem")).getSingleResult(true);
     }
 
-    @Pending
     @Then("we can get the only one record from the test domain")
     public void assertResultItem() {
+        assertThat(result, Matchers.is(notNullValue()));
+        assertThat(result.getItemName(), Matchers.is("firstItem"));
+        assertThat(result.getSampleValue(), Matchers.is("this is sample."));
     }
 
-    @Pending
     @When("there is no record matching the specified item's name")
-    public void selectNonExistingItem() {
+    public void selectNonExistingItem() throws SimpleQueryException, MultipleResultsExistException {
+        result = ctx.getClient().select().from(ItemTestDomain.class).whereItemName(is("secondItem")).getSingleResult(true);
     }
 
-    @Pending
     @Then("the return value must be a null")
     public void assertResultIsNull() {
+        assertThat(result, Matchers.is(nullValue()));
     }
-
     
     private Expression<ItemTestDomain> exp;
     
@@ -118,11 +129,12 @@ public class ItemQueryTest extends BaseStoryRunner {
     }
 
     @Domain(DOMAIN_NAME)
-    private static class ItemTestDomain {
+    public static class ItemTestDomain {
 
         private String itemName;
         private String sampleValue;
 
+        @ItemName
         public String getItemName() {
             return itemName;
         }

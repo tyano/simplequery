@@ -150,11 +150,11 @@ public class PropertyAttributeAccessor<T> implements AttributeAccessor<T> {
             return (T) target;
 
         } catch (IllegalAccessException ex) {
-            throw new IllegalStateException("Could not access to a property of a class for a security reason. propertyName: " + path + ", class: " + target.getClass().getCanonicalName() + ", full property-path: " + propertyPath);
+            throw new IllegalStateException("Could not access to a property of a class for a security reason. propertyName: " + path + ", class: " + target.getClass().getCanonicalName() + ", full property-path: " + propertyPath, ex);
         } catch (InvocationTargetException ex) {
-            throw new IllegalStateException("An exception has been thrown by accessing a property on the class. propertyName: " + path + ", class: " + target.getClass().getCanonicalName() + ", full property-path: " + propertyPath);
+            throw new IllegalStateException("An exception has been thrown by accessing a property on the class. propertyName: " + path + ", class: " + target.getClass().getCanonicalName() + ", full property-path: " + propertyPath, ex);
         } catch (IntrospectionException ex) {
-            throw new IllegalStateException("Could not introspect a bean. the class of the target bean is: " + target.getClass().getCanonicalName());
+            throw new IllegalStateException("Could not introspect a bean. the class of the target bean is: " + target.getClass().getCanonicalName(), ex);
         } catch (PropertyNotFoundException ex) {
             return null;
         }

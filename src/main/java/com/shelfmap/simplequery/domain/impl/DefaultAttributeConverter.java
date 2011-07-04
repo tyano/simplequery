@@ -81,7 +81,7 @@ public class DefaultAttributeConverter<T> implements AttributeConverter<T> {
                     }
                 } catch (NoSuchMethodException ex) {
                     //There are no constructor nor method for restoring a value.
-                    throw new CanNotRestoreAttributeException("There are no constructor with a String argument nor 'valueOf(String)' static method in the target class.", targetValue, clazz);
+                    throw new CanNotRestoreAttributeException("There are no constructor with a String argument nor 'valueOf(String)' static method in the target class.", ex, targetValue, clazz);
                 }
             }
         } catch (InstantiationException ex) {

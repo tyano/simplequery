@@ -15,24 +15,39 @@
  */
 package com.shelfmap.simplequery;
 
+import static org.hamcrest.Matchers.isIn;
+import static org.hamcrest.Matchers.nullValue;
+import static com.shelfmap.simplequery.expression.matcher.MatcherFactory.is;
+import static org.junit.Assert.assertThat;
+import static org.hamcrest.Matchers.notNullValue;
 import com.shelfmap.simplequery.annotation.Domain;
 import com.amazonaws.services.simpledb.AmazonSimpleDB;
 import com.amazonaws.services.simpledb.model.BatchPutAttributesRequest;
 import com.amazonaws.services.simpledb.model.CreateDomainRequest;
 import com.amazonaws.services.simpledb.model.DeleteDomainRequest;
 import com.amazonaws.services.simpledb.model.ReplaceableItem;
+import com.shelfmap.simplequery.expression.MultipleResultsExistException;
+import com.shelfmap.simplequery.expression.SimpleQueryException;
 import static java.util.Arrays.asList;
 import static com.shelfmap.simplequery.SimpleDbUtil.*;
 import com.google.inject.Binder;
 import com.google.inject.Inject;
 import com.google.inject.Scopes;
+import com.shelfmap.simplequery.annotation.Attribute;
+import com.shelfmap.simplequery.annotation.Container;
+import com.shelfmap.simplequery.annotation.ItemName;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
+import org.hamcrest.Matchers;
 import org.jbehave.core.annotations.Given;
 import org.jbehave.core.annotations.Pending;
 import org.jbehave.core.annotations.Then;
 import org.jbehave.core.annotations.When;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -41,6 +56,7 @@ import org.jbehave.core.annotations.When;
  */
 @StoryPath("stories/ListProperty.story")
 public class ListPropertyTest extends BaseStoryRunner {
+    private static final Logger LOGGER = LoggerFactory.getLogger(ListPropertyTest.class);
     private static final String DOMAIN_NAME = "list-property";
     
     @Inject
@@ -62,8 +78,7 @@ public class ListPropertyTest extends BaseStoryRunner {
     public void createDomains() {
         AmazonSimpleDB simpleDb = ctx.getSimpleDb();
         List<ReplaceableItem> items = asList(
-                     item("first", attr("tag", "red", true)),
-                     item("first", attr("tag", "blue", false))
+                     item("first", attr("tag", "red", true), attr("tag", "blue", false), attr("tag", "yellow", false))
                 );
         
         simpleDb.deleteDomain(new DeleteDomainRequest(DOMAIN_NAME));
@@ -72,24 +87,57 @@ public class ListPropertyTest extends BaseStoryRunner {
         simpleDb.batchPutAttributes(new BatchPutAttributesRequest(DOMAIN_NAME, items));
     }
 
-    @Pending
+    @Given("a initialized domain which have a multi-value column without values")
+    public void createDomainWithNullColumn() {
+        AmazonSimpleDB simpleDb = ctx.getSimpleDb();
+        List<ReplaceableItem> items = asList(
+                     item("empty", attr("name", "sample", true))
+                );
+        
+        simpleDb.deleteDomain(new DeleteDomainRequest(DOMAIN_NAME));
+        simpleDb.createDomain(new CreateDomainRequest(DOMAIN_NAME));
+        
+        simpleDb.batchPutAttributes(new BatchPutAttributesRequest(DOMAIN_NAME, items));
+    }
+    
+    
+    ListPropertyDomain result;
+    DomainWithoutList noListResult;
+    
     @When("selecting an item from the domain which have a multi-value column")
-    public void selectItemsWithMultiValues() {
+    public void selectItemsWithMultiValues() throws SimpleQueryException, MultipleResultsExistException {
+        result = ctx.getClient().select().from(ListPropertyDomain.class).whereItemName(is("first")).getSingleResult(true);
     }
 
-    @Pending
     @Then("we can get the values through a property whose type is a kind of Collection")
     public void assertListProperty() {
+        assertThat(result, Matchers.is(notNullValue()));
+        assertThat(result.getTags(), Matchers.is(notNullValue()));
+        assertThat(result.getTags().size(), Matchers.is(3));
+        
+        List<String> tags = result.getTags();
+        LOGGER.debug("tags = {}", tags);
+        
+        Collections.sort(tags);
+        LOGGER.debug("tags = {}", tags);
+
+        assertThat(tags.get(0), Matchers.is("blue"));
+        assertThat(tags.get(1), Matchers.is("red"));
+        assertThat(tags.get(2), Matchers.is("yellow"));
     }
 
-    @Pending
     @When("selecting an item from the same domain, but the properties type is not a kind of Collection")
-    public void selectItemBySingleObjectProperty() {
+    public void selectItemBySingleObjectProperty() throws SimpleQueryException, MultipleResultsExistException {
+        noListResult = ctx.getClient().select().from(DomainWithoutList.class).whereItemName(is("first")).getSingleResult(true);
     }
 
-    @Pending
-    @Then("we should get a first value of the multi-value column")
+    @Then("we should get a random value from values of the multi-value column")
     public void assertItMustBeAFirstValue() {
+        List<String> values = Arrays.asList("red", "blue", "yellow");
+        assertThat(noListResult, Matchers.is(notNullValue()));
+        assertThat(noListResult.getTag(), Matchers.is(notNullValue()));
+        String tag = noListResult.getTag();
+        assertThat(tag, isIn(values));
     }
 
     @Pending
@@ -113,12 +161,13 @@ public class ListPropertyTest extends BaseStoryRunner {
     }
     
     @Domain(value=DOMAIN_NAME)
-    private static class ListPropertyDomain {
+    public static class ListPropertyDomain {
         private String itemName;
         private List<String> tags;
         
         private final Object tagMonitor = new Object();
 
+        @ItemName
         public String getItemName() {
             return itemName;
         }
@@ -127,8 +176,11 @@ public class ListPropertyTest extends BaseStoryRunner {
             this.itemName = itemName;
         }
         
+        @Container(containerType=ArrayList.class, valueType=String.class)
+        @Attribute(attributeName="tag")
         public List<String> getTags() {
             synchronized(tagMonitor) {
+                if(tags == null) createInnerList();
                 return new ArrayList<String>(tags);
             }
         }
@@ -155,6 +207,30 @@ public class ListPropertyTest extends BaseStoryRunner {
                     tags = new ArrayList<String>();
                 }
             }
+        }
+    }
+    
+    @Domain(DOMAIN_NAME)
+    public static class DomainWithoutList {
+        private String domainName;
+        private String tag;
+
+        @ItemName
+        public String getDomainName() {
+            return domainName;
+        }
+
+        public void setDomainName(String domainName) {
+            this.domainName = domainName;
+        }
+
+        @Attribute(attributeName="tag")
+        public String getTag() {
+            return tag;
+        }
+
+        public void setTag(String tag) {
+            this.tag = tag;
         }
     }
 }

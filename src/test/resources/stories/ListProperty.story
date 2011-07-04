@@ -7,7 +7,13 @@ When selecting an item from the domain which have a multi-value column
 Then we can get the values through a property whose type is a kind of Collection
 
 When selecting an item from the same domain, but the properties type is not a kind of Collection
-Then we should get a first value of the multi-value column
+Then we should get a random value from values of the multi-value column
+
+
+Scenario: If the value of multi-value column is null, the result value must be empty list or null.
+
+Given a SimpleQuery client
+Given a initialized domain which have a multi-value column without values
 
 When the value of a multi-value column is null and the type of the property associated with the column is a kind of Collection
 Then the return value must be a empty collection

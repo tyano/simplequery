@@ -112,12 +112,12 @@ public class DefaultItemConverter<T> implements ItemConverter<T> {
                 CT prev = accessor.read(instance);
                 if(attributeValue == null) {
                     if(prev == null) {
-                        Object newArray = Array.newInstance(containerType, 0);
+                        Object newArray = Array.newInstance(valueType, 0);
                         accessor.write(instance, containerType.cast(newArray));
                     }
                 } else {
                     int prevLength = prev == null ? 0 : Array.getLength(prev);
-                    Object newArray = Array.newInstance(containerType, prevLength+1);
+                    Object newArray = Array.newInstance(valueType, prevLength+1);
                     for(int i = 0; i < prevLength; i++) {
                         Object o = Array.get(prev, i);
                         Array.set(newArray, i, o);

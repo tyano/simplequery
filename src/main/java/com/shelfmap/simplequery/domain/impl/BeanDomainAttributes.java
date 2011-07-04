@@ -18,12 +18,13 @@ package com.shelfmap.simplequery.domain.impl;
 import com.shelfmap.simplequery.Configuration;
 import com.shelfmap.simplequery.domain.AttributeStore;
 import static com.shelfmap.simplequery.util.Assertion.isNotNull;
-import com.shelfmap.simplequery.FlatAttribute;
-import com.shelfmap.simplequery.FloatAttribute;
-import com.shelfmap.simplequery.IntAttribute;
-import com.shelfmap.simplequery.LongAttribute;
-import com.shelfmap.simplequery.Attribute;
-import com.shelfmap.simplequery.Container;
+import com.shelfmap.simplequery.annotation.FlatAttribute;
+import com.shelfmap.simplequery.annotation.FloatAttribute;
+import com.shelfmap.simplequery.annotation.IntAttribute;
+import com.shelfmap.simplequery.annotation.LongAttribute;
+import com.shelfmap.simplequery.annotation.Attribute;
+import com.shelfmap.simplequery.annotation.Container;
+import com.shelfmap.simplequery.annotation.ItemName;
 import com.shelfmap.simplequery.domain.AttributeAccessor;
 import com.shelfmap.simplequery.domain.AttributeConverter;
 import com.shelfmap.simplequery.domain.AttributeKey;
@@ -48,6 +49,7 @@ public class BeanDomainAttributes implements DomainAttributes {
     private final String domainName;
     private final String parentPropertyPath;
     private final Configuration configuration;
+    private String itemNameProperty;
 
     public BeanDomainAttributes(Class<?> domainClass, String domainName, Configuration configuration) {
         this(domainClass, domainName, configuration, null);
@@ -69,17 +71,21 @@ public class BeanDomainAttributes implements DomainAttributes {
                 //do not handle the properties of Object class.
                 //(Object class have only one property 'getClass()')
                 if(!descriptor.getName().equals("class")) {
-                    Class<?> containerType = primitiveToObject(descriptor.getPropertyType());
+                    Class<?> propertyType = primitiveToObject(descriptor.getPropertyType());
                     String propertyName = descriptor.getName();
                     Method getter = descriptor.getReadMethod();
                     
-                    Class<?> valueType = containerType; 
-                    if(Collection.class.isAssignableFrom(containerType) || containerType.isArray()) {
-                        Container container = getter.getAnnotation(Container.class);
-                        if(container == null) throw new IllegalStateException("Collection property must have a @Container annotation.");
-                        valueType = container.valueType();
+                    if(getter.isAnnotationPresent(ItemName.class)) {
+                        handleItemName(propertyType, propertyName, getter);
+                    } else {
+                        Class<?> valueType = propertyType; 
+                        if(Collection.class.isAssignableFrom(propertyType) || propertyType.isArray()) {
+                            Container container = getter.getAnnotation(Container.class);
+                            if(container == null) throw new IllegalStateException("Collection property must have a @Container annotation.");
+                            valueType = container.valueType();
+                        }
+                        handleAttributeWithType(valueType, propertyType, propertyName, getter);
                     }
-                    handleAttributeWithType(valueType, containerType, propertyName, getter);
                 }
             }
         } catch (IntrospectionException ex) {
@@ -96,6 +102,15 @@ public class BeanDomainAttributes implements DomainAttributes {
             return Float.class;
         else
             return type;
+    }
+    
+    private void handleItemName(Class<?> type, String propertyName, Method getter) {
+        if(!String.class.isAssignableFrom(type)) {
+            throw new IllegalStateException("Can not handle a domain class: " + domainClass.getCanonicalName() + " - The type of @ItemName property must be String.class.");
+        }
+        DomainAttribute<String,String> itemNameAttribute = createAttribute(propertyName, String.class, String.class, getter);
+        attributeStore.putAttribute(propertyName, String.class, String.class, itemNameAttribute);
+        this.itemNameProperty = propertyName;
     }
     
     private <VT,CT> void handleAttributeWithType(Class<VT> valueType, Class<CT> containerType, String propertyName, Method getter) {
@@ -314,5 +329,10 @@ public class BeanDomainAttributes implements DomainAttributes {
     @Override
     public Class<?> getContainerType(String attributeName) {
         return attributeStore.getContainerType(attributeName);
+    }
+
+    @Override
+    public DomainAttribute<String, String> getItemNameAttribute() {
+        return attributeStore.getAttribute(this.itemNameProperty, String.class, String.class);
     }
 }

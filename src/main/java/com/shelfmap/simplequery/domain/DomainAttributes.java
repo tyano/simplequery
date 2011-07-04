@@ -21,6 +21,7 @@ package com.shelfmap.simplequery.domain;
  * @author Tsutomu YANO
  */
 public interface DomainAttributes extends Iterable<DomainAttribute<?,?>> {
+    DomainAttribute<String,String> getItemNameAttribute();
     boolean isAttributeDefined(String attributeName);
     <VT,CT> DomainAttribute<VT,CT> getAttribute(String attributeName, Class<VT> valueType, Class<CT> containerType);
     Class<?> getValueType(String attributeName);

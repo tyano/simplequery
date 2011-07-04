@@ -73,6 +73,13 @@ public class DefaultItemConverter<T> implements ItemConverter<T> {
                 throw new CanNotConvertItemException("could not write a attribute: " + domainAttribute.getAttributeName() + " for the item: " + item.getName(), ex, item);
             }
         }
+        
+        DomainAttribute<String,String> itemNameAttribute = domainAttributes.getItemNameAttribute();
+        String itemNameValue = item.getName();
+        if(itemNameAttribute != null) {
+           itemNameAttribute.getAttributeAccessor().write(instance, itemNameValue);
+        }
+        
         return instance;
     }
 

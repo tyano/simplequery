@@ -43,7 +43,6 @@ import java.util.Collections;
 import java.util.List;
 import org.hamcrest.Matchers;
 import org.jbehave.core.annotations.Given;
-import org.jbehave.core.annotations.Pending;
 import org.jbehave.core.annotations.Then;
 import org.jbehave.core.annotations.When;
 import org.slf4j.Logger;
@@ -140,24 +139,27 @@ public class ListPropertyTest extends BaseStoryRunner {
         assertThat(tag, isIn(values));
     }
 
-    @Pending
     @When("the value of a multi-value column is null and the type of the property associated with the column is a kind of Collection")
-    public void selectEmptyMultiValueColumnByList() {
+    public void selectEmptyMultiValueColumnByList() throws SimpleQueryException, MultipleResultsExistException {
+        result = ctx.getClient().select().from(ListPropertyDomain.class).whereItemName(is("empty")).getSingleResult(true);
     }
 
-    @Pending
     @Then("the return value must be a empty collection")
     public void assertTheResultIsEmptyCollection() {
+        assertThat(result, Matchers.is(notNullValue()));
+        assertThat(result.getTags(), Matchers.is(notNullValue()));
+        assertThat(result.getTags().isEmpty(), Matchers.is(true));
     }
 
-    @Pending
     @When("the value of a multi-value column is null and the type of the property associated with the column is not a Collection")
-    public void selectEmptyMultiValueColumnBySingleObjectProperty() {
+    public void selectEmptyMultiValueColumnBySingleObjectProperty() throws SimpleQueryException, MultipleResultsExistException {
+        noListResult = ctx.getClient().select().from(DomainWithoutList.class).whereItemName(is("empty")).getSingleResult(true);
     }
 
-    @Pending
     @Then("the return value must be a null")
     public void assertItsResultMustBeANullValue() {
+        assertThat(noListResult, Matchers.is(notNullValue()));
+        assertThat(noListResult.getTag(), Matchers.is(nullValue()));
     }
     
     @Domain(value=DOMAIN_NAME)

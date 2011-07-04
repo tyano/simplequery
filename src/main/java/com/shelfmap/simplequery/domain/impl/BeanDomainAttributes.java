@@ -82,6 +82,7 @@ public class BeanDomainAttributes implements DomainAttributes {
                         if(Collection.class.isAssignableFrom(propertyType) || propertyType.isArray()) {
                             Container container = getter.getAnnotation(Container.class);
                             if(container == null) throw new IllegalStateException("Collection property must have a @Container annotation.");
+                            propertyType = container.containerType();
                             valueType = container.valueType();
                         }
                         handleAttributeWithType(valueType, propertyType, propertyName, getter);

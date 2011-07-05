@@ -18,7 +18,7 @@ Given a SimpleQuery client
 Given a initialized domain which have a multi-value column without values
 
 When the value of a multi-value column is null and the type of the property associated with the column is a kind of Collection
-Then the return value must be a empty collection
+Then the return value must be an empty collection
 
 When the value of a multi-value column is null and the type of the property associated with the column is not a Collection
 Then the return value must be a null

@@ -139,7 +139,7 @@ public class ListPropertyTest extends BaseStoryRunner {
         result = ctx.getClient().select().from(ListPropertyDomain.class).whereItemName(is("empty")).getSingleResult(true);
     }
 
-    @Then("the return value must be a empty collection")
+    @Then("the return value must be an empty collection")
     public void assertTheResultIsEmptyCollection() {
         assertThat(result, Matchers.is(notNullValue()));
         assertThat(result.getTags(), Matchers.is(notNullValue()));

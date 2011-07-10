@@ -56,7 +56,7 @@ public class ConditionGroup implements Condition<Void> {
     public Condition<?> and(Condition<?> other) {
         return other.withParent(this, BasicOperator.AND);
     }
-    
+
     private <T> Condition<T> newCondition(String attributeName, Matcher<T> matcher) {
         return new DefaultCondition<T>(attributeName, matcher);
     }
@@ -150,5 +150,10 @@ public class ConditionGroup implements Condition<Void> {
     @Override
     public Condition<Void> withMatcher(Matcher<Void> matcher) {
         return this;
+    }
+
+    @Override
+    public Condition<?> not() {
+        return new NotCondition(this);
     }
 }

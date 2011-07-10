@@ -26,7 +26,7 @@ import com.shelfmap.simplequery.expression.Operator;
  */
 public final class NullCondition implements Condition<Object> {
     public static final NullCondition INSTANCE = new NullCondition();
-    
+
     private NullCondition() {
         super();
     }
@@ -39,7 +39,7 @@ public final class NullCondition implements Condition<Object> {
     private <T> Condition<T> newCondition(String attributeName, Matcher<T> matcher) {
         return new DefaultCondition<T>(attributeName, matcher);
     }
-    
+
     @Override
     public Condition<?> and(String attributeName, Matcher<?> matcher) {
         return newCondition(attributeName, matcher);
@@ -122,6 +122,11 @@ public final class NullCondition implements Condition<Object> {
 
     @Override
     public Condition<Object> withMatcher(Matcher<Object> matcher) {
+        return this;
+    }
+
+    @Override
+    public Condition<?> not() {
         return this;
     }
 }

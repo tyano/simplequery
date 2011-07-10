@@ -49,7 +49,7 @@ public class DefaultWhereExpression<T> extends BaseExpression<T> implements Wher
                     }
                 }),
                 domainExpression.getDomainName());
-        
+
         isNotNull("condition", condition);
         this.domainExpression = domainExpression;
         this.condition = condition;
@@ -84,7 +84,7 @@ public class DefaultWhereExpression<T> extends BaseExpression<T> implements Wher
         String attributeName = current.getAttributeName();
         Matcher<AT> matcher = current.getMatcher();
         if (matcher != null) {
-            
+
             //TODO DomainAttributes#getAttribute might return an DomainAttribute whose type parameter don't match with the Condition 'current'.
             @SuppressWarnings("unchecked")
             DomainAttribute<AT,?> attribute = (DomainAttribute<AT,?>) domainAttributes.getAttribute(attributeName);
@@ -119,7 +119,7 @@ public class DefaultWhereExpression<T> extends BaseExpression<T> implements Wher
         Condition<?> other = newCondition(attributeName, matcher);
         return this.and(other);
     }
-    
+
     private <T> Condition<T> newCondition(String attributeName, Matcher<T> matcher) {
         return new DefaultCondition<T>(attributeName, matcher);
     }
@@ -175,5 +175,10 @@ public class DefaultWhereExpression<T> extends BaseExpression<T> implements Wher
                 getConfiguration(),
                 domainExpression.rebuildWith(attributes),
                 condition);
+    }
+
+    @Override
+    public WhereExpression<T> not() {
+        return new DefaultWhereExpression<T>(getAmazonSimpleDB(), getConfiguration(), this.domainExpression, new NotCondition(this.condition));
     }
 }

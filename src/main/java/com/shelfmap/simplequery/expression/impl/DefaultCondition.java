@@ -35,9 +35,9 @@ public class DefaultCondition<T> implements Condition<T> {
     private Operator operator;
     private String attributeName;
     private Matcher<T> matcher;
-    
+
     public static final List<String> SIMPLEDB_FUNCTION_LIST = Arrays.asList("itemName()");
-    
+
 
     public DefaultCondition(String attributeName, Matcher<T> matcher) {
         isNotNull("attributeName", attributeName);
@@ -54,7 +54,7 @@ public class DefaultCondition<T> implements Condition<T> {
         this.attributeName = attributeName;
         this.matcher = matcher;
     }
-    
+
     @Override
     public String getAttributeName() {
         return attributeName;
@@ -64,13 +64,13 @@ public class DefaultCondition<T> implements Condition<T> {
     public Matcher<T> getMatcher() {
         return matcher;
     }
-    
-    
+
+
     @Override
     public Condition<?> and(Condition<?> other) {
         return other.withParent(this, BasicOperator.AND);
     }
-    
+
     private <T> Condition<T> newCondition(String attributeName, Matcher<T> matcher) {
         return new DefaultCondition<T>(attributeName, matcher);
     }
@@ -91,22 +91,22 @@ public class DefaultCondition<T> implements Condition<T> {
         Condition<?> other = newCondition(attributeName, matcher);
         return this.or(other);
     }
-    
+
     @Override
     public Condition<?> group() {
         return new ConditionGroup(this);
     }
-    
+
     @Override
     public String describe() {
         StringBuilder sb = new StringBuilder();
-        
+
         sb.append(getParent().describe());
         sb.append(getOperator().describe());
-        
+
         final String attributeName = SIMPLEDB_FUNCTION_LIST.contains(getAttributeName()) ? getAttributeName() : SimpleDBUtils.quoteName(getAttributeName());
         sb.append(attributeName).append(" ").append(getMatcher().describe());
-        
+
         return sb.toString();
     }
 
@@ -119,7 +119,7 @@ public class DefaultCondition<T> implements Condition<T> {
     public Condition<?> getParent() {
         return parent;
     }
-    
+
     @Override
     public Condition<T> withParent(Condition<?> parent, Operator operator) {
         return new DefaultCondition<T>(parent, operator, getAttributeName(), getMatcher());
@@ -162,5 +162,10 @@ public class DefaultCondition<T> implements Condition<T> {
     @Override
     public Condition<T> withMatcher(Matcher<T> matcher) {
         return new DefaultCondition<T>(getParent(), getOperator(), getAttributeName(), matcher);
+    }
+
+    @Override
+    public Condition<?> not() {
+        return new NotCondition(this);
     }
 }

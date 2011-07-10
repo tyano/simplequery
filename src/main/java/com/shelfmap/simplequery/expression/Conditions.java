@@ -27,11 +27,11 @@ import com.shelfmap.simplequery.expression.matcher.Matcher;
 public final class Conditions {
     private Conditions() {
     }
-    
+
     public static <T> Condition<T> condition(String attributeName, Matcher<T> matcher) {
         return new DefaultCondition<T>(attributeName, matcher);
     }
-    
+
     public static Condition<?> condition(Condition<?> first, BasicOperator op, Condition<?> second) {
         switch(op) {
             case AND:
@@ -44,8 +44,12 @@ public final class Conditions {
                 throw new IllegalArgumentException("Operator not supported: " + op);
         }
     }
-    
+
     public static Condition<?> group(Condition<?> condition) {
         return condition.group();
+    }
+
+    public static Condition<?> not(Condition<?> condition) {
+        return condition.not();
     }
 }

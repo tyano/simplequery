@@ -20,7 +20,7 @@ import com.shelfmap.simplequery.expression.matcher.Matcher;
 import com.shelfmap.simplequery.domain.AttributeConverter;
 
 /**
- *
+ * @param <T> the type of conbined object. ex) Expression.and(Condition) will return a Expression, Condition.and(Condition) will return a Condition.
  * @author Tsutomu YANO
  */
 public interface Conjunctive<T> {
@@ -34,4 +34,5 @@ public interface Conjunctive<T> {
     T intersection(String attributeName, Matcher<?> matcher);
     <E> T intersection(String attributeName, Matcher<E> matcher, AttributeConverter<E> attributeConverter);
     T group();
+    T not();
 }

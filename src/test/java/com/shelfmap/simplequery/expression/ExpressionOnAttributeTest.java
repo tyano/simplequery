@@ -15,10 +15,14 @@
  */
 package com.shelfmap.simplequery.expression;
 
+import static com.shelfmap.simplequery.attribute.Attributes.attr;
+import static com.shelfmap.simplequery.attribute.Attributes.$;
+import static com.shelfmap.simplequery.attribute.Attributes.every;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import com.shelfmap.simplequery.BaseStoryRunner;
 import com.shelfmap.simplequery.StoryPath;
+import com.shelfmap.simplequery.attribute.Attributes;
 import com.shelfmap.simplequery.attribute.DefaultAttribute;
 import com.shelfmap.simplequery.attribute.EveryAttribute;
 import com.shelfmap.simplequery.attribute.QueryAttribute;
@@ -41,9 +45,24 @@ public class ExpressionOnAttributeTest extends BaseStoryRunner {
         attribute = new DefaultAttribute(name);
     }
 
+    @When("an instance of DefaultAttribute is created by Attributes.$() method")
+    public void createDefaultAttributeWith$(@Named("name") String name) {
+        attribute = $(name);
+    }
+
+    @When("an instance of DefaultAttribute is created by Attributes.attr() method")
+    public void createDefaultAttributeWith_attr(@Named("name") String name) {
+        attribute = attr(name);
+    }
+
     @When("an attribute of name '<name>' is an instance of EveryAttribute")
     public void createEveryAttribute(@Named("name") String name) {
         attribute = new EveryAttribute(name);
+    }
+
+    @When("an attribute of name '<name>' is created with Attributes.every() method")
+    public void createEveryWithAttributes(@Named("name") String name) {
+        attribute = every(name);
     }
 
     @Then("the describe() method of the instance must return '<quoted>'")

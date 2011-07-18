@@ -1,6 +1,6 @@
 Scenario: a simple attribute which have only the name must be an instance of QueryAttribute interface.
 
-When an attribute of name '<name>' is a instance of DefaultAttribute
+When an attribute of name '<name>' is an instance of DefaultAttribute
 Then the describe() method of the instance must return '<quoted>'
 
 Examples:
@@ -12,6 +12,12 @@ Examples:
 
 Scenario: we can use the 'every()' expression of SimpleDB through very similar way like every("attribute-name") in Java code.
 
-When using Condisions.every("attribute-name")
-Then it must return a Attribute object and the describe() method of the object must return a string 'every(`attribute-name`)'
+When an attribute of name '<name>' is an instance of EveryAttribute
+Then the describe() method of the instance must return a string '<quoted>'
+
+Examples:
+|name             |quoted                    |
+|name             |every(`name`)             |
+|need`escape      |every(`need``escape`)     |
+|usingwherekeyword|every(`usingwherekeyword`)|
 

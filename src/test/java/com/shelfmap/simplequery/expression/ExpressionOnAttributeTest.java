@@ -20,7 +20,9 @@ import static org.junit.Assert.assertThat;
 import com.shelfmap.simplequery.BaseStoryRunner;
 import com.shelfmap.simplequery.StoryPath;
 import com.shelfmap.simplequery.attribute.DefaultAttribute;
+import com.shelfmap.simplequery.attribute.EveryAttribute;
 import com.shelfmap.simplequery.attribute.QueryAttribute;
+import org.jbehave.core.annotations.Alias;
 import org.jbehave.core.annotations.Named;
 import org.jbehave.core.annotations.Then;
 import org.jbehave.core.annotations.When;
@@ -34,12 +36,18 @@ public class ExpressionOnAttributeTest extends BaseStoryRunner {
 
     QueryAttribute attribute;
 
-    @When("an attribute of name '<name>' is a instance of DefaultAttribute")
+    @When("an attribute of name '<name>' is an instance of DefaultAttribute")
     public void createDefaultAttribute(@Named("name") String name) {
         attribute = new DefaultAttribute(name);
     }
 
+    @When("an attribute of name '<name>' is an instance of EveryAttribute")
+    public void createEveryAttribute(@Named("name") String name) {
+        attribute = new EveryAttribute(name);
+    }
+
     @Then("the describe() method of the instance must return '<quoted>'")
+    @Alias("the describe() method of the instance must return a string '<quoted>'")
     public void assertDefaultAttribute(@Named("quoted") String quoted) {
         assertThat(attribute.describe(), is(quoted));
     }

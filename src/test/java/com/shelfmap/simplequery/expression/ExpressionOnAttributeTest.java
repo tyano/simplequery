@@ -22,9 +22,12 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import com.shelfmap.simplequery.BaseStoryRunner;
 import com.shelfmap.simplequery.StoryPath;
+import com.shelfmap.simplequery.attribute.AllAttribute;
 import com.shelfmap.simplequery.attribute.Attributes;
+import com.shelfmap.simplequery.attribute.CountAttribute;
 import com.shelfmap.simplequery.attribute.DefaultAttribute;
 import com.shelfmap.simplequery.attribute.EveryAttribute;
+import com.shelfmap.simplequery.attribute.ItemNameAttribute;
 import com.shelfmap.simplequery.attribute.QueryAttribute;
 import org.jbehave.core.annotations.Alias;
 import org.jbehave.core.annotations.Named;
@@ -69,5 +72,25 @@ public class ExpressionOnAttributeTest extends BaseStoryRunner {
     @Alias("the describe() method of the instance must return a string '<quoted>'")
     public void assertDefaultAttribute(@Named("quoted") String quoted) {
         assertThat(attribute.describe(), is(quoted));
+    }
+
+    @When("using ItemNameAttribute class as a attribute")
+    public void createItemNameAttribute() {
+        attribute = new ItemNameAttribute();
+    }
+
+    @When("using CountAttribute class as a attribute")
+    public void createCountAttribute() {
+        attribute = new CountAttribute();
+    }
+
+    @When("using AllAttribute class as a attribute")
+    public void createAllAttribute() {
+        attribute = new AllAttribute();
+    }
+
+    @Then("the described name of the attribute must be $result")
+    public void assertDescribed(String result) {
+        assertThat(attribute.describe(), is(result));
     }
 }

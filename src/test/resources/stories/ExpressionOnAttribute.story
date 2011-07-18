@@ -29,3 +29,22 @@ Examples:
 |name             |every(`name`)             |
 |need`escape      |every(`need``escape`)     |
 |usingwherekeyword|every(`usingwherekeyword`)|
+
+
+Scenario: support 'itemName()' expression of Amazon SimpleDB
+
+When using ItemNameAttribute class as a attribute
+Then the described name of the attribute must be itemName()
+
+
+Scenario: support 'count(*)' expression
+
+When using CountAttribute class as a attribute
+Then the described name of the attribute must be count(*)
+
+Scenario: support '*' attribute
+
+When using AllAttribute class as a attribute
+Then the described name of the attribute must be *
+
+

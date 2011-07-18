@@ -23,13 +23,20 @@ import static java.lang.String.format;
  *
  * @author Tsutomu YANO
  */
-public class EveryAttribute extends DefaultAttribute {
+public class EveryAttribute implements ConditionAttribute {
+
+    private final DefaultAttribute attribute;
 
     /**
      * @param name name of attribute
      */
     public EveryAttribute(String name) {
-        super(name);
+        super();
+        this.attribute = new DefaultAttribute(name);
+    }
+
+    public String getName() {
+        return this.attribute.getName();
     }
 
     /**
@@ -37,6 +44,6 @@ public class EveryAttribute extends DefaultAttribute {
      */
     @Override
     public String describe() {
-        return format("every(%s)", super.describe());
+        return format("every(%s)", this.attribute.describe());
     }
 }

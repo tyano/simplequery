@@ -19,7 +19,7 @@ package com.shelfmap.simplequery.attribute;
  *
  * @author Tsutomu YANO
  */
-public class CountAttribute implements QueryAttribute {
+public class CountAttribute implements SelectAttribute {
 
     public CountAttribute() {
         super();

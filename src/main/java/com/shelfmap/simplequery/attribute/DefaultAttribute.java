@@ -23,7 +23,7 @@ import com.amazonaws.services.simpledb.util.SimpleDBUtils;
  *
  * @author Tsutomu YANO
  */
-public class DefaultAttribute implements QueryAttribute {
+public class DefaultAttribute implements SelectAttribute, ConditionAttribute {
 
     private String name;
 

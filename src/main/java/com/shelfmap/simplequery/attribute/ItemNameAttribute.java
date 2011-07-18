@@ -19,7 +19,7 @@ package com.shelfmap.simplequery.attribute;
  *
  * @author Tsutomu YANO
  */
-public class ItemNameAttribute implements QueryAttribute {
+public class ItemNameAttribute implements SelectAttribute, ConditionAttribute {
 
     public ItemNameAttribute() {
         super();

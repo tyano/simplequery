@@ -19,7 +19,7 @@ package com.shelfmap.simplequery.attribute;
  *
  * @author Tsutomu YANO
  */
-public class AllAttribute implements QueryAttribute {
+public class AllAttribute implements SelectAttribute {
 
     public AllAttribute() {
         super();

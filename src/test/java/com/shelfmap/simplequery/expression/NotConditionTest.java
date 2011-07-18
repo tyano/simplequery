@@ -40,17 +40,17 @@ public class NotConditionTest extends BaseStoryRunner {
     Condition<?> condition;
 
     @When("using .not() medhod against an condition object")
-    public void createNotExpression() {
+    public void createNotCondition() {
         condition = condition("name", in("yano", "yano2")).not();
     }
 
     @When("using not() static method of the Conditions class")
-    public void createNotExpressionWithCondisions() {
+    public void createNotConditionWithCondisions() {
         condition = not(condition("name", in("yano", "yano2")));
     }
 
-    @Then("the result must be like 'not (a expression)'")
-    public void assertNotExpression() {
+    @Then("the result of describe() must be like 'not (a expression)'")
+    public void assertNotCondition() {
         assertThat(condition.describe(), Matchers.is("not (`name` in ('yano', 'yano2'))"));
     }
 
@@ -59,7 +59,7 @@ public class NotConditionTest extends BaseStoryRunner {
         condition = not(group(condition("name", is("yano")).and(condition("address", is("Tokyo")))));
     }
 
-    @Then("the result must be like 'not ((a expression and a expression))")
+    @Then("the result of describe() must be like 'not ((a expression and a expression))")
     public void assertNotGroupCondition() {
         assertThat(condition.describe(), Matchers.is("not ((`name` = 'yano' and `address` = 'Tokyo'))"));
     }

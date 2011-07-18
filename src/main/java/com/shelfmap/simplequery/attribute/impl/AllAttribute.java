@@ -13,37 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.shelfmap.simplequery.attribute;
+package com.shelfmap.simplequery.attribute.impl;
 
-import static java.lang.String.format;
+import com.shelfmap.simplequery.attribute.SelectAttribute;
 
 /**
- * an implementation of QueryAttribute.
- * this class describes 'every(attrbuteName)' expression of Amazon SimpleDB.
  *
  * @author Tsutomu YANO
  */
-public class EveryAttribute implements ConditionAttribute {
+public class AllAttribute implements SelectAttribute {
 
-    private final DefaultAttribute attribute;
-
-    /**
-     * @param name name of attribute
-     */
-    public EveryAttribute(String name) {
+    public AllAttribute() {
         super();
-        this.attribute = new DefaultAttribute(name);
     }
 
-    public String getName() {
-        return this.attribute.getName();
-    }
-
-    /**
-     * {@inheritDoc }
-     */
     @Override
     public String describe() {
-        return format("every(%s)", this.attribute.describe());
+        return "*";
     }
 }

@@ -15,6 +15,9 @@
  */
 package com.shelfmap.simplequery.attribute;
 
+import com.shelfmap.simplequery.attribute.impl.DefaultAttribute;
+import com.shelfmap.simplequery.attribute.impl.EveryAttribute;
+
 /**
  * Utility class for creating instance of QueryAttribute.
  *

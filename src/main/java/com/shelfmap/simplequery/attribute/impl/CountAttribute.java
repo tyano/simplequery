@@ -13,20 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.shelfmap.simplequery.attribute;
+package com.shelfmap.simplequery.attribute.impl;
+
+import com.shelfmap.simplequery.attribute.SelectAttribute;
 
 /**
  *
  * @author Tsutomu YANO
  */
-public class AllAttribute implements SelectAttribute {
+public class CountAttribute implements SelectAttribute {
 
-    public AllAttribute() {
+    public CountAttribute() {
         super();
     }
 
     @Override
     public String describe() {
-        return "*";
+        return "count(*)";
     }
 }

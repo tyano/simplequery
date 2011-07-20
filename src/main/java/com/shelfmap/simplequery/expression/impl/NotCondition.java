@@ -15,6 +15,8 @@
  */
 package com.shelfmap.simplequery.expression.impl;
 
+import com.shelfmap.simplequery.attribute.ConditionAttribute;
+import com.shelfmap.simplequery.attribute.impl.DefaultAttribute;
 import com.shelfmap.simplequery.domain.AttributeConverter;
 import com.shelfmap.simplequery.expression.Condition;
 import com.shelfmap.simplequery.expression.Operator;
@@ -40,8 +42,8 @@ public class NotCondition implements Condition<Void>{
         this.operator = operator;
     }
 
-    private <T> Condition<T> newCondition(String attributeName, Matcher<T> matcher) {
-        return new DefaultCondition<T>(attributeName, matcher);
+    private <T> Condition<T> newCondition(ConditionAttribute attribute, Matcher<T> matcher) {
+        return new DefaultCondition<T>(attribute, matcher);
     }
 
     @Override
@@ -59,8 +61,8 @@ public class NotCondition implements Condition<Void>{
     }
 
     @Override
-    public String getAttributeName() {
-        return "";
+    public ConditionAttribute getAttribute() {
+        return new DefaultAttribute("");
     }
 
     @Override
@@ -74,7 +76,7 @@ public class NotCondition implements Condition<Void>{
     }
 
     @Override
-    public Condition<Void> withAttributeName(String attributeName) {
+    public Condition<Void> withAttribute(ConditionAttribute attribute) {
         return this;
     }
 
@@ -101,16 +103,29 @@ public class NotCondition implements Condition<Void>{
 
     @Override
     public Condition<?> and(String attributeName, Matcher<?> matcher) {
-        Condition<?> other = newCondition(attributeName, matcher);
+        Condition<?> other = newCondition(new DefaultAttribute(attributeName), matcher);
+        return this.and(other);
+    }
+
+    @Override
+    public Condition<?> and(ConditionAttribute attribute, Matcher<?> matcher) {
+        Condition<?> other = newCondition(attribute, matcher);
+        return this.and(other);
+    }
+
+    @Override
+    public <E> Condition<?> and(ConditionAttribute attribute, Matcher<E> matcher, AttributeConverter<E> attributeConverter) {
+        Condition<?> other = newCondition(attribute, matcher.withAttributeConverter(attributeConverter));
         return this.and(other);
     }
 
     @Override
     public <E> Condition<?> and(String attributeName, Matcher<E> matcher, AttributeConverter<E> attributeConverter) {
-        Condition<?> other = newCondition(attributeName, matcher.withAttributeConverter(attributeConverter));
+        Condition<?> other = newCondition(new DefaultAttribute(attributeName), matcher.withAttributeConverter(attributeConverter));
         return this.and(other);
     }
-
+    
+    
     @Override
     public Condition<?> or(Condition<?> other) {
         return other.withParent(this, BasicOperator.OR);
@@ -118,13 +133,25 @@ public class NotCondition implements Condition<Void>{
 
     @Override
     public Condition<?> or(String attributeName, Matcher<?> matcher) {
-        Condition<?> other = newCondition(attributeName, matcher);
+        Condition<?> other = newCondition(new DefaultAttribute(attributeName), matcher);
+        return this.or(other);
+    }
+
+    @Override
+    public Condition<?> or(ConditionAttribute attribute, Matcher<?> matcher) {
+        Condition<?> other = newCondition(attribute, matcher);
         return this.or(other);
     }
 
     @Override
     public <E> Condition<?> or(String attributeName, Matcher<E> matcher, AttributeConverter<E> attributeConverter) {
-        Condition<?> other = newCondition(attributeName, matcher.withAttributeConverter(attributeConverter));
+        Condition<?> other = newCondition(new DefaultAttribute(attributeName), matcher.withAttributeConverter(attributeConverter));
+        return this.or(other);
+    }
+
+    @Override
+    public <E> Condition<?> or(ConditionAttribute attribute, Matcher<E> matcher, AttributeConverter<E> attributeConverter) {
+        Condition<?> other = newCondition(attribute, matcher.withAttributeConverter(attributeConverter));
         return this.or(other);
     }
 
@@ -135,13 +162,25 @@ public class NotCondition implements Condition<Void>{
 
     @Override
     public Condition<?> intersection(String attributeName, Matcher<?> matcher) {
-        Condition<?> other = newCondition(attributeName, matcher);
+        Condition<?> other = newCondition(new DefaultAttribute(attributeName), matcher);
+        return this.intersection(other);
+    }
+
+    @Override
+    public Condition<?> intersection(ConditionAttribute attribute, Matcher<?> matcher) {
+        Condition<?> other = newCondition(attribute, matcher);
         return this.intersection(other);
     }
 
     @Override
     public <E> Condition<?> intersection(String attributeName, Matcher<E> matcher, AttributeConverter<E> attributeConverter) {
-        Condition<?> other = newCondition(attributeName, matcher.withAttributeConverter(attributeConverter));
+        Condition<?> other = newCondition(new DefaultAttribute(attributeName), matcher.withAttributeConverter(attributeConverter));
+        return this.intersection(other);
+    }
+
+    @Override
+    public <E> Condition<?> intersection(ConditionAttribute attribute, Matcher<E> matcher, AttributeConverter<E> attributeConverter) {
+        Condition<?> other = newCondition(attribute, matcher.withAttributeConverter(attributeConverter));
         return this.intersection(other);
     }
 

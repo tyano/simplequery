@@ -22,8 +22,9 @@ import com.shelfmap.simplequery.attribute.SelectAttribute;
  * @author Tsutomu YANO
  */
 public class CountAttribute implements SelectAttribute {
-
-    public CountAttribute() {
+    public static final CountAttribute INSTANCE = new CountAttribute();
+  
+    private CountAttribute() {
         super();
     }
 

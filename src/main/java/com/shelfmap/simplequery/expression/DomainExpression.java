@@ -16,6 +16,7 @@
 
 package com.shelfmap.simplequery.expression;
 
+import com.shelfmap.simplequery.attribute.ConditionAttribute;
 import com.shelfmap.simplequery.expression.matcher.Matcher;
 
 /**
@@ -29,6 +30,7 @@ public interface DomainExpression<T> extends Expression<T>{
     WhereExpression<T> whereItemName(Matcher<?> matcher);
     WhereExpression<T> where(Condition<?> expression);
     WhereExpression<T> where(String attributeName, Matcher<?> matcher);
+    WhereExpression<T> where(ConditionAttribute attribute, Matcher<?> matcher);
     OrderByExpression<T> orderBy(String attributeName, SortOrder sortOrder);
     LimitExpression<T> limit(int limitCount);
     DomainExpression<T> rebuildWith(SelectQuery select);

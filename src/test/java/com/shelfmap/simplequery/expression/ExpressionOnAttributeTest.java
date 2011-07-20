@@ -75,12 +75,12 @@ public class ExpressionOnAttributeTest extends BaseStoryRunner {
 
     @When("using ItemNameAttribute class as a attribute")
     public void createItemNameAttribute() {
-        attribute = new ItemNameAttribute();
+        attribute = ItemNameAttribute.INSTANCE;
     }
 
     @When("using CountAttribute class as a attribute")
     public void createCountAttribute() {
-        attribute = new CountAttribute();
+        attribute = CountAttribute.INSTANCE;
     }
 
     @When("using AllAttribute class as a attribute")

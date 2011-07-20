@@ -23,13 +23,19 @@ import com.shelfmap.simplequery.attribute.SelectAttribute;
  * @author Tsutomu YANO
  */
 public class ItemNameAttribute implements SelectAttribute, ConditionAttribute {
-
-    public ItemNameAttribute() {
+    public static final ItemNameAttribute INSTANCE = new ItemNameAttribute();
+    
+    private ItemNameAttribute() {
         super();
     }
 
     @Override
     public String describe() {
+        return "itemName()";
+    }
+
+    @Override
+    public String getAttributeName() {
         return "itemName()";
     }
 }

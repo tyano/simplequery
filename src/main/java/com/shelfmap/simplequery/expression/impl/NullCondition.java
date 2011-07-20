@@ -15,10 +15,13 @@
  */
 package com.shelfmap.simplequery.expression.impl;
 
+
+import com.shelfmap.simplequery.attribute.ConditionAttribute;
+import com.shelfmap.simplequery.attribute.impl.DefaultAttribute;
 import com.shelfmap.simplequery.domain.AttributeConverter;
 import com.shelfmap.simplequery.expression.Condition;
-import com.shelfmap.simplequery.expression.matcher.Matcher;
 import com.shelfmap.simplequery.expression.Operator;
+import com.shelfmap.simplequery.expression.matcher.Matcher;
 
 /**
  *
@@ -36,13 +39,18 @@ public final class NullCondition implements Condition<Object> {
         return other;
     }
 
-    private <T> Condition<T> newCondition(String attributeName, Matcher<T> matcher) {
-        return new DefaultCondition<T>(attributeName, matcher);
+    private <T> Condition<T> newCondition(ConditionAttribute attribute, Matcher<T> matcher) {
+        return new DefaultCondition<T>(attribute, matcher);
     }
 
     @Override
     public Condition<?> and(String attributeName, Matcher<?> matcher) {
-        return newCondition(attributeName, matcher);
+        return newCondition(new DefaultAttribute(attributeName), matcher);
+    }
+
+    @Override
+    public Condition<?> and(ConditionAttribute attribute, Matcher<?> matcher) {
+        return newCondition(attribute, matcher);
     }
 
     @Override
@@ -52,7 +60,12 @@ public final class NullCondition implements Condition<Object> {
 
     @Override
     public Condition<?> or(String attributeName, Matcher<?> matcher) {
-        return newCondition(attributeName, matcher);
+        return newCondition(new DefaultAttribute(attributeName), matcher);
+    }
+
+    @Override
+    public Condition<?> or(ConditionAttribute attribute, Matcher<?> matcher) {
+        return newCondition(attribute, matcher);
     }
 
     @Override
@@ -77,12 +90,22 @@ public final class NullCondition implements Condition<Object> {
 
     @Override
     public <E> Condition<?> and(String attributeName, Matcher<E> matcher, AttributeConverter<E> attributeConverter) {
-        return newCondition(attributeName, matcher.withAttributeConverter(attributeConverter));
+        return newCondition(new DefaultAttribute(attributeName), matcher.withAttributeConverter(attributeConverter));
+    }
+
+    @Override
+    public <E> Condition<?> and(ConditionAttribute attribute, Matcher<E> matcher, AttributeConverter<E> attributeConverter) {
+        return newCondition(attribute, matcher.withAttributeConverter(attributeConverter));
     }
 
     @Override
     public <E> Condition<?> or(String attributeName, Matcher<E> matcher, AttributeConverter<E> attributeConverter) {
-        return newCondition(attributeName, matcher.withAttributeConverter(attributeConverter));
+        return newCondition(new DefaultAttribute(attributeName), matcher.withAttributeConverter(attributeConverter));
+    }
+
+    @Override
+    public <E> Condition<?> or(ConditionAttribute attribute, Matcher<E> matcher, AttributeConverter<E> attributeConverter) {
+        return newCondition(attribute, matcher.withAttributeConverter(attributeConverter));
     }
 
     @Override
@@ -92,12 +115,22 @@ public final class NullCondition implements Condition<Object> {
 
     @Override
     public Condition<?> intersection(String attributeName, Matcher<?> matcher) {
-        return newCondition(attributeName, matcher);
+        return newCondition(new DefaultAttribute(attributeName), matcher);
+    }
+
+    @Override
+    public Condition<?> intersection(ConditionAttribute attribute, Matcher<?> matcher) {
+        return newCondition(attribute, matcher);
     }
 
     @Override
     public <E> Condition<?> intersection(String attributeName, Matcher<E> matcher, AttributeConverter<E> attributeConverter) {
-        return newCondition(attributeName, matcher.withAttributeConverter(attributeConverter));
+        return newCondition(new DefaultAttribute(attributeName), matcher.withAttributeConverter(attributeConverter));
+    }
+
+    @Override
+    public <E> Condition<?> intersection(ConditionAttribute attribute, Matcher<E> matcher, AttributeConverter<E> attributeConverter) {
+        return newCondition(attribute, matcher.withAttributeConverter(attributeConverter));
     }
 
     @Override
@@ -106,8 +139,8 @@ public final class NullCondition implements Condition<Object> {
     }
 
     @Override
-    public String getAttributeName() {
-        return "";
+    public ConditionAttribute getAttribute() {
+        return new DefaultAttribute("");
     }
 
     @Override
@@ -116,7 +149,7 @@ public final class NullCondition implements Condition<Object> {
     }
 
     @Override
-    public Condition<Object> withAttributeName(String attributeName) {
+    public Condition<Object> withAttribute(ConditionAttribute attribute) {
         return this;
     }
 

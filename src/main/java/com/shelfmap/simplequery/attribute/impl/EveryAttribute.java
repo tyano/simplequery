@@ -36,8 +36,10 @@ public class EveryAttribute implements ConditionAttribute {
         this.attribute = new DefaultAttribute(name);
     }
 
-    public String getName() {
-        return this.attribute.getName();
+    
+    @Override
+    public String getAttributeName() {
+        return this.attribute.getAttributeName();
     }
 
     /**

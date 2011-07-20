@@ -16,14 +16,17 @@
 
 package com.shelfmap.simplequery.expression.impl;
 
-import com.amazonaws.services.simpledb.util.SimpleDBUtils;
-import com.shelfmap.simplequery.domain.AttributeConverter;
-import static com.shelfmap.simplequery.util.Assertion.isNotNull;
-import com.shelfmap.simplequery.expression.Condition;
-import com.shelfmap.simplequery.expression.matcher.Matcher;
-import com.shelfmap.simplequery.expression.Operator;
 import java.util.Arrays;
 import java.util.List;
+
+import com.shelfmap.simplequery.attribute.ConditionAttribute;
+import com.shelfmap.simplequery.attribute.impl.DefaultAttribute;
+import com.shelfmap.simplequery.domain.AttributeConverter;
+import com.shelfmap.simplequery.expression.Condition;
+import com.shelfmap.simplequery.expression.Operator;
+import com.shelfmap.simplequery.expression.matcher.Matcher;
+
+import static com.shelfmap.simplequery.util.Assertion.isNotNull;
 
 /**
  *
@@ -33,31 +36,31 @@ public class DefaultCondition<T> implements Condition<T> {
 
     private Condition<?> parent;
     private Operator operator;
-    private String attributeName;
+    private ConditionAttribute attribute;
     private Matcher<T> matcher;
 
     public static final List<String> SIMPLEDB_FUNCTION_LIST = Arrays.asList("itemName()");
 
 
-    public DefaultCondition(String attributeName, Matcher<T> matcher) {
-        isNotNull("attributeName", attributeName);
+    public DefaultCondition(ConditionAttribute attribute, Matcher<T> matcher) {
+        isNotNull("attribute", attribute);
         isNotNull("matcher", matcher);
         this.parent = NullCondition.INSTANCE;
         this.operator = NullOperator.INSTANCE;
-        this.attributeName = attributeName;
+        this.attribute = attribute;
         this.matcher = matcher;
     }
 
-    protected DefaultCondition(Condition<?> parent, Operator operator, String attributeName, Matcher<T> matcher) {
+    protected DefaultCondition(Condition<?> parent, Operator operator, ConditionAttribute attribute, Matcher<T> matcher) {
         this.parent = parent;
         this.operator = operator;
-        this.attributeName = attributeName;
+        this.attribute = attribute;
         this.matcher = matcher;
     }
 
     @Override
-    public String getAttributeName() {
-        return attributeName;
+    public ConditionAttribute getAttribute() {
+        return attribute;
     }
 
     @Override
@@ -71,13 +74,19 @@ public class DefaultCondition<T> implements Condition<T> {
         return other.withParent(this, BasicOperator.AND);
     }
 
-    private <T> Condition<T> newCondition(String attributeName, Matcher<T> matcher) {
-        return new DefaultCondition<T>(attributeName, matcher);
+    private <T> Condition<T> newCondition(ConditionAttribute attribute, Matcher<T> matcher) {
+        return new DefaultCondition<T>(attribute, matcher);
     }
 
     @Override
     public Condition<?> and(String attributeName, Matcher<?> matcher) {
-        Condition<?> other = newCondition(attributeName, matcher);
+        Condition<?> other = newCondition(new DefaultAttribute(attributeName), matcher);
+        return this.and(other);
+    }
+
+    @Override
+    public Condition<?> and(ConditionAttribute attribute, Matcher<?> matcher) {
+        Condition<?> other = newCondition(attribute, matcher);
         return this.and(other);
     }
 
@@ -88,7 +97,13 @@ public class DefaultCondition<T> implements Condition<T> {
 
     @Override
     public Condition<?> or(String attributeName, Matcher<?> matcher) {
-        Condition<?> other = newCondition(attributeName, matcher);
+        Condition<?> other = newCondition(new DefaultAttribute(attributeName), matcher);
+        return this.or(other);
+    }
+
+    @Override
+    public Condition<?> or(ConditionAttribute attribute, Matcher<?> matcher) {
+        Condition<?> other = newCondition(attribute, matcher);
         return this.or(other);
     }
 
@@ -103,9 +118,7 @@ public class DefaultCondition<T> implements Condition<T> {
 
         sb.append(getParent().describe());
         sb.append(getOperator().describe());
-
-        final String attributeName = SIMPLEDB_FUNCTION_LIST.contains(getAttributeName()) ? getAttributeName() : SimpleDBUtils.quoteName(getAttributeName());
-        sb.append(attributeName).append(" ").append(getMatcher().describe());
+        sb.append(getAttribute().describe()).append(" ").append(getMatcher().describe());
 
         return sb.toString();
     }
@@ -122,18 +135,30 @@ public class DefaultCondition<T> implements Condition<T> {
 
     @Override
     public Condition<T> withParent(Condition<?> parent, Operator operator) {
-        return new DefaultCondition<T>(parent, operator, getAttributeName(), getMatcher());
+        return new DefaultCondition<T>(parent, operator, getAttribute(), getMatcher());
     }
 
     @Override
     public <E> Condition<?> and(String attributeName, Matcher<E> matcher, AttributeConverter<E> attributeConverter) {
-        Condition<?> other = newCondition(attributeName, matcher.withAttributeConverter(attributeConverter));
+        Condition<?> other = newCondition(new DefaultAttribute(attributeName), matcher.withAttributeConverter(attributeConverter));
+        return this.and(other);
+    }
+
+    @Override
+    public <E> Condition<?> and(ConditionAttribute attribute, Matcher<E> matcher, AttributeConverter<E> attributeConverter) {
+        Condition<?> other = newCondition(attribute, matcher.withAttributeConverter(attributeConverter));
         return this.and(other);
     }
 
     @Override
     public <E> Condition<?> or(String attributeName, Matcher<E> matcher, AttributeConverter<E> attributeConverter) {
-        Condition<?> other = newCondition(attributeName, matcher.withAttributeConverter(attributeConverter));
+        Condition<?> other = newCondition(new DefaultAttribute(attributeName), matcher.withAttributeConverter(attributeConverter));
+        return this.or(other);
+    }
+
+    @Override
+    public <E> Condition<?> or(ConditionAttribute attribute, Matcher<E> matcher, AttributeConverter<E> attributeConverter) {
+        Condition<?> other = newCondition(attribute, matcher.withAttributeConverter(attributeConverter));
         return this.or(other);
     }
 
@@ -144,24 +169,36 @@ public class DefaultCondition<T> implements Condition<T> {
 
     @Override
     public Condition<?> intersection(String attributeName, Matcher<?> matcher) {
-        Condition<?> other = newCondition(attributeName, matcher);
+        Condition<?> other = newCondition(new DefaultAttribute(attributeName), matcher);
+        return this.intersection(other);
+    }
+
+    @Override
+    public Condition<?> intersection(ConditionAttribute attribute, Matcher<?> matcher) {
+        Condition<?> other = newCondition(attribute, matcher);
         return this.intersection(other);
     }
 
     @Override
     public <E> Condition<?> intersection(String attributeName, Matcher<E> matcher, AttributeConverter<E> attributeConverter) {
-        Condition<?> other = newCondition(attributeName, matcher.withAttributeConverter(attributeConverter));
+        Condition<?> other = newCondition(new DefaultAttribute(attributeName), matcher.withAttributeConverter(attributeConverter));
         return this.intersection(other);
     }
 
     @Override
-    public Condition<T> withAttributeName(String attributeName) {
-        return new DefaultCondition<T>(getParent(), getOperator(), attributeName, getMatcher());
+    public <E> Condition<?> intersection(ConditionAttribute attribute, Matcher<E> matcher, AttributeConverter<E> attributeConverter) {
+        Condition<?> other = newCondition(attribute, matcher.withAttributeConverter(attributeConverter));
+        return this.intersection(other);
+    }
+
+    @Override
+    public Condition<T> withAttribute(ConditionAttribute attribute) {
+        return new DefaultCondition<T>(getParent(), getOperator(), attribute, getMatcher());
     }
 
     @Override
     public Condition<T> withMatcher(Matcher<T> matcher) {
-        return new DefaultCondition<T>(getParent(), getOperator(), getAttributeName(), matcher);
+        return new DefaultCondition<T>(getParent(), getOperator(), getAttribute(), matcher);
     }
 
     @Override

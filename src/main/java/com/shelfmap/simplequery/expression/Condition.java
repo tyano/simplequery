@@ -16,6 +16,7 @@
 
 package com.shelfmap.simplequery.expression;
 
+import com.shelfmap.simplequery.attribute.ConditionAttribute;
 import com.shelfmap.simplequery.expression.matcher.Matcher;
 
 /**
@@ -25,11 +26,11 @@ public interface Condition<T> extends Describable, Conjunctive<Condition<?>> {
     /* properties (read only) */
     Condition<?> getParent();
     Operator getOperator();
-    String getAttributeName();
+    ConditionAttribute getAttribute();
     Matcher<T> getMatcher();
 
     /* methods for building new instance with new property value. */
     Condition<T> withParent(Condition<?> parent, Operator operator);
-    Condition<T> withAttributeName(String attributeName);
+    Condition<T> withAttribute(ConditionAttribute attribute);
     Condition<T> withMatcher(Matcher<T> matcher);
 }

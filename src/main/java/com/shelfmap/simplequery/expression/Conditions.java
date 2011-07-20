@@ -16,6 +16,8 @@
 
 package com.shelfmap.simplequery.expression;
 
+import com.shelfmap.simplequery.attribute.ConditionAttribute;
+import com.shelfmap.simplequery.attribute.impl.DefaultAttribute;
 import com.shelfmap.simplequery.expression.impl.BasicOperator;
 import com.shelfmap.simplequery.expression.impl.DefaultCondition;
 import com.shelfmap.simplequery.expression.matcher.Matcher;
@@ -29,7 +31,11 @@ public final class Conditions {
     }
 
     public static <T> Condition<T> condition(String attributeName, Matcher<T> matcher) {
-        return new DefaultCondition<T>(attributeName, matcher);
+        return new DefaultCondition<T>(new DefaultAttribute(attributeName), matcher);
+    }
+    
+    public static <T> Condition<T> condition(ConditionAttribute attribute, Matcher<T> matcher) {
+        return new DefaultCondition<T>(attribute, matcher);
     }
 
     public static Condition<?> condition(Condition<?> first, BasicOperator op, Condition<?> second) {

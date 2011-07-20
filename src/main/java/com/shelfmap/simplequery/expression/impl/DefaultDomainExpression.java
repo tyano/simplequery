@@ -19,6 +19,9 @@ package com.shelfmap.simplequery.expression.impl;
 import com.amazonaws.services.simpledb.AmazonSimpleDB;
 import com.amazonaws.services.simpledb.util.SimpleDBUtils;
 import com.shelfmap.simplequery.Configuration;
+import com.shelfmap.simplequery.attribute.ConditionAttribute;
+import com.shelfmap.simplequery.attribute.impl.DefaultAttribute;
+import com.shelfmap.simplequery.attribute.impl.ItemNameAttribute;
 import static com.shelfmap.simplequery.util.Assertion.isNotNull;
 import com.shelfmap.simplequery.expression.Condition;
 import com.shelfmap.simplequery.expression.DomainExpression;
@@ -28,7 +31,6 @@ import com.shelfmap.simplequery.expression.SelectQuery;
 import com.shelfmap.simplequery.expression.SortOrder;
 import com.shelfmap.simplequery.expression.matcher.Matcher;
 import com.shelfmap.simplequery.expression.WhereExpression;
-import com.shelfmap.simplequery.expression.matcher.MatcherFactory;
 
 /**
  *
@@ -54,19 +56,25 @@ public class DefaultDomainExpression<T> extends BaseExpression<T> implements Dom
         return new DefaultWhereExpression<T>(getAmazonSimpleDB(), getConfiguration(), this, expression);
     }
 
-    private <T> Condition<T> newCondition(String attributeName, Matcher<T> matcher) {
-        return new DefaultCondition<T>(attributeName, matcher);
+    private <T> Condition<T> newCondition(ConditionAttribute attribute, Matcher<T> matcher) {
+        return new DefaultCondition<T>(attribute, matcher);
     }
     
     @Override
     public WhereExpression<T> where(String attributeName, Matcher<?> matcher) {
-        Condition<?> condition = newCondition(attributeName, matcher);
+        Condition<?> condition = newCondition(new DefaultAttribute(attributeName), matcher);
+        return this.where(condition);
+    }
+
+    @Override
+    public WhereExpression<T> where(ConditionAttribute attribute, Matcher<?> matcher) {
+        Condition<?> condition = newCondition(attribute, matcher);
         return this.where(condition);
     }
     
     @Override
     public WhereExpression<T> whereItemName(Matcher<?> matcher) {
-        return this.where("itemName()", matcher);
+        return this.where(ItemNameAttribute.INSTANCE, matcher);
     }
 
     @Override

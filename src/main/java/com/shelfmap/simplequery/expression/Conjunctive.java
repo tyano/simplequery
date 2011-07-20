@@ -16,8 +16,10 @@
 
 package com.shelfmap.simplequery.expression;
 
-import com.shelfmap.simplequery.expression.matcher.Matcher;
+
+import com.shelfmap.simplequery.attribute.ConditionAttribute;
 import com.shelfmap.simplequery.domain.AttributeConverter;
+import com.shelfmap.simplequery.expression.matcher.Matcher;
 
 /**
  * @param <T> the type of conbined object. ex) Expression.and(Condition) will return a Expression, Condition.and(Condition) will return a Condition.
@@ -26,13 +28,19 @@ import com.shelfmap.simplequery.domain.AttributeConverter;
 public interface Conjunctive<T> {
     T and(Condition<?> other);
     T and(String attributeName, Matcher<?> matcher);
+    T and(ConditionAttribute attribute, Matcher<?> matcher);
     <E> T and(String attributeName, Matcher<E> matcher, AttributeConverter<E> attributeConverter);
+    <E> T and(ConditionAttribute attribute, Matcher<E> matcher, AttributeConverter<E> attributeConverter);
     T or(Condition<?> other);
     T or(String attributeName, Matcher<?> matcher);
+    T or(ConditionAttribute attribute, Matcher<?> matcher);
     <E> T or(String attributeName, Matcher<E> matcher, AttributeConverter<E> attributeConverter);
+    <E> T or(ConditionAttribute attribute, Matcher<E> matcher, AttributeConverter<E> attributeConverter);
     T intersection(Condition<?> other);
     T intersection(String attributeName, Matcher<?> matcher);
+    T intersection(ConditionAttribute attribute, Matcher<?> matcher);
     <E> T intersection(String attributeName, Matcher<E> matcher, AttributeConverter<E> attributeConverter);
+    <E> T intersection(ConditionAttribute attribute, Matcher<E> matcher, AttributeConverter<E> attributeConverter);
     T group();
     T not();
 }

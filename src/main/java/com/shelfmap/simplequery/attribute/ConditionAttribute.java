@@ -20,5 +20,5 @@ package com.shelfmap.simplequery.attribute;
  * @author Tsutomu YANO
  */
 public interface ConditionAttribute extends QueryAttribute {
-
+    String getAttributeName();
 }

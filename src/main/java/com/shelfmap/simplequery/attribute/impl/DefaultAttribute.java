@@ -41,13 +41,14 @@ public class DefaultAttribute implements SelectAttribute, ConditionAttribute {
      */
     @Override
     public String describe() {
-        return SimpleDBUtils.quoteName(getName());
+        return SimpleDBUtils.quoteName(getAttributeName());
     }
 
     /**
      * @return name of this attribute, not quoted.
      */
-    public String getName() {
+    @Override
+    public String getAttributeName() {
         return name;
     }
 }

@@ -16,6 +16,8 @@
 
 package com.shelfmap.simplequery.expression;
 
+import com.shelfmap.simplequery.attribute.SelectAttribute;
+
 /**
  * The base interface which all expressions depend on.
  * All expressions must be able to return the results of their own evaluation.
@@ -47,5 +49,5 @@ public interface Expression<T> extends Describable {
     QueryResults<T> getResults(boolean consistent) throws SimpleQueryException;
     
     int count() throws SimpleQueryException;
-    Expression<T> rebuildWith(String... attributes);
+    Expression<T> rebuildWith(SelectAttribute... attributes);
 }

@@ -16,21 +16,25 @@
 
 package com.shelfmap.simplequery.expression.impl;
 
+
+import com.shelfmap.simplequery.attribute.SelectAttribute;
 import com.amazonaws.services.simpledb.AmazonSimpleDB;
 import com.amazonaws.services.simpledb.util.SimpleDBUtils;
+
 import com.shelfmap.simplequery.Configuration;
 import com.shelfmap.simplequery.attribute.ConditionAttribute;
 import com.shelfmap.simplequery.attribute.impl.DefaultAttribute;
 import com.shelfmap.simplequery.attribute.impl.ItemNameAttribute;
-import static com.shelfmap.simplequery.util.Assertion.isNotNull;
 import com.shelfmap.simplequery.expression.Condition;
 import com.shelfmap.simplequery.expression.DomainExpression;
 import com.shelfmap.simplequery.expression.LimitExpression;
 import com.shelfmap.simplequery.expression.OrderByExpression;
 import com.shelfmap.simplequery.expression.SelectQuery;
 import com.shelfmap.simplequery.expression.SortOrder;
-import com.shelfmap.simplequery.expression.matcher.Matcher;
 import com.shelfmap.simplequery.expression.WhereExpression;
+import com.shelfmap.simplequery.expression.matcher.Matcher;
+
+import static com.shelfmap.simplequery.util.Assertion.isNotNull;
 
 /**
  *
@@ -108,7 +112,7 @@ public class DefaultDomainExpression<T> extends BaseExpression<T> implements Dom
     }
 
     @Override
-    public DomainExpression<T> rebuildWith(String... attributes) {
+    public DomainExpression<T> rebuildWith(SelectAttribute... attributes) {
         SelectQuery select = new Select(getAmazonSimpleDB(), getConfiguration(), attributes);
         return rebuildWith(select);
     }

@@ -22,7 +22,7 @@ import com.shelfmap.simplequery.attribute.SelectAttribute;
  * @author Tsutomu YANO
  */
 public class AllAttribute implements SelectAttribute {
-    private static final AllAttribute INSTANCE = new AllAttribute();
+    public static final AllAttribute INSTANCE = new AllAttribute();
     
     public AllAttribute() {
         super();

@@ -17,6 +17,8 @@
 package com.shelfmap.simplequery;
 
 import com.amazonaws.services.simpledb.AmazonSimpleDB;
+import com.shelfmap.simplequery.attribute.QueryAttribute;
+import com.shelfmap.simplequery.attribute.SelectAttribute;
 import com.shelfmap.simplequery.expression.SelectQuery;
 import com.shelfmap.simplequery.expression.impl.Select;
 
@@ -39,11 +41,11 @@ public class SimpleQueryClient implements Client {
     }
 
     @Override
-    public SelectQuery select(String... attribute) {
+    public SelectQuery select(SelectAttribute... attribute) {
         return newSelectQuery(attribute);
     }
     
-    protected SelectQuery newSelectQuery(String... attribute) {
+    protected SelectQuery newSelectQuery(SelectAttribute... attribute) {
         return new Select(simpleDB, configuration, attribute);
     }
 }

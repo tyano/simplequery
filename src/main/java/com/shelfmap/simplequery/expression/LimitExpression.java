@@ -16,6 +16,8 @@
 
 package com.shelfmap.simplequery.expression;
 
+import com.shelfmap.simplequery.attribute.SelectAttribute;
+
 /**
  *
  * @author Tsutomu YANO
@@ -27,5 +29,5 @@ public interface LimitExpression<T> extends Expression<T> {
     int getLimitCount();
     
     @Override
-    LimitExpression<T> rebuildWith(String... attributes);
+    LimitExpression<T> rebuildWith(SelectAttribute... attributes);
 }

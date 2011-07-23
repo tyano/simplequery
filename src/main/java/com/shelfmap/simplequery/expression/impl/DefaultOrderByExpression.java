@@ -15,9 +15,11 @@
  */
 package com.shelfmap.simplequery.expression.impl;
 
-import static com.shelfmap.simplequery.util.Assertion.*;
+
+import com.shelfmap.simplequery.attribute.SelectAttribute;
 import com.amazonaws.services.simpledb.AmazonSimpleDB;
 import com.amazonaws.services.simpledb.util.SimpleDBUtils;
+
 import com.shelfmap.simplequery.Configuration;
 import com.shelfmap.simplequery.expression.DomainExpression;
 import com.shelfmap.simplequery.expression.LimitExpression;
@@ -25,6 +27,8 @@ import com.shelfmap.simplequery.expression.OrderByExpression;
 import com.shelfmap.simplequery.expression.SortOrder;
 import com.shelfmap.simplequery.expression.WhereExpression;
 import com.shelfmap.simplequery.util.Assertion;
+
+import static com.shelfmap.simplequery.util.Assertion.*;
 
 /**
  *
@@ -117,7 +121,7 @@ public class DefaultOrderByExpression<T> extends BaseExpression<T> implements Or
     }
 
     @Override
-    public OrderByExpression<T> rebuildWith(String... attributes) {
+    public OrderByExpression<T> rebuildWith(SelectAttribute... attributes) {
         return (getWhereExpression() != null)
                 ? new DefaultOrderByExpression<T>(getAmazonSimpleDB(),
                                                   getConfiguration(),

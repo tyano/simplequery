@@ -16,6 +16,7 @@
 
 package com.shelfmap.simplequery.expression;
 
+import com.shelfmap.simplequery.attribute.SelectAttribute;
 import java.util.Collection;
 
 /**
@@ -24,9 +25,9 @@ import java.util.Collection;
  */
 public interface SelectQuery extends Describable {
     
-    void addAttributes(String... attribute);
-    SelectQuery withAttributes(String... attribute);
-    Collection<String> getAttributes();
+    void addAttributes(SelectAttribute... attribute);
+    SelectQuery withAttributes(SelectAttribute... attribute);
+    Collection<SelectAttribute> getAttributes();
     
     /**
      * You can create a Expression object which returns all items of a domain.

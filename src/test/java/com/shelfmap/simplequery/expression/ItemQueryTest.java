@@ -40,6 +40,7 @@ import com.shelfmap.simplequery.TestContext;
 import com.shelfmap.simplequery.annotation.Attribute;
 import com.shelfmap.simplequery.annotation.Domain;
 import com.shelfmap.simplequery.annotation.ItemName;
+import com.shelfmap.simplequery.attribute.impl.AllAttribute;
 import com.shelfmap.simplequery.expression.impl.Select;
 import com.shelfmap.simplequery.expression.matcher.MatcherFactory;
 
@@ -115,7 +116,7 @@ public class ItemQueryTest extends BaseStoryRunner {
     
     @When("the expression is created with 'is' matcher")
     public void createItemQueryWithIs() {
-        exp = new Select(ctx.getSimpleDb(), ctx.getConfiguration(), "*").from(ItemTestDomain.class).whereItemName(is("firstItem"));
+        exp = new Select(ctx.getSimpleDb(), ctx.getConfiguration(), AllAttribute.INSTANCE).from(ItemTestDomain.class).whereItemName(is("firstItem"));
     }
 
     @Then("the result string must be -> $resultExp")
@@ -125,7 +126,7 @@ public class ItemQueryTest extends BaseStoryRunner {
 
     @When("the expression is created with 'in' matcher")
     public void createItemQueryWithIn() {
-        exp = new Select(ctx.getSimpleDb(), ctx.getConfiguration(), "*").from(ItemTestDomain.class).whereItemName(MatcherFactory.in("firstItem", "secondItem"));
+        exp = new Select(ctx.getSimpleDb(), ctx.getConfiguration(), AllAttribute.INSTANCE).from(ItemTestDomain.class).whereItemName(MatcherFactory.in("firstItem", "secondItem"));
     }
 
     @Domain(DOMAIN_NAME)

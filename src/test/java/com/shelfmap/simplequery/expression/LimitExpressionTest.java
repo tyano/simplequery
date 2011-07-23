@@ -25,6 +25,7 @@ import com.shelfmap.simplequery.ClientFactory;
 import com.shelfmap.simplequery.IClientHolder;
 import com.shelfmap.simplequery.StoryPath;
 import com.shelfmap.simplequery.TestContext;
+import com.shelfmap.simplequery.attribute.impl.AllAttribute;
 import com.shelfmap.simplequery.expression.impl.Select;
 import java.util.Arrays;
 import java.util.List;
@@ -57,7 +58,7 @@ public class LimitExpressionTest extends BaseStoryRunner {
 
     @When("calling limit(10) for OrderByExpression")
     public void callLimitAgainstOrderByExp() {
-        exp = new Select(ctx.getSimpleDb(), ctx.getConfiguration(), "*").from(TestDomain.class).where("name", like("yano%")).orderBy("name", SortOrder.Asc).limit(10);
+        exp = new Select(ctx.getSimpleDb(), ctx.getConfiguration(), AllAttribute.INSTANCE).from(TestDomain.class).where("name", like("yano%")).orderBy("name", SortOrder.Asc).limit(10);
     }
 
     @Then("it should generate 'limit 10'")
@@ -67,7 +68,7 @@ public class LimitExpressionTest extends BaseStoryRunner {
 
     @When("limit(10) for WhereExpression")
     public void callLimitAgainstWhereExp() {
-        exp = new Select(ctx.getSimpleDb(), ctx.getConfiguration(), "*").from(TestDomain.class).where("name", like("yano%")).limit(10);
+        exp = new Select(ctx.getSimpleDb(), ctx.getConfiguration(), AllAttribute.INSTANCE).from(TestDomain.class).where("name", like("yano%")).limit(10);
     }
 
     @Then("it should generate 'limit 10' after where expression")
@@ -77,7 +78,7 @@ public class LimitExpressionTest extends BaseStoryRunner {
 
     @When("limit(10) for DomainExpression")
     public void callLimitAgainstDomainExp() {
-        exp = new Select(ctx.getSimpleDb(), ctx.getConfiguration(), "*").from(TestDomain.class).limit(10);
+        exp = new Select(ctx.getSimpleDb(), ctx.getConfiguration(), AllAttribute.INSTANCE).from(TestDomain.class).limit(10);
     }
 
     @Then("it should generate 'limit 10' after domain expression")

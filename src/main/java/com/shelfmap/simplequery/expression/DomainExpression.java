@@ -17,6 +17,7 @@
 package com.shelfmap.simplequery.expression;
 
 import com.shelfmap.simplequery.attribute.ConditionAttribute;
+import com.shelfmap.simplequery.attribute.SelectAttribute;
 import com.shelfmap.simplequery.expression.matcher.Matcher;
 
 /**
@@ -36,5 +37,5 @@ public interface DomainExpression<T> extends Expression<T>{
     DomainExpression<T> rebuildWith(SelectQuery select);
 
     @Override
-    DomainExpression<T> rebuildWith(String... attributes);
+    DomainExpression<T> rebuildWith(SelectAttribute... attributes);
 }

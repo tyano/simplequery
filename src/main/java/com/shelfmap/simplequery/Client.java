@@ -17,6 +17,7 @@
 package com.shelfmap.simplequery;
 
 import com.amazonaws.services.simpledb.AmazonSimpleDB;
+import com.shelfmap.simplequery.attribute.SelectAttribute;
 import com.shelfmap.simplequery.expression.SelectQuery;
 
 /**
@@ -25,5 +26,5 @@ import com.shelfmap.simplequery.expression.SelectQuery;
  */
 public interface Client {
     AmazonSimpleDB getSimpleDB();
-    SelectQuery select(String... attribute);
+    SelectQuery select(SelectAttribute... attribute);
 }

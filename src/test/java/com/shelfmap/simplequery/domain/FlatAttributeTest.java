@@ -92,7 +92,7 @@ public class FlatAttributeTest extends BaseStoryRunner {
 
     @When("select an item whose name is 'test-1'")
     public void selectingTest1() throws Exception {
-        Expression<User> exp = ctx.getClient().select("*").from(User.class).where("name", is("test-1"));
+        Expression<User> exp = ctx.getClient().select().from(User.class).where("name", is("test-1"));
         user = exp.getSingleResult(true);
     }
 

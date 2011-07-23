@@ -15,6 +15,8 @@
  */
 package com.shelfmap.simplequery.expression;
 
+import com.shelfmap.simplequery.attribute.SelectAttribute;
+
 /**
  *
  * @author Tsutomu YANO
@@ -26,5 +28,5 @@ public interface WhereExpression<T> extends Expression<T>, Conjunctive<WhereExpr
     LimitExpression<T> limit(int limitCount);
 
     @Override
-    WhereExpression<T> rebuildWith(String... attributes);
+    WhereExpression<T> rebuildWith(SelectAttribute... attributes);
 }

@@ -16,6 +16,8 @@
 
 package com.shelfmap.simplequery.expression;
 
+import com.shelfmap.simplequery.attribute.SelectAttribute;
+
 /**
  *
  * @author Tsutomu YANO
@@ -28,5 +30,5 @@ public interface OrderByExpression<T> extends Expression<T> {
     SortOrder getSortOrder();
 
     @Override
-    OrderByExpression<T> rebuildWith(String... attributes);
+    OrderByExpression<T> rebuildWith(SelectAttribute... attributes);
 }

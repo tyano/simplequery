@@ -16,10 +16,12 @@
 package com.shelfmap.simplequery.expression.impl;
 
 
+
 import com.amazonaws.services.simpledb.AmazonSimpleDB;
 
 import com.shelfmap.simplequery.Configuration;
 import com.shelfmap.simplequery.attribute.ConditionAttribute;
+import com.shelfmap.simplequery.attribute.SelectAttribute;
 import com.shelfmap.simplequery.attribute.impl.DefaultAttribute;
 import com.shelfmap.simplequery.domain.AttributeConverter;
 import com.shelfmap.simplequery.domain.DomainAttribute;
@@ -211,7 +213,7 @@ public class DefaultWhereExpression<T> extends BaseExpression<T> implements Wher
     }
 
     @Override
-    public WhereExpression<T> rebuildWith(String... attributes) {
+    public WhereExpression<T> rebuildWith(SelectAttribute... attributes) {
         return new DefaultWhereExpression<T>(getAmazonSimpleDB(),
                 getConfiguration(),
                 domainExpression.rebuildWith(attributes),

@@ -18,6 +18,7 @@ package com.shelfmap.simplequery.expression.impl;
 import static com.shelfmap.simplequery.util.Assertion.*;
 import com.amazonaws.services.simpledb.AmazonSimpleDB;
 import com.shelfmap.simplequery.Configuration;
+import com.shelfmap.simplequery.attribute.SelectAttribute;
 import com.shelfmap.simplequery.expression.DomainExpression;
 import com.shelfmap.simplequery.expression.LimitExpression;
 import com.shelfmap.simplequery.expression.OrderByExpression;
@@ -119,7 +120,7 @@ public class DefaultLimitExpression<T> extends BaseExpression<T> implements Limi
     }
 
     @Override
-    public LimitExpression<T> rebuildWith(String... attributes) {
+    public LimitExpression<T> rebuildWith(SelectAttribute... attributes) {
         return (orderByExpression != null)
                 ? new DefaultLimitExpression<T>(getAmazonSimpleDB(), getConfiguration(), orderByExpression.rebuildWith(attributes), limitCount)
                 : (whereExpression != null)

@@ -22,6 +22,7 @@ import com.amazonaws.services.simpledb.model.Item;
 import com.amazonaws.services.simpledb.model.SelectRequest;
 import com.amazonaws.services.simpledb.model.SelectResult;
 import com.shelfmap.simplequery.Configuration;
+import com.shelfmap.simplequery.attribute.impl.CountAttribute;
 import com.shelfmap.simplequery.expression.CanNotConvertItemException;
 import com.shelfmap.simplequery.expression.Expression;
 import com.shelfmap.simplequery.expression.MultipleResultsExistException;
@@ -34,8 +35,6 @@ import java.util.List;
  * @author Tsutomu YANO
  */
 public abstract class BaseExpression<T> implements Expression<T> {
-    private static final String COUNT_ATTRIBUTE = "count(*)";
-    
     private final Configuration configuration;
     private final AmazonSimpleDB simpleDB;
     private final Class<T> domainClass;
@@ -78,7 +77,7 @@ public abstract class BaseExpression<T> implements Expression<T> {
 
     @Override
     public int count() throws SimpleQueryException {
-        Expression<T> rebuilt = rebuildWith(COUNT_ATTRIBUTE);
+        Expression<T> rebuilt = rebuildWith(CountAttribute.INSTANCE);
         SelectRequest req = new SelectRequest(rebuilt.describe());
         SelectResult selectResult = simpleDB.select(req);
         List<Item> items = selectResult.getItems();

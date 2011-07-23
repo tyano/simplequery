@@ -85,7 +85,7 @@ public class ExpressionOnAttributeTest extends BaseStoryRunner {
 
     @When("using AllAttribute class as a attribute")
     public void createAllAttribute() {
-        attribute = new AllAttribute();
+        attribute = AllAttribute.INSTANCE;
     }
 
     @Then("the described name of the attribute must be $result")

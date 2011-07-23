@@ -24,7 +24,7 @@ import com.shelfmap.simplequery.attribute.SelectAttribute;
 public class AllAttribute implements SelectAttribute {
     public static final AllAttribute INSTANCE = new AllAttribute();
     
-    public AllAttribute() {
+    private AllAttribute() {
         super();
     }
 

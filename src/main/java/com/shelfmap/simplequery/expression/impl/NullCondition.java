@@ -44,11 +44,6 @@ public final class NullCondition implements Condition<Object> {
     }
 
     @Override
-    public Condition<?> and(String attributeName, Matcher<?> matcher) {
-        return newCondition(new DefaultAttribute(attributeName), matcher);
-    }
-
-    @Override
     public Condition<?> and(ConditionAttribute attribute, Matcher<?> matcher) {
         return newCondition(attribute, matcher);
     }
@@ -56,11 +51,6 @@ public final class NullCondition implements Condition<Object> {
     @Override
     public Condition<?> or(Condition<?> other) {
         return other;
-    }
-
-    @Override
-    public Condition<?> or(String attributeName, Matcher<?> matcher) {
-        return newCondition(new DefaultAttribute(attributeName), matcher);
     }
 
     @Override
@@ -89,18 +79,8 @@ public final class NullCondition implements Condition<Object> {
     }
 
     @Override
-    public <E> Condition<?> and(String attributeName, Matcher<E> matcher, AttributeConverter<E> attributeConverter) {
-        return newCondition(new DefaultAttribute(attributeName), matcher.withAttributeConverter(attributeConverter));
-    }
-
-    @Override
     public <E> Condition<?> and(ConditionAttribute attribute, Matcher<E> matcher, AttributeConverter<E> attributeConverter) {
         return newCondition(attribute, matcher.withAttributeConverter(attributeConverter));
-    }
-
-    @Override
-    public <E> Condition<?> or(String attributeName, Matcher<E> matcher, AttributeConverter<E> attributeConverter) {
-        return newCondition(new DefaultAttribute(attributeName), matcher.withAttributeConverter(attributeConverter));
     }
 
     @Override
@@ -114,18 +94,8 @@ public final class NullCondition implements Condition<Object> {
     }
 
     @Override
-    public Condition<?> intersection(String attributeName, Matcher<?> matcher) {
-        return newCondition(new DefaultAttribute(attributeName), matcher);
-    }
-
-    @Override
     public Condition<?> intersection(ConditionAttribute attribute, Matcher<?> matcher) {
         return newCondition(attribute, matcher);
-    }
-
-    @Override
-    public <E> Condition<?> intersection(String attributeName, Matcher<E> matcher, AttributeConverter<E> attributeConverter) {
-        return newCondition(new DefaultAttribute(attributeName), matcher.withAttributeConverter(attributeConverter));
     }
 
     @Override

@@ -16,6 +16,7 @@
 
 package com.shelfmap.simplequery.expression;
 
+import static com.shelfmap.simplequery.attribute.Attributes.attr;
 import static com.shelfmap.simplequery.expression.matcher.MatcherFactory.greaterThan;
 import static org.junit.Assert.assertThat;
 import com.amazonaws.auth.PropertiesCredentials;
@@ -55,7 +56,7 @@ public class WhereExpressionTest extends BaseStoryRunner {
 
     @When("TestDomain don't have any @Attribute annotation on it's properties,")
     public void createExpression() {
-        expression = new Select(simpleDB, configuration).from(DomainWithoutAttribute.class).where("saving", greaterThan(100000));
+        expression = new Select(simpleDB, configuration).from(DomainWithoutAttribute.class).where(attr("saving"), greaterThan(100000));
     }
 
     @Then("WhereExpression will generate a simple expression with no padding nor offset.")
@@ -65,7 +66,7 @@ public class WhereExpressionTest extends BaseStoryRunner {
 
     @When("TestDomain have a @Attribute on a property whose name is same with the attribute specified in a expression")
     public void createExpressionWithAnnotation() {
-        expression = new Select(simpleDB, configuration).from(DomainWithAttribute.class).where("saving", greaterThan(100000));
+        expression = new Select(simpleDB, configuration).from(DomainWithAttribute.class).where(attr("saving"), greaterThan(100000));
     }
 
     @Then("WhereExpression will use a padding and a offset on the annotation")
@@ -75,7 +76,7 @@ public class WhereExpressionTest extends BaseStoryRunner {
 
     @When("a property have a @Attribute annotation, but the annotation don't have attributeName,")
     public void createExpressionWithoutAttributeName() {
-        expression = new Select(simpleDB, configuration).from(DomainWithoutAttributeName.class).where("saving", greaterThan(500));
+        expression = new Select(simpleDB, configuration).from(DomainWithoutAttributeName.class).where(attr("saving"), greaterThan(500));
     }
 
     @Then("this library will find the annotation through the name of property instead of the attributeName, and uses values of the annotation.")

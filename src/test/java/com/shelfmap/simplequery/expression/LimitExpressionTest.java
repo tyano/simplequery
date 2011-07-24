@@ -15,6 +15,7 @@
  */
 package com.shelfmap.simplequery.expression;
 
+import static com.shelfmap.simplequery.attribute.Attributes.attr;
 import static org.junit.Assert.assertThat;
 import static com.shelfmap.simplequery.expression.matcher.MatcherFactory.*;
 import com.google.inject.Binder;
@@ -58,7 +59,7 @@ public class LimitExpressionTest extends BaseStoryRunner {
 
     @When("calling limit(10) for OrderByExpression")
     public void callLimitAgainstOrderByExp() {
-        exp = new Select(ctx.getSimpleDb(), ctx.getConfiguration(), AllAttribute.INSTANCE).from(TestDomain.class).where("name", like("yano%")).orderBy("name", SortOrder.Asc).limit(10);
+        exp = new Select(ctx.getSimpleDb(), ctx.getConfiguration(), AllAttribute.INSTANCE).from(TestDomain.class).where(attr("name"), like("yano%")).orderBy(attr("name"), SortOrder.Asc).limit(10);
     }
 
     @Then("it should generate 'limit 10'")
@@ -68,7 +69,7 @@ public class LimitExpressionTest extends BaseStoryRunner {
 
     @When("limit(10) for WhereExpression")
     public void callLimitAgainstWhereExp() {
-        exp = new Select(ctx.getSimpleDb(), ctx.getConfiguration(), AllAttribute.INSTANCE).from(TestDomain.class).where("name", like("yano%")).limit(10);
+        exp = new Select(ctx.getSimpleDb(), ctx.getConfiguration(), AllAttribute.INSTANCE).from(TestDomain.class).where(attr("name"), like("yano%")).limit(10);
     }
 
     @Then("it should generate 'limit 10' after where expression")

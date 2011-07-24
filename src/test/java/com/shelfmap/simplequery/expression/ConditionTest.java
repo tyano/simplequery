@@ -15,8 +15,10 @@
  */
 package com.shelfmap.simplequery.expression;
 
+import static com.shelfmap.simplequery.attribute.Attributes.attr;
 import com.shelfmap.simplequery.BaseStoryRunner;
 import com.shelfmap.simplequery.StoryPath;
+import com.shelfmap.simplequery.attribute.Attributes;
 import static com.shelfmap.simplequery.expression.Conditions.*;
 import static com.shelfmap.simplequery.expression.matcher.MatcherFactory.*;
 import static org.junit.Assert.assertThat;
@@ -39,7 +41,7 @@ public class ConditionTest extends BaseStoryRunner {
 
     @When("a condition is initialized with a attribute name '$attributeName' and a matcher 'is($value)'")
     public void createCondition1(String attributeName, int value) {
-        condition = condition(attributeName, is(value));
+        condition = $(attr(attributeName), is(value));
     }
 
     @Then("the describe() method of the condition must return a string like \"$expected\"")
@@ -49,22 +51,22 @@ public class ConditionTest extends BaseStoryRunner {
 
     @When("a condition is initialized with a attribute name '$attributeName' and a matcher 'greaterEqual($value)', and the matcher has a padding of $padding")
     public void createPaddingCondition(String attributeName, int value, int padding) {
-        condition = condition(attributeName, greaterEqual(value).withAttributeConverter(new IntAttributeConverter(padding, 0)));
+        condition = $(attr(attributeName), greaterEqual(value).withAttributeConverter(new IntAttributeConverter(padding, 0)));
     }
 
     @When("a condition is initialized with a attribute name '$attributeName' and a matcher 'greaterThan($value)', and the matcher has a padding of $padding and a offset of $offsetValue,")
     public void createOffsetCondition(String attributeName, int value, int padding, int offsetValue) {
-        condition = condition(attributeName, greaterThan(value).withAttributeConverter(new IntAttributeConverter(padding, offsetValue)));
+        condition = $(attr(attributeName), greaterThan(value).withAttributeConverter(new IntAttributeConverter(padding, offsetValue)));
     }
 
     @When("a condition with a expression like $attributeName = '$value', and group() method has been called to the condition")
     public void createGroupCondigion(String attributeName, String value) {
-        condition = condition(attributeName, is(value)).group();
+        condition = $(attr(attributeName), is(value)).group();
     }
 
     @When("a groupd condition and a normal condition is joined with operator 'and'")
     public void createGroupedCondition1() {
-        condition = condition("first", like("yano-%")).group().and("last", notLike("%.java"));
+        condition = $(attr("first"), like("yano-%")).group().and(attr("last"), notLike("%.java"));
     }
 
     @Then("the result must be like (first condition) and normal-condition")
@@ -74,8 +76,8 @@ public class ConditionTest extends BaseStoryRunner {
 
     @When("multiple grouped conditions are used and collected conditions have been grouped at last")
     public void createGroupedCondition2() {
-        condition = condition("first", is(1)).and("second", isNot(2)).group().or(
-                condition("third", lessThan(100)).and("fourth", lessEqual(200)).group()).group();
+        condition = $(attr("first"), is(1)).and(attr("second"), isNot(2)).group().or(
+                $(attr("third"), lessThan(100)).and(attr("fourth"), lessEqual(200)).group()).group();
     }
 
     @Then("the result must be grouped multiple times like ((first expression) or (second expression)).")
@@ -85,18 +87,18 @@ public class ConditionTest extends BaseStoryRunner {
 
     @When("a intersection method is called")
     public void createIntersectionCondition() {
-        condition = condition("first", is(1));
+        condition = $(attr("first"), is(1));
     }
 
     @Then("two conditions will be joined with a intersection operator.")
     public void assertIntersection() {
-        Condition<?> intersection = condition.intersection("second", greaterEqual(30));
+        Condition<?> intersection = condition.intersection(attr("second"), greaterEqual(30));
         assertThat(intersection.describe(), Matchers.is("`first` = '1' intersection `second` >= '30'"));
     }
 
     @When("another condition has been joined after using intersection")
     public void join3Conditions() {
-        condition = condition("first", is(1)).intersection("second", lessThan(0).withAttributeConverter(new IntAttributeConverter(5, 90000))).or("third", is("name"));
+        condition = $(attr("first"), is(1)).intersection(attr("second"), lessThan(0).withAttributeConverter(new IntAttributeConverter(5, 90000))).or(attr("third"), is("name"));
     }
 
     @Then("three conditions will be joined as a series of conditions. Don't grouped automatically.")
@@ -106,8 +108,8 @@ public class ConditionTest extends BaseStoryRunner {
 
     @When("two grouped condition has been joined with a intersection operator")
     public void join2groupedConditions() {
-        Condition<?> c1 = group(condition("first", is(1)).and("second", is("name")));
-        Condition<?> c2 = group(condition("third", is(2)).or("fourth", is("age")));
+        Condition<?> c1 = group($(attr("first"), is(1)).and(attr("second"), is("name")));
+        Condition<?> c2 = group($(attr("third"), is(2)).or(attr("fourth"), is("age")));
         condition = c1.intersection(c2);
     }
 

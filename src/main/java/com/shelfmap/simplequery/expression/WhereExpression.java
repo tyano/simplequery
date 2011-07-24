@@ -15,6 +15,7 @@
  */
 package com.shelfmap.simplequery.expression;
 
+import com.shelfmap.simplequery.attribute.ConditionAttribute;
 import com.shelfmap.simplequery.attribute.SelectAttribute;
 
 /**
@@ -24,7 +25,7 @@ import com.shelfmap.simplequery.attribute.SelectAttribute;
 public interface WhereExpression<T> extends Expression<T>, Conjunctive<WhereExpression<T>> {
     DomainExpression<T> getDomainExpression();
     Condition<?> getCondition();
-    OrderByExpression<T> orderBy(String attributeName, SortOrder sortOrder);
+    OrderByExpression<T> orderBy(ConditionAttribute attribute, SortOrder sortOrder);
     LimitExpression<T> limit(int limitCount);
 
     @Override

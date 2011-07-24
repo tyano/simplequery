@@ -54,7 +54,7 @@ public class DefaultDomainExpression<T> extends BaseExpression<T> implements Dom
         this.domainName = domainName;
         this.typeToken = typeToken;
     }
-    
+
     @Override
     public WhereExpression<T> where(Condition<?> expression) {
         return new DefaultWhereExpression<T>(getAmazonSimpleDB(), getConfiguration(), this, expression);
@@ -63,19 +63,13 @@ public class DefaultDomainExpression<T> extends BaseExpression<T> implements Dom
     private <T> Condition<T> newCondition(ConditionAttribute attribute, Matcher<T> matcher) {
         return new DefaultCondition<T>(attribute, matcher);
     }
-    
-    @Override
-    public WhereExpression<T> where(String attributeName, Matcher<?> matcher) {
-        Condition<?> condition = newCondition(new DefaultAttribute(attributeName), matcher);
-        return this.where(condition);
-    }
 
     @Override
     public WhereExpression<T> where(ConditionAttribute attribute, Matcher<?> matcher) {
         Condition<?> condition = newCondition(attribute, matcher);
         return this.where(condition);
     }
-    
+
     @Override
     public WhereExpression<T> whereItemName(Matcher<?> matcher) {
         return this.where(ItemNameAttribute.INSTANCE, matcher);
@@ -107,8 +101,8 @@ public class DefaultDomainExpression<T> extends BaseExpression<T> implements Dom
     }
 
     @Override
-    public OrderByExpression<T> orderBy(String attributeName, SortOrder sortOrder) {
-        return new DefaultOrderByExpression<T>(getAmazonSimpleDB(), getConfiguration(), this, attributeName, sortOrder);
+    public OrderByExpression<T> orderBy(ConditionAttribute attribute, SortOrder sortOrder) {
+        return new DefaultOrderByExpression<T>(getAmazonSimpleDB(), getConfiguration(), this, attribute, sortOrder);
     }
 
     @Override

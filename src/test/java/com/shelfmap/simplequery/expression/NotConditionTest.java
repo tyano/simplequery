@@ -21,10 +21,11 @@ import org.jbehave.core.annotations.When;
 
 import com.shelfmap.simplequery.BaseStoryRunner;
 import com.shelfmap.simplequery.StoryPath;
+import static com.shelfmap.simplequery.attribute.Attributes.attr;
+import static com.shelfmap.simplequery.expression.Conditions.$;
 
 import static org.junit.Assert.assertThat;
 
-import static com.shelfmap.simplequery.expression.Conditions.condition;
 import static com.shelfmap.simplequery.expression.Conditions.group;
 import static com.shelfmap.simplequery.expression.Conditions.not;
 import static com.shelfmap.simplequery.expression.matcher.MatcherFactory.in;
@@ -41,12 +42,12 @@ public class NotConditionTest extends BaseStoryRunner {
 
     @When("using .not() medhod against an condition object")
     public void createNotCondition() {
-        condition = condition("name", in("yano", "yano2")).not();
+        condition = $(attr("name"), in("yano", "yano2")).not();
     }
 
     @When("using not() static method of the Conditions class")
     public void createNotConditionWithCondisions() {
-        condition = not(condition("name", in("yano", "yano2")));
+        condition = not($(attr("name"), in("yano", "yano2")));
     }
 
     @Then("the result of describe() must be like 'not (a expression)'")
@@ -56,7 +57,7 @@ public class NotConditionTest extends BaseStoryRunner {
 
     @When("using not() method against a GroupCondition object")
     public void createNotConditionOnGroupCondition() {
-        condition = not(group(condition("name", is("yano")).and(condition("address", is("Tokyo")))));
+        condition = not(group($(attr("name"), is("yano")).and($(attr("address"), is("Tokyo")))));
     }
 
     @Then("the result of describe() must be like 'not ((a expression and a expression))")

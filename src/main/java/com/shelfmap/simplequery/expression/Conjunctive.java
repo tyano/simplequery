@@ -27,19 +27,13 @@ import com.shelfmap.simplequery.expression.matcher.Matcher;
  */
 public interface Conjunctive<T> {
     T and(Condition<?> other);
-    T and(String attributeName, Matcher<?> matcher);
     T and(ConditionAttribute attribute, Matcher<?> matcher);
-    <E> T and(String attributeName, Matcher<E> matcher, AttributeConverter<E> attributeConverter);
     <E> T and(ConditionAttribute attribute, Matcher<E> matcher, AttributeConverter<E> attributeConverter);
     T or(Condition<?> other);
-    T or(String attributeName, Matcher<?> matcher);
     T or(ConditionAttribute attribute, Matcher<?> matcher);
-    <E> T or(String attributeName, Matcher<E> matcher, AttributeConverter<E> attributeConverter);
     <E> T or(ConditionAttribute attribute, Matcher<E> matcher, AttributeConverter<E> attributeConverter);
     T intersection(Condition<?> other);
-    T intersection(String attributeName, Matcher<?> matcher);
     T intersection(ConditionAttribute attribute, Matcher<?> matcher);
-    <E> T intersection(String attributeName, Matcher<E> matcher, AttributeConverter<E> attributeConverter);
     <E> T intersection(ConditionAttribute attribute, Matcher<E> matcher, AttributeConverter<E> attributeConverter);
     T group();
     T not();

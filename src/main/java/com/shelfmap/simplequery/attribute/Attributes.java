@@ -33,15 +33,6 @@ public class Attributes {
      * @param name name of an attribute
      * @return an instance of DefaultAttribute
      */
-    public static DefaultAttribute $(String name) {
-        return new DefaultAttribute(name);
-    }
-
-    /**
-     * Utility method for creating a DefaultAttribute.
-     * @param name name of an attribute
-     * @return an instance of DefaultAttribute
-     */
     public static DefaultAttribute attr(String name) {
         return new DefaultAttribute(name);
     }

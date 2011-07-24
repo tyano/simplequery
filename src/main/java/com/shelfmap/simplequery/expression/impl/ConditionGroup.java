@@ -65,23 +65,11 @@ public class ConditionGroup implements Condition<Void> {
     }
 
     @Override
-    public Condition<?> and(String attributeName, Matcher<?> matcher) {
-        Condition<?> other = newCondition(new DefaultAttribute(attributeName), matcher);
-        return this.and(other);
-    }
-
-    @Override
     public Condition<?> and(ConditionAttribute attribute, Matcher<?> matcher) {
         Condition<?> other = newCondition(attribute, matcher);
         return this.and(other);
     }
 
-    @Override
-    public <E> Condition<?> and(String attributeName, Matcher<E> matcher, AttributeConverter<E> attributeConverter) {
-        Condition<?> other = newCondition(new DefaultAttribute(attributeName), matcher.withAttributeConverter(attributeConverter));
-        return this.and(other);
-    }
-    
     @Override
     public <E> Condition<?> and(ConditionAttribute attribute, Matcher<E> matcher, AttributeConverter<E> attributeConverter) {
         Condition<?> other = newCondition(attribute, matcher.withAttributeConverter(attributeConverter));
@@ -94,20 +82,8 @@ public class ConditionGroup implements Condition<Void> {
     }
 
     @Override
-    public Condition<?> or(String attributeName, Matcher<?> matcher) {
-        Condition<?> other = newCondition(new DefaultAttribute(attributeName), matcher);
-        return this.or(other);
-    }
-
-    @Override
     public Condition<?> or(ConditionAttribute attribute, Matcher<?> matcher) {
         Condition<?> other = newCondition(attribute, matcher);
-        return this.or(other);
-    }
-
-    @Override
-    public <E> Condition<?> or(String attributeName, Matcher<E> matcher, AttributeConverter<E> attributeConverter) {
-        Condition<?> other = newCondition(new DefaultAttribute(attributeName), matcher.withAttributeConverter(attributeConverter));
         return this.or(other);
     }
 
@@ -148,20 +124,8 @@ public class ConditionGroup implements Condition<Void> {
     }
 
     @Override
-    public Condition<?> intersection(String attributeName, Matcher<?> matcher) {
-        Condition<?> other = newCondition(new DefaultAttribute(attributeName), matcher);
-        return this.intersection(other);
-    }
-
-    @Override
     public Condition<?> intersection(ConditionAttribute attribute, Matcher<?> matcher) {
         Condition<?> other = newCondition(attribute, matcher);
-        return this.intersection(other);
-    }
-
-    @Override
-    public <E> Condition<?> intersection(String attributeName, Matcher<E> matcher, AttributeConverter<E> attributeConverter) {
-        Condition<?> other = newCondition(new DefaultAttribute(attributeName), matcher.withAttributeConverter(attributeConverter));
         return this.intersection(other);
     }
 

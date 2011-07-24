@@ -16,7 +16,6 @@
 package com.shelfmap.simplequery.expression;
 
 import static com.shelfmap.simplequery.attribute.Attributes.attr;
-import static com.shelfmap.simplequery.attribute.Attributes.$;
 import static com.shelfmap.simplequery.attribute.Attributes.every;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
@@ -49,7 +48,7 @@ public class ExpressionOnAttributeTest extends BaseStoryRunner {
 
     @When("an instance of DefaultAttribute is created by Attributes.$() method")
     public void createDefaultAttributeWith$(@Named("name") String name) {
-        attribute = $(name);
+        attribute = attr(name);
     }
 
     @When("an instance of DefaultAttribute is created by Attributes.attr() method")

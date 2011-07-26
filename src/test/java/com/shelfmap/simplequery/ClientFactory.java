@@ -40,6 +40,9 @@ public class ClientFactory {
         holder.setClient(new SimpleQueryClient(new File(getSecurityCredentialPath()), conf));
         holder.setSimpleDb(holder.getClient().getSimpleDB());
         holder.setConfiguration(conf);
+    
+//        holder.getClient().getS3().setEndpoint("s3-ap-northeast-1.amazonaws.com");
+//        holder.getSimpleDb().setEndpoint("sdb.ap-northeast-1.amazonaws.com");
     }
 
     public String getSecurityCredentialPath() {

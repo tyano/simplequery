@@ -16,18 +16,18 @@
 package com.shelfmap.simplequery.domain.impl;
 
 import com.shelfmap.simplequery.domain.AttributeConverter;
+import com.shelfmap.simplequery.domain.BlobReference;
+import com.shelfmap.simplequery.domain.DefaultBlobReference;
+import com.shelfmap.simplequery.domain.S3Resource;
+import com.shelfmap.simplequery.domain.S3ResourceInfo;
 import com.shelfmap.simplequery.expression.CanNotRestoreAttributeException;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
- * @param <T> 
+ * @param <T>
  * @author Tsutomu YANO
  */
-public class BlobAttributeConverter<T> implements AttributeConverter<T> {
+public class BlobAttributeConverter<T> implements AttributeConverter<BlobReference<T>> {
 
     private Class<T> targetClass;
 
@@ -43,23 +43,28 @@ public class BlobAttributeConverter<T> implements AttributeConverter<T> {
     public void setTargetClass(Class<T> targetClass) {
         this.targetClass = targetClass;
     }
-    
+
+    /**
+     * {@inheritDoc }
+     * <p>
+     * the string expression of BlobReference must be a string which contains
+     * bucket's name and key name of Amazon S3, separated by '|'.
+     */
     @Override
-    public String convertValue(T targetValue) {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public String convertValue(BlobReference<T> targetValue) {
+        S3ResourceInfo info = targetValue.getResourceInfo();
+        return info.getBucketName() + "|" + info.getKey();
     }
 
     @Override
-    public T restoreValue(String targetValue) throws CanNotRestoreAttributeException {
-        try {
-            //'targetValue' is a url for S3 resource.
-            //we must retrieve the binary data from the url and restore object T from it.
-            URL url = new URL(targetValue);
-            
-            return null;
-        } catch (MalformedURLException ex) {
-            throw new CanNotRestoreAttributeException(targetValue, ex, targetValue, getTargetClass());
-        }
+    public BlobReference<T> restoreValue(String targetValue) throws CanNotRestoreAttributeException {
+        String[] nameAndKey = targetValue.split("|", 2);
+        if(nameAndKey.length != 2) throw new IllegalStateException("the string expression for a Blob must be a string which contains the bucket's name and key separated by '|'.");
+
+        String bucketName = nameAndKey[0];
+        String key = nameAndKey[1];
+
+        return new DefaultBlobReference<T>(new S3Resource(bucketName, key));
     }
-    
+
 }

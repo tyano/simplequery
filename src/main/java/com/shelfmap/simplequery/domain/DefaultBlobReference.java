@@ -34,9 +34,11 @@ public class DefaultBlobReference<T> implements BlobReference<T> {
     private static final Logger LOGGER = LoggerFactory.getLogger(DefaultBlobReference.class);
 
     private final S3ResourceInfo resourceInfo;
+    private final Class<T> targetClass;
 
-    public DefaultBlobReference(S3ResourceInfo resourceInfo) {
+    public DefaultBlobReference(S3ResourceInfo resourceInfo, Class<T> targetClass) {
         this.resourceInfo = resourceInfo;
+        this.targetClass = targetClass;
     }
 
     @Override
@@ -57,11 +59,10 @@ public class DefaultBlobReference<T> implements BlobReference<T> {
         }
     }
 
-    @SuppressWarnings("unchecked")
     private T restoreObject(InputStream stream) throws IOException, ClassNotFoundException {
         ObjectInputStream ois = new ObjectInputStream(stream);
         try {
-            return (T) ois.readObject();
+            return targetClass.cast(ois.readObject());
         } finally {
             try {
                 if(ois != null) ois.close();
@@ -74,5 +75,9 @@ public class DefaultBlobReference<T> implements BlobReference<T> {
     @Override
     public S3ResourceInfo getResourceInfo() {
         return this.resourceInfo;
+    }
+
+    public Class<T> getTargetClass() {
+        return targetClass;
     }
 }

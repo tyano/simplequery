@@ -64,7 +64,7 @@ public class BlobAttributeConverter<T> implements AttributeConverter<BlobReferen
         String bucketName = nameAndKey[0];
         String key = nameAndKey[1];
 
-        return new DefaultBlobReference<T>(new S3Resource(bucketName, key));
+        return new DefaultBlobReference<T>(new S3Resource(bucketName, key), getTargetClass());
     }
 
 }

@@ -15,12 +15,8 @@
  */
 package com.shelfmap.simplequery;
 
-import com.amazonaws.auth.PropertiesCredentials;
-import com.amazonaws.services.simpledb.AmazonSimpleDB;
-import com.amazonaws.services.simpledb.AmazonSimpleDBClient;
 import com.google.inject.Inject;
 import java.io.File;
-import java.io.IOException;
 import org.jbehave.core.annotations.Given;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,25 +35,14 @@ public class ClientFactory {
     public void createClinet() {
         LOGGER.debug("create client.");
 
-        AmazonSimpleDB simpleDb = getAmazonSimpleDB();
         Configuration conf = new com.shelfmap.simplequery.DefaultConfiguration();
 
-        holder.setSimpleDb(getAmazonSimpleDB());
-        holder.setClient(new SimpleQueryClient(simpleDb, conf));
+        holder.setClient(new SimpleQueryClient(new File(getSecurityCredentialPath()), conf));
+        holder.setSimpleDb(holder.getClient().getSimpleDB());
         holder.setConfiguration(conf);
     }
 
     public String getSecurityCredentialPath() {
         return "/Users/t_yano/aws.credential.properties";
-    }
-
-    public AmazonSimpleDB getAmazonSimpleDB() {
-        try {
-            return new AmazonSimpleDBClient(new PropertiesCredentials(new File(getSecurityCredentialPath())));
-        } catch (IOException ex) {
-            throw new IllegalStateException(ex);
-        } catch (IllegalArgumentException ex) {
-            throw new IllegalStateException(ex);
-        }
     }
 }

@@ -16,6 +16,7 @@
 package com.shelfmap.simplequery.domain.impl;
 
 import com.shelfmap.simplequery.domain.AttributeConverter;
+import com.shelfmap.simplequery.domain.BlobContentConverter;
 import com.shelfmap.simplequery.domain.BlobReference;
 import com.shelfmap.simplequery.domain.DefaultBlobReference;
 import com.shelfmap.simplequery.domain.S3Resource;
@@ -30,10 +31,12 @@ import com.shelfmap.simplequery.expression.CanNotRestoreAttributeException;
 public class BlobAttributeConverter<T> implements AttributeConverter<BlobReference<T>> {
 
     private Class<T> targetClass;
+    private Class<? extends BlobContentConverter<T>> contentConverterClass;
 
-    public BlobAttributeConverter(Class<T> targetClass) {
+    public BlobAttributeConverter(Class<T> targetClass, Class<? extends BlobContentConverter<T>> contentConverterClass) {
         super();
         this.targetClass = targetClass;
+        this.contentConverterClass = contentConverterClass;
     }
 
     public Class<T> getTargetClass() {
@@ -43,6 +46,15 @@ public class BlobAttributeConverter<T> implements AttributeConverter<BlobReferen
     public void setTargetClass(Class<T> targetClass) {
         this.targetClass = targetClass;
     }
+
+    public Class<? extends BlobContentConverter<T>> getContentConverterClass() {
+        return contentConverterClass;
+    }
+
+    public void setContentConverterClass(Class<? extends BlobContentConverter<T>> contentConverterClass) {
+        this.contentConverterClass = contentConverterClass;
+    }
+    
 
     /**
      * {@inheritDoc }
@@ -64,7 +76,16 @@ public class BlobAttributeConverter<T> implements AttributeConverter<BlobReferen
         String bucketName = nameAndKey[0];
         String key = nameAndKey[1];
 
-        return new DefaultBlobReference<T>(new S3Resource(bucketName, key), getTargetClass());
+        BlobContentConverter<T> contentConverter = null;
+        try {
+            contentConverter = contentConverterClass.newInstance();
+        } catch (InstantiationException ex) {
+            throw new IllegalStateException("Could not instantiate the converter-class: " + this.contentConverterClass.getCanonicalName());
+        } catch (IllegalAccessException ex) {
+            throw new IllegalStateException("Could not access the default constructor of converter-class: " + this.contentConverterClass.getCanonicalName());
+        }
+        
+        return new DefaultBlobReference<T>(new S3Resource(bucketName, key), getTargetClass(), contentConverter);
     }
 
 }

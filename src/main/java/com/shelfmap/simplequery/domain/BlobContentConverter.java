@@ -15,15 +15,15 @@
  */
 package com.shelfmap.simplequery.domain;
 
-import com.shelfmap.simplequery.Client;
-import java.io.Serializable;
+import com.amazonaws.services.s3.model.ObjectMetadata;
+import java.io.InputStream;
+import java.io.OutputStream;
 
 /**
  *
  * @author Tsutomu YANO
  */
-public interface BlobReference<T> extends Serializable {
-    T getContent(Client client) throws BlobRestoreException;
-    S3ResourceInfo getResourceInfo();
-    BlobContentConverter<T> getContentConverter();
+public interface BlobContentConverter<T> {
+    T restoreObject(ObjectMetadata metadata, InputStream stream) throws BlobRestoreException;
+    void writeObject(OutputStream stream, T object) throws BlobOutputException;
 }

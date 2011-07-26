@@ -15,15 +15,25 @@
  */
 package com.shelfmap.simplequery.domain;
 
-import com.shelfmap.simplequery.Client;
-import java.io.Serializable;
-
 /**
  *
  * @author Tsutomu YANO
  */
-public interface BlobReference<T> extends Serializable {
-    T getContent(Client client) throws BlobRestoreException;
-    S3ResourceInfo getResourceInfo();
-    BlobContentConverter<T> getContentConverter();
+public class BlobOutputException extends Exception {
+    private static final long serialVersionUID = 1L;
+
+    public BlobOutputException(Throwable thrwbl) {
+        super(thrwbl);
+    }
+
+    public BlobOutputException(String string, Throwable thrwbl) {
+        super(string, thrwbl);
+    }
+
+    public BlobOutputException(String string) {
+        super(string);
+    }
+
+    public BlobOutputException() {
+    }
 }

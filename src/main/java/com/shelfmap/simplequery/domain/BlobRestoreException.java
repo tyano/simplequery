@@ -24,29 +24,19 @@ package com.shelfmap.simplequery.domain;
 public class BlobRestoreException extends Exception {
     private static final long serialVersionUID = 1L;
 
-    private final S3ResourceInfo info;
-
-    public BlobRestoreException(Throwable thrwbl, S3ResourceInfo info) {
+    public BlobRestoreException(Throwable thrwbl) {
         super(thrwbl);
-        this.info = info;
     }
 
-    public BlobRestoreException(String string, Throwable thrwbl, S3ResourceInfo info) {
+    public BlobRestoreException(String string, Throwable thrwbl) {
         super(string, thrwbl);
-        this.info = info;
     }
 
-    public BlobRestoreException(String string, S3ResourceInfo info) {
+    public BlobRestoreException(String string) {
         super(string);
-        this.info = info;
     }
 
     public BlobRestoreException(S3ResourceInfo info) {
         super();
-        this.info = info;
-    }
-
-    public S3ResourceInfo getBlobInfo() {
-        return info;
     }
 }

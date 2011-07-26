@@ -17,16 +17,17 @@ package com.shelfmap.simplequery.domain;
 
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.GetObjectRequest;
+import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.S3Object;
 import com.shelfmap.simplequery.Client;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.ObjectInputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  *
+ * @param <T> 
  * @author Tsutomu YANO
  */
 public class DefaultBlobReference<T> implements BlobReference<T> {
@@ -35,10 +36,12 @@ public class DefaultBlobReference<T> implements BlobReference<T> {
 
     private final S3ResourceInfo resourceInfo;
     private final Class<T> targetClass;
+    private final BlobContentConverter<T> converter;
 
-    public DefaultBlobReference(S3ResourceInfo resourceInfo, Class<T> targetClass) {
+    public DefaultBlobReference(S3ResourceInfo resourceInfo, Class<T> targetClass, BlobContentConverter<T> converter) {
         this.resourceInfo = resourceInfo;
         this.targetClass = targetClass;
+        this.converter = converter;
     }
 
     @Override
@@ -48,24 +51,16 @@ public class DefaultBlobReference<T> implements BlobReference<T> {
         AmazonS3 s3 = client.getS3();
 
         GetObjectRequest request = new GetObjectRequest(bucket, key);
-        S3Object resource = s3.getObject(request);
-        InputStream resourceStream = resource.getObjectContent();
+        InputStream resourceStream = null;
         try {
-            return restoreObject(resourceStream);
-        } catch (IOException ex) {
-            throw new BlobRestoreException("could not read a object stream of Blob(bucket=" + resourceInfo.getBucketName() + ", key=" + resourceInfo.getKey() + ").", ex, resourceInfo);
-        } catch (ClassNotFoundException ex) {
-            throw new BlobRestoreException("could not find a class for restoring an object.", ex, resourceInfo);
-        }
-    }
-
-    private T restoreObject(InputStream stream) throws IOException, ClassNotFoundException {
-        ObjectInputStream ois = new ObjectInputStream(stream);
-        try {
-            return targetClass.cast(ois.readObject());
+            S3Object resource = s3.getObject(request);
+            ObjectMetadata metadata = resource.getObjectMetadata();
+            resourceStream = resource.getObjectContent();
+            T content = getContentConverter().restoreObject(metadata, resourceStream);
+            return content;
         } finally {
             try {
-                if(ois != null) ois.close();
+                if(resourceStream != null) resourceStream.close();
             } catch (IOException ex) {
                 LOGGER.error("could not close a stream.", ex);
             }
@@ -79,5 +74,10 @@ public class DefaultBlobReference<T> implements BlobReference<T> {
 
     public Class<T> getTargetClass() {
         return targetClass;
+    }
+
+    @Override
+    public BlobContentConverter<T> getContentConverter() {
+        return converter;
     }
 }

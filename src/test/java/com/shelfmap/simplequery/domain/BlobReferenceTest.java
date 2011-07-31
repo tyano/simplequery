@@ -15,10 +15,12 @@
  */
 package com.shelfmap.simplequery.domain;
 
+import com.shelfmap.simplequery.domain.impl.ImageContentConverter;
 import static org.junit.Assert.assertThat;
 import static org.hamcrest.Matchers.is;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.CreateBucketRequest;
+import com.amazonaws.services.s3.model.DeleteObjectRequest;
 import com.amazonaws.services.s3.model.ObjectListing;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
@@ -42,6 +44,8 @@ import java.util.List;
 import java.util.Map;
 import javax.imageio.ImageIO;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.RandomStringUtils;
+import org.jbehave.core.annotations.AfterStory;
 import org.jbehave.core.annotations.Given;
 import org.jbehave.core.annotations.Then;
 import org.jbehave.core.annotations.When;
@@ -52,6 +56,7 @@ import org.jbehave.core.annotations.When;
  */
 @StoryPath("stories/BlobReferenceSpec.story")
 public class BlobReferenceTest extends BaseStoryRunner {
+
     @Override
     protected void configureTestContext(Binder binder) {
         binder.bind(IClientHolder.class).to(TestContext.class).in(Scopes.SINGLETON);
@@ -63,50 +68,46 @@ public class BlobReferenceTest extends BaseStoryRunner {
     protected List<? extends Class<?>> getStepsClasses() {
         return Arrays.asList(ClientFactory.class);
     }
-
-    
     @Inject
     TestContext ctx;
-    
     BufferedImage testImage;
     Client client;
-    
     private static final String BUCKET_NAME = "simplequery-tokyo-test-bucket";
     private static final String KEY_NAME = "test-key-name";
-    
+
     @Given("a S3 resource")
     public void createTestS3Resource() throws IOException {
         AmazonS3 s3 = ctx.getClient().getS3();
         s3.setEndpoint("s3-ap-northeast-1.amazonaws.com");
-        
-        if(!s3.doesBucketExist(BUCKET_NAME)) {
+
+        if (!s3.doesBucketExist(BUCKET_NAME)) {
             CreateBucketRequest request = new CreateBucketRequest(BUCKET_NAME);
             request.setRegion("ap-northeast-1");
             s3.createBucket(request);
         }
-        
+
         boolean found = false;
         ObjectListing listing = s3.listObjects(BUCKET_NAME);
-        for(S3ObjectSummary s : listing.getObjectSummaries()) {
-            if(s.getKey().equals(KEY_NAME)) {
+        for (S3ObjectSummary s : listing.getObjectSummaries()) {
+            if (s.getKey().equals(KEY_NAME)) {
                 found = true;
                 break;
             }
         }
-        
+
         InputStream is = getClass().getResourceAsStream("/images/testimage.jpg");
         try {
             testImage = ImageIO.read(is);
         } finally {
             IOUtils.closeQuietly(is);
         }
-        
+
         InputStream uploadSource = null;
         try {
-            if(!found) {
+            if (!found) {
                 uploadSource = getClass().getResourceAsStream("/images/testimage.jpg");
                 ObjectMetadata metadata = new ObjectMetadata();
-                metadata.addUserMetadata("type", "jpeg");
+                metadata.addUserMetadata("format", "jpeg");
                 PutObjectRequest request = new PutObjectRequest(BUCKET_NAME, KEY_NAME, uploadSource, metadata);
                 s3.putObject(request);
             }
@@ -115,13 +116,14 @@ public class BlobReferenceTest extends BaseStoryRunner {
         }
 
     }
-
-    BlobReference<BufferedImage> blob;
     
+    
+    BlobReference<BufferedImage> blob;
+
     @When("retrieve the content of a BlobReference, which describes a given s3 resource")
     public void retrieveResource() {
-        Map<String,Object> metadata = new HashMap<String, Object>();
-        metadata.put(ImageContentConverter.BUFFER_SIZE_KEY, 1024*1000);
+        Map<String, Object> metadata = new HashMap<String, Object>();
+        metadata.put(ImageContentConverter.BUFFER_SIZE_KEY, 1024 * 1000);
         metadata.put(ImageContentConverter.IMAGE_FORMAT_KEY, "jpeg");
         blob = new DefaultBlobReference<BufferedImage>(new S3Resource(BUCKET_NAME, KEY_NAME), BufferedImage.class, new ImageContentConverter(metadata));
     }
@@ -129,10 +131,10 @@ public class BlobReferenceTest extends BaseStoryRunner {
     @Then("we can get a deserialized java object.")
     public void assertRerource() throws BlobRestoreException, IOException {
         BufferedImage image = blob.getContent(ctx.getClient());
-        
+
         ByteArrayOutputStream source = new ByteArrayOutputStream();
         ByteArrayOutputStream target = new ByteArrayOutputStream();
-        
+
         try {
             ImageIO.write(testImage, "jpeg", source);
             ImageIO.write(image, "jpeg", target);
@@ -140,7 +142,64 @@ public class BlobReferenceTest extends BaseStoryRunner {
             IOUtils.closeQuietly(source);
             IOUtils.closeQuietly(target);
         }
-        
+
         assertThat(source.toByteArray(), is(target.toByteArray()));
+    }
+    
+    
+    private String testKeyName;
+    
+    @When("putting a object as the content of a BlobReference")
+    public void putImageToS3() throws Exception {
+        testKeyName = "testUpload" + RandomStringUtils.randomAlphanumeric(10);
+        
+        Map<String, Object> conversionInfo = createConversionInfo();
+        ObjectMetadata metadata = new ObjectMetadata();
+        metadata.addUserMetadata("format", "jpeg");
+        
+        BlobReference<BufferedImage> imageReference = new DefaultBlobReference<BufferedImage>(new S3Resource(BUCKET_NAME, testKeyName), BufferedImage.class, new ImageContentConverter(conversionInfo));
+        imageReference.setContent(ctx.getClient(), testImage, metadata);
+    }
+
+    @Then("the put object must immediately be uploaded to S3 storage")
+    public void assertTheUploadResult() throws Exception {
+        Map<String, Object> conversionInfo = createConversionInfo();
+        BlobReference<BufferedImage> imageRestoreReference = new DefaultBlobReference<BufferedImage>(new S3Resource(BUCKET_NAME, testKeyName), BufferedImage.class, new ImageContentConverter(conversionInfo));
+        
+        BufferedImage image = imageRestoreReference.getContent(ctx.getClient());
+        
+        ByteArrayOutputStream source = new ByteArrayOutputStream();
+        ByteArrayOutputStream target = new ByteArrayOutputStream();
+        try {
+            ImageIO.write(testImage, "jpeg", source);
+            ImageIO.write(image, "jpeg", target);
+        } finally {
+            IOUtils.closeQuietly(source);
+            IOUtils.closeQuietly(target);
+        }
+
+        byte[] sourceBytes = source.toByteArray();
+        byte[] targetBytes = target.toByteArray();
+        assertThat(sourceBytes, is(targetBytes));   
+        
+//        ImageIO.write(image, "jpeg", new File(System.getProperty("user.home"), "testfile.jpeg"));
+    }
+    
+    @AfterStory
+    public void deleteTestKey() {
+        AmazonS3 s3 = ctx.getClient().getS3();
+        s3.setEndpoint("s3-ap-northeast-1.amazonaws.com");
+
+        if (s3.doesBucketExist(BUCKET_NAME)) {
+            DeleteObjectRequest request = new DeleteObjectRequest(BUCKET_NAME, testKeyName);
+            s3.deleteObject(request);
+        }
+    }
+    
+    private Map<String,Object> createConversionInfo() {
+        Map<String, Object> conversionInfo = new HashMap<String, Object>();
+        conversionInfo.put(ImageContentConverter.BUFFER_SIZE_KEY, 1024 * 1000);
+        conversionInfo.put(ImageContentConverter.IMAGE_FORMAT_KEY, "jpeg");
+        return conversionInfo;
     }
 }

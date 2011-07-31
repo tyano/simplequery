@@ -13,9 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.shelfmap.simplequery.domain;
+package com.shelfmap.simplequery.domain.impl;
 
 import com.amazonaws.services.s3.model.ObjectMetadata;
+import com.shelfmap.simplequery.domain.BlobContentConverter;
+import com.shelfmap.simplequery.domain.BlobOutputException;
+import com.shelfmap.simplequery.domain.BlobRestoreException;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
@@ -84,8 +87,9 @@ public class ImageContentConverter implements BlobContentConverter<BufferedImage
         public void run() {
             PipedOutputStream output = new PipedOutputStream();
             try {
-                stream.connect(output);
+                output.connect(stream);
                 ImageIO.write(this.image, this.format, output);
+                output.flush();
             } catch(IOException ex) {
                 LOGGER.error("the OutputStream for blob-image suddenly is closed for an exception.", ex);
             } finally {

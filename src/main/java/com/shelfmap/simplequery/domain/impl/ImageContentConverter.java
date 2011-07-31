@@ -101,6 +101,7 @@ public class ImageContentConverter implements BlobContentConverter<BufferedImage
                     }
                 }
             }
+            LOGGER.debug("Thread finished.");
         }
         
     }

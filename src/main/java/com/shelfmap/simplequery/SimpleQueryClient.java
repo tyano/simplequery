@@ -99,4 +99,14 @@ public class SimpleQueryClient implements Client {
     protected ClientConfiguration configureS3() {
         return null;
     }
+
+    @Override
+    public Configuration getConfiguration() {
+        return configuration;
+    }
+
+    @Override
+    public AWSCredentials getCredentials() {
+        return credentials;
+    }
 }

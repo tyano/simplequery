@@ -15,11 +15,18 @@
  */
 package com.shelfmap.simplequery.domain;
 
+import com.amazonaws.AmazonClientException;
+import com.amazonaws.AmazonServiceException;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.GetObjectRequest;
 import com.amazonaws.services.s3.model.ObjectMetadata;
+import com.amazonaws.services.s3.model.ProgressEvent;
+import com.amazonaws.services.s3.model.ProgressListener;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.amazonaws.services.s3.model.S3Object;
+import com.amazonaws.services.s3.transfer.TransferManager;
+import com.amazonaws.services.s3.transfer.TransferManagerConfiguration;
+import com.amazonaws.services.s3.transfer.Upload;
 import com.shelfmap.simplequery.Client;
 import java.io.IOException;
 import java.io.InputStream;
@@ -75,13 +82,22 @@ public class DefaultBlobReference<T> implements BlobReference<T> {
     public void setContent(Client client, T object, ObjectMetadata metadata) throws BlobOutputException {
         String bucket = resourceInfo.getBucketName();
         String key = resourceInfo.getKey();
-        AmazonS3 s3 = client.getS3();
 
         InputStream source = null;
         try {
             source = getContentConverter().objectToStream(object);
             PutObjectRequest request = new PutObjectRequest(bucket, key, source, metadata);
-            s3.putObject(request);
+            
+            TransferManager transfer = new TransferManager(client.getCredentials());
+            Upload upload = transfer.upload(request);
+            upload.waitForCompletion();
+        } catch (AmazonServiceException ex) {
+            throw new BlobOutputException("a problem occured in Amazon S3.", ex);
+        } catch (AmazonClientException ex) {
+            throw new BlobOutputException("Client had an problem when uploading data.", ex);
+        } catch (InterruptedException ex) {
+            LOGGER.warn("Thead is interrupted.", ex);
+            Thread.currentThread().interrupt();
         } finally {
             if(source != null) {
                 try {

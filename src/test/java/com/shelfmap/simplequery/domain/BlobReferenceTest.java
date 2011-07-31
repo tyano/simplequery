@@ -37,7 +37,9 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import javax.imageio.ImageIO;
 import org.apache.commons.io.IOUtils;
 import org.jbehave.core.annotations.Given;
@@ -118,7 +120,10 @@ public class BlobReferenceTest extends BaseStoryRunner {
     
     @When("retrieve the content of a BlobReference, which describes a given s3 resource")
     public void retrieveResource() {
-        blob = new DefaultBlobReference<BufferedImage>(new S3Resource(BUCKET_NAME, KEY_NAME), BufferedImage.class, new ImageContentConverter());
+        Map<String,Object> metadata = new HashMap<String, Object>();
+        metadata.put(ImageContentConverter.BUFFER_SIZE_KEY, 1024*1000);
+        metadata.put(ImageContentConverter.IMAGE_FORMAT_KEY, "jpeg");
+        blob = new DefaultBlobReference<BufferedImage>(new S3Resource(BUCKET_NAME, KEY_NAME), BufferedImage.class, new ImageContentConverter(metadata));
     }
 
     @Then("we can get a deserialized java object.")

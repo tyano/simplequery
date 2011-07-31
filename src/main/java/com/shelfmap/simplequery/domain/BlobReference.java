@@ -15,6 +15,7 @@
  */
 package com.shelfmap.simplequery.domain;
 
+import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.shelfmap.simplequery.Client;
 import java.io.Serializable;
 
@@ -24,6 +25,7 @@ import java.io.Serializable;
  */
 public interface BlobReference<T> extends Serializable {
     T getContent(Client client) throws BlobRestoreException;
+    void setContent(Client client, T object, ObjectMetadata metadata) throws BlobOutputException;
     S3ResourceInfo getResourceInfo();
     BlobContentConverter<T> getContentConverter();
 }

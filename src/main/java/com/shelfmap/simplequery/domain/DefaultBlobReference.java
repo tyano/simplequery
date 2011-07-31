@@ -18,10 +18,12 @@ package com.shelfmap.simplequery.domain;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.GetObjectRequest;
 import com.amazonaws.services.s3.model.ObjectMetadata;
+import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.amazonaws.services.s3.model.S3Object;
 import com.shelfmap.simplequery.Client;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.logging.Level;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,9 +33,9 @@ import org.slf4j.LoggerFactory;
  * @author Tsutomu YANO
  */
 public class DefaultBlobReference<T> implements BlobReference<T> {
+
     private static final long serialVersionUID = 1L;
     private static final Logger LOGGER = LoggerFactory.getLogger(DefaultBlobReference.class);
-
     private final S3ResourceInfo resourceInfo;
     private final Class<T> targetClass;
     private final BlobContentConverter<T> converter;
@@ -60,11 +62,36 @@ public class DefaultBlobReference<T> implements BlobReference<T> {
             return content;
         } finally {
             try {
-                if(resourceStream != null) resourceStream.close();
+                if (resourceStream != null) {
+                    resourceStream.close();
+                }
             } catch (IOException ex) {
                 LOGGER.error("could not close a stream.", ex);
             }
         }
+    }
+
+    @Override
+    public void setContent(Client client, T object, ObjectMetadata metadata) throws BlobOutputException {
+        String bucket = resourceInfo.getBucketName();
+        String key = resourceInfo.getKey();
+        AmazonS3 s3 = client.getS3();
+
+        InputStream source = null;
+        try {
+            source = getContentConverter().objectToStream(object);
+            PutObjectRequest request = new PutObjectRequest(bucket, key, source, metadata);
+            s3.putObject(request);
+        } finally {
+            if(source != null) {
+                try {
+                    source.close();
+                } catch (IOException ex) {
+                    LOGGER.error("Could not close an stream.", ex);
+                }
+            }
+        }
+
     }
 
     @Override

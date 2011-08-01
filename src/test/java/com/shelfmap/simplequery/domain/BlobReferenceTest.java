@@ -29,12 +29,12 @@ import com.google.inject.Binder;
 import com.google.inject.Inject;
 import com.google.inject.Scopes;
 import com.shelfmap.simplequery.BaseStoryRunner;
-import com.shelfmap.simplequery.Client;
 import com.shelfmap.simplequery.ClientFactory;
 import com.shelfmap.simplequery.IClientHolder;
 import com.shelfmap.simplequery.StoryPath;
 import com.shelfmap.simplequery.TestContext;
 import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -71,7 +71,6 @@ public class BlobReferenceTest extends BaseStoryRunner {
     @Inject
     TestContext ctx;
     BufferedImage testImage;
-    Client client;
     private static final String BUCKET_NAME = "simplequery-tokyo-test-bucket";
     private static final String KEY_NAME = "test-key-name";
 
@@ -148,17 +147,48 @@ public class BlobReferenceTest extends BaseStoryRunner {
     
     
     private String testKeyName;
+    private BufferedImage sourceImage;
     
     @When("putting a object as the content of a BlobReference")
     public void putImageToS3() throws Exception {
         testKeyName = "testUpload" + RandomStringUtils.randomAlphanumeric(10);
         
-        Map<String, Object> conversionInfo = createConversionInfo();
-        ObjectMetadata metadata = new ObjectMetadata();
-        metadata.addUserMetadata("format", "jpeg");
         
-        BlobReference<BufferedImage> imageReference = new DefaultBlobReference<BufferedImage>(new S3Resource(BUCKET_NAME, testKeyName), BufferedImage.class, new ImageContentConverter(conversionInfo));
-        imageReference.setContent(ctx.getClient(), testImage, metadata);
+        AmazonS3 s3 = ctx.getClient().getS3();
+        
+        ByteArrayOutputStream byteOutput = null;
+        ByteArrayInputStream byteInput = null;
+        InputStream source = null;
+        try {
+            //Created an image for assertion.
+            //First, we must write testImage to byteArray with ImageIO.
+            //Then we must create an image for assertion from the byteArray.
+            //Because the data from getResourceStream() and the data create ImageIO.write() are not same binary data.
+            byteOutput = new ByteArrayOutputStream();
+            ImageIO.write(testImage, "jpeg", byteOutput);
+            byteOutput.close();
+            
+            byte[] data = byteOutput.toByteArray();
+            byteInput = new ByteArrayInputStream(data);
+            
+            //This is the image which will be used at assertion-time.
+            sourceImage = ImageIO.read(byteInput);
+            
+            Map<String, Object> conversionInfo = createConversionInfo();
+            ObjectMetadata metadata = new ObjectMetadata();
+            metadata.addUserMetadata("format", "jpeg");
+
+            BlobReference<BufferedImage> imageReference = new DefaultBlobReference<BufferedImage>(new S3Resource(BUCKET_NAME, testKeyName), BufferedImage.class, new ImageContentConverter(conversionInfo));
+            
+            //Here we use testImage (not sourceImage) for setContent().
+            //setContent() will create binary stream with ImageIO.write().
+            //so the data is same with the source binary data of sourceImage.
+            imageReference.setContent(ctx.getClient(), testImage, metadata);
+        } finally {
+            IOUtils.closeQuietly(source);
+            IOUtils.closeQuietly(byteInput);
+            IOUtils.closeQuietly(byteOutput);
+        }
     }
 
     @Then("the put object must immediately be uploaded to S3 storage")
@@ -171,7 +201,7 @@ public class BlobReferenceTest extends BaseStoryRunner {
         ByteArrayOutputStream source = new ByteArrayOutputStream();
         ByteArrayOutputStream target = new ByteArrayOutputStream();
         try {
-            ImageIO.write(testImage, "jpeg", source);
+            ImageIO.write(sourceImage, "jpeg", source);
             ImageIO.write(image, "jpeg", target);
         } finally {
             IOUtils.closeQuietly(source);
@@ -181,8 +211,6 @@ public class BlobReferenceTest extends BaseStoryRunner {
         byte[] sourceBytes = source.toByteArray();
         byte[] targetBytes = target.toByteArray();
         assertThat(sourceBytes, is(targetBytes));   
-        
-//        ImageIO.write(image, "jpeg", new File(System.getProperty("user.home"), "testfile.jpeg"));
     }
     
     @AfterStory

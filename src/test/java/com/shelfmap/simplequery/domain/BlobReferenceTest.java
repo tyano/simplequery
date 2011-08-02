@@ -115,8 +115,6 @@ public class BlobReferenceTest extends BaseStoryRunner {
         }
 
     }
-    
-    
     BlobReference<BufferedImage> blob;
 
     @When("retrieve the content of a BlobReference, which describes a given s3 resource")
@@ -144,18 +142,16 @@ public class BlobReferenceTest extends BaseStoryRunner {
 
         assertThat(source.toByteArray(), is(target.toByteArray()));
     }
-    
-    
     private String testKeyName;
     private BufferedImage sourceImage;
-    
+
     @When("putting a object as the content of a BlobReference")
     public void putImageToS3() throws Exception {
         testKeyName = "testUpload" + RandomStringUtils.randomAlphanumeric(10);
-        
-        
+
+
         AmazonS3 s3 = ctx.getClient().getS3();
-        
+
         ByteArrayOutputStream byteOutput = null;
         ByteArrayInputStream byteInput = null;
         InputStream source = null;
@@ -167,19 +163,19 @@ public class BlobReferenceTest extends BaseStoryRunner {
             byteOutput = new ByteArrayOutputStream();
             ImageIO.write(testImage, "jpeg", byteOutput);
             byteOutput.close();
-            
+
             byte[] data = byteOutput.toByteArray();
             byteInput = new ByteArrayInputStream(data);
-            
+
             //This is the image which will be used at assertion-time.
             sourceImage = ImageIO.read(byteInput);
-            
+
             Map<String, Object> conversionInfo = createConversionInfo();
             ObjectMetadata metadata = new ObjectMetadata();
             metadata.addUserMetadata("format", "jpeg");
 
             BlobReference<BufferedImage> imageReference = new DefaultBlobReference<BufferedImage>(new S3Resource(BUCKET_NAME, testKeyName), BufferedImage.class, new ImageContentConverter(conversionInfo));
-            
+
             //Here we use testImage (not sourceImage) for setContent().
             //setContent() will create binary stream with ImageIO.write().
             //so the data is same with the source binary data of sourceImage.
@@ -195,9 +191,9 @@ public class BlobReferenceTest extends BaseStoryRunner {
     public void assertTheUploadResult() throws Exception {
         Map<String, Object> conversionInfo = createConversionInfo();
         BlobReference<BufferedImage> imageRestoreReference = new DefaultBlobReference<BufferedImage>(new S3Resource(BUCKET_NAME, testKeyName), BufferedImage.class, new ImageContentConverter(conversionInfo));
-        
+
         BufferedImage image = imageRestoreReference.getContent(ctx.getClient());
-        
+
         ByteArrayOutputStream source = new ByteArrayOutputStream();
         ByteArrayOutputStream target = new ByteArrayOutputStream();
         try {
@@ -210,9 +206,9 @@ public class BlobReferenceTest extends BaseStoryRunner {
 
         byte[] sourceBytes = source.toByteArray();
         byte[] targetBytes = target.toByteArray();
-        assertThat(sourceBytes, is(targetBytes));   
+        assertThat(sourceBytes, is(targetBytes));
     }
-    
+
     @AfterStory
     public void deleteTestKey() {
         AmazonS3 s3 = ctx.getClient().getS3();
@@ -223,11 +219,23 @@ public class BlobReferenceTest extends BaseStoryRunner {
             s3.deleteObject(request);
         }
     }
-    
-    private Map<String,Object> createConversionInfo() {
+
+    private Map<String, Object> createConversionInfo() {
         Map<String, Object> conversionInfo = new HashMap<String, Object>();
         conversionInfo.put(ImageContentConverter.BUFFER_SIZE_KEY, 1024 * 1000);
         conversionInfo.put(ImageContentConverter.IMAGE_FORMAT_KEY, "jpeg");
         return conversionInfo;
+    }
+
+    @Given("a S3 bucket")
+    public void initS3Bucket() {
+    }
+
+    @When("putting a string object through BlobReference")
+    public void writeStringToS3() {
+    }
+
+    @Then("it must be regeneratable by the other BlobReference of same key and bucket.")
+    public void readTheStringFromS3() {
     }
 }

@@ -19,6 +19,7 @@ import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.shelfmap.simplequery.domain.BlobContentConverter;
 import com.shelfmap.simplequery.domain.BlobOutputException;
 import com.shelfmap.simplequery.domain.BlobRestoreException;
+import com.shelfmap.simplequery.util.IO;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
@@ -36,17 +37,17 @@ import org.slf4j.LoggerFactory;
 public class ImageContentConverter implements BlobContentConverter<BufferedImage> {
     private static final Logger LOGGER = LoggerFactory.getLogger(ImageContentConverter.class);
     private static final int BUFFER_SIZE = 1024 * 1000; //1K * 1000 = 1M
-    
+
     public static final String BUFFER_SIZE_KEY = "BUFFER_SIZE";
     public static final String IMAGE_FORMAT_KEY = "IMAGE_FORMAT";
-    
-    private Map<String,Object> metadata;
-    
-    public ImageContentConverter(Map<String,Object> metadata) {
+
+    private Map<String,Object> conversionInfo;
+
+    public ImageContentConverter(Map<String,Object> conversionInfo) {
         super();
-        this.metadata = metadata;
+        this.conversionInfo = conversionInfo;
     }
-    
+
     @Override
     public BufferedImage restoreObject(ObjectMetadata metadata, InputStream stream) throws BlobRestoreException {
         try {
@@ -58,20 +59,20 @@ public class ImageContentConverter implements BlobContentConverter<BufferedImage
 
     @Override
     public InputStream objectToStream(final BufferedImage object) throws BlobOutputException {
-        Object bufferSizeValue = metadata.get(BUFFER_SIZE_KEY);
+        Object bufferSizeValue = conversionInfo.get(BUFFER_SIZE_KEY);
         int bufferSize = (bufferSizeValue instanceof Integer) ? ((Integer)bufferSizeValue).intValue() : BUFFER_SIZE;
 
-        Object formatValue = metadata.get(IMAGE_FORMAT_KEY);
+        Object formatValue = conversionInfo.get(IMAGE_FORMAT_KEY);
         String format = (formatValue instanceof String) ? (String)formatValue : "jpeg";
-        
+
         PipedInputStream stream = new PipedInputStream(bufferSize);
         Thread t = new Thread(new ImageWriter(stream, object, format));
         t.start();
 
         return stream;
     }
-    
-    public static class ImageWriter implements Runnable {
+
+    private static class ImageWriter implements Runnable {
         private PipedInputStream stream;
         private BufferedImage image;
         private String format;
@@ -82,7 +83,7 @@ public class ImageContentConverter implements BlobContentConverter<BufferedImage
             this.image = image;
             this.format = format;
         }
-        
+
         @Override
         public void run() {
             PipedOutputStream output = new PipedOutputStream();
@@ -93,16 +94,10 @@ public class ImageContentConverter implements BlobContentConverter<BufferedImage
             } catch(IOException ex) {
                 LOGGER.error("the OutputStream for blob-image suddenly is closed for an exception.", ex);
             } finally {
-                if(output != null) {
-                    try {
-                        output.close();
-                    } catch (IOException ex) {
-                        LOGGER.error("Could not close an output stream.", ex);
-                    }
-                }
+                IO.close(output, this);
             }
             LOGGER.debug("Thread finished.");
         }
-        
+
     }
 }

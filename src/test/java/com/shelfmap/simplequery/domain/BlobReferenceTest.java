@@ -77,13 +77,6 @@ public class BlobReferenceTest extends BaseStoryRunner {
     @Given("a S3 resource")
     public void createTestS3Resource() throws IOException {
         AmazonS3 s3 = ctx.getClient().getS3();
-        s3.setEndpoint("s3-ap-northeast-1.amazonaws.com");
-
-        if (!s3.doesBucketExist(BUCKET_NAME)) {
-            CreateBucketRequest request = new CreateBucketRequest(BUCKET_NAME);
-            request.setRegion("ap-northeast-1");
-            s3.createBucket(request);
-        }
 
         boolean found = false;
         ObjectListing listing = s3.listObjects(BUCKET_NAME);
@@ -229,10 +222,19 @@ public class BlobReferenceTest extends BaseStoryRunner {
 
     @Given("a S3 bucket")
     public void initS3Bucket() {
+        AmazonS3 s3 = ctx.getClient().getS3();
+        s3.setEndpoint("s3-ap-northeast-1.amazonaws.com");
+
+        if (!s3.doesBucketExist(BUCKET_NAME)) {
+            CreateBucketRequest request = new CreateBucketRequest(BUCKET_NAME);
+            request.setRegion("ap-northeast-1");
+            s3.createBucket(request);
+        }
     }
 
     @When("putting a string object through BlobReference")
     public void writeStringToS3() {
+        
     }
 
     @Then("it must be regeneratable by the other BlobReference of same key and bucket.")

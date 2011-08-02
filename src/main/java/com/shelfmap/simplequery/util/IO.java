@@ -28,11 +28,16 @@ public class IO {
 
     public static void close(Closeable target, Object owner) {
         assert owner != null;
+        close(target, owner.getClass());
+    }
+
+    public static void close(Closeable target, Class<?> loggerOwner) {
+        assert loggerOwner != null;
         if(target != null) {
             try {
                 target.close();
             } catch (IOException ex) {
-                Logger logger = LoggerFactory.getLogger(owner.getClass());
+                Logger logger = LoggerFactory.getLogger(loggerOwner);
                 logger.error("Could not close an object.", ex);
             }
         }

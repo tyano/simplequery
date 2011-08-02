@@ -16,6 +16,7 @@
 package com.shelfmap.simplequery.domain;
 
 import com.shelfmap.simplequery.domain.impl.ImageContentConverter;
+import java.io.UnsupportedEncodingException;
 import static org.junit.Assert.assertThat;
 import static org.hamcrest.Matchers.is;
 import com.amazonaws.services.s3.AmazonS3;
@@ -33,11 +34,16 @@ import com.shelfmap.simplequery.ClientFactory;
 import com.shelfmap.simplequery.IClientHolder;
 import com.shelfmap.simplequery.StoryPath;
 import com.shelfmap.simplequery.TestContext;
+import com.shelfmap.simplequery.domain.impl.StringContentConverter;
+import com.shelfmap.simplequery.util.IO;
 import java.awt.image.BufferedImage;
+import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -232,12 +238,54 @@ public class BlobReferenceTest extends BaseStoryRunner {
         }
     }
 
+    private static final int BUF_SIZE = 1024;
+    private static final String TEXT_KEY = "hojoki.txt";
+    private static final String TEST_STRING;
+
+    static {
+        InputStream input = null;
+        Reader inputReader = null;
+        BufferedReader br = null;
+        StringBuilder sb = new StringBuilder();
+
+        try {
+            input = BlobReferenceTest.class.getResourceAsStream("/text/hojoki.txt");
+            inputReader = new InputStreamReader(input, "UTF-8");
+            br = new BufferedReader(inputReader);
+
+            char[] buf = new char[BUF_SIZE];
+            for(int i = br.read(buf); i >= 0; i = br.read(buf)) {
+                if(i > 0) {
+                    sb.append(buf, 0, i);
+                }
+            }
+        } catch (IOException ex) {
+            throw new RuntimeException(ex);
+        } finally {
+            IO.close(br, BlobReferenceTest.class);
+            IO.close(inputReader, BlobReferenceTest.class);
+            IO.close(input, BlobReferenceTest.class);
+        }
+        TEST_STRING = sb.toString();
+    }
+
     @When("putting a string object through BlobReference")
-    public void writeStringToS3() {
-        
+    public void writeStringToS3() throws BlobOutputException {
+        BlobReference<String> stringBlob = new DefaultBlobReference<String>(new S3Resource(BUCKET_NAME, TEXT_KEY), String.class, new StringContentConverter(createStringConversionInfo()));
+        stringBlob.setContent(ctx.getClient(), TEST_STRING, new ObjectMetadata());
     }
 
     @Then("it must be regeneratable by the other BlobReference of same key and bucket.")
-    public void readTheStringFromS3() {
+    public void readTheStringFromS3() throws BlobRestoreException {
+        BlobReference<String> inputBlob = new DefaultBlobReference<String>(new S3Resource(BUCKET_NAME, TEXT_KEY), String.class, new StringContentConverter(createStringConversionInfo()));
+        String content = inputBlob.getContent(ctx.getClient());
+
+        assertThat(content, is(TEST_STRING));
+    }
+
+    private Map<String,Object> createStringConversionInfo() {
+        Map<String,Object> info = new HashMap<String, Object>();
+        info.put(StringContentConverter.BUFFER_SIZE_KEY, 1024*1000);
+        return info;
     }
 }

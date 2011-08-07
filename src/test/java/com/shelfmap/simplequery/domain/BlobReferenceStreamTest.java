@@ -28,6 +28,7 @@ import com.shelfmap.simplequery.ClientFactory;
 import com.shelfmap.simplequery.IClientHolder;
 import com.shelfmap.simplequery.StoryPath;
 import com.shelfmap.simplequery.TestContext;
+import com.shelfmap.simplequery.domain.impl.ImageContentConverter;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
@@ -98,8 +99,10 @@ public class BlobReferenceStreamTest extends BaseStoryRunner {
 
     }
 
+    BlobReference<BufferedImage> blob;
     @When("we have a BlobReference object which point to a key in S3 storage")
     public void createBlob() {
+        blob = new DefaultBlobReference<BufferedImage>(new S3Resource(BUCKET_NAME, KEY_NAME), BufferedImage.class, new ImageContentConverter(null));
     }
 
     @Then("we must be able to retrieve the data though an InputStream as a byte stream.")

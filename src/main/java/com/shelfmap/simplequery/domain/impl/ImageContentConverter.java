@@ -36,7 +36,7 @@ import org.slf4j.LoggerFactory;
  */
 public class ImageContentConverter implements BlobContentConverter<BufferedImage> {
     private static final Logger LOGGER = LoggerFactory.getLogger(ImageContentConverter.class);
-    private static final int BUFFER_SIZE = 1024 * 1000; //1K * 1000 = 1M
+    private static final int BUFFER_SIZE = 1024 * 500; //1K * 500 = 500K
 
     public static final String BUFFER_SIZE_KEY = "BUFFER_SIZE";
     public static final String IMAGE_FORMAT_KEY = "IMAGE_FORMAT";

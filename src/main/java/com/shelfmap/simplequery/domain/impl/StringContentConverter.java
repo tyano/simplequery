@@ -27,6 +27,7 @@ import java.io.InputStream;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
 import java.util.Map;
+import java.util.concurrent.Executors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -65,9 +66,7 @@ public class StringContentConverter implements BlobContentConverter<String> {
         Object bufferSizeValue = conversionInfo.get(BUFFER_SIZE_KEY);
         int bufferSize = (bufferSizeValue instanceof Integer) ? ((Integer)bufferSizeValue).intValue() : BUFFER_SIZE;
         PipedInputStream stream = new PipedInputStream(bufferSize);
-
-        Thread t = new Thread(new StringWriter(stream, object));
-        t.start();
+        Executors.newSingleThreadExecutor().execute(new StringWriter(stream, object));
 
         return stream;
     }

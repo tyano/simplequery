@@ -26,6 +26,8 @@ import java.io.InputStream;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
 import java.util.Map;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 import javax.imageio.ImageIO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -66,8 +68,7 @@ public class ImageContentConverter implements BlobContentConverter<BufferedImage
         String format = (formatValue instanceof String) ? (String)formatValue : "jpeg";
 
         PipedInputStream stream = new PipedInputStream(bufferSize);
-        Thread t = new Thread(new ImageWriter(stream, object, format));
-        t.start();
+        Executors.newSingleThreadExecutor().execute(new ImageWriter(stream, object, format));
 
         return stream;
     }

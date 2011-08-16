@@ -15,8 +15,10 @@
  */
 package com.shelfmap.simplequery.util;
 
+import java.io.ByteArrayOutputStream;
 import java.io.Closeable;
 import java.io.IOException;
+import java.io.InputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,5 +43,24 @@ public class IO {
                 logger.error("Could not close an object.", ex);
             }
         }
+    }
+
+    private static final int BUFFER_SIZE = 1024;
+
+    public static byte[] readBytes(InputStream stream) throws IOException {
+        byte[] bytes = new byte[BUFFER_SIZE];
+        ByteArrayOutputStream output = new ByteArrayOutputStream(BUFFER_SIZE);
+        try {
+            int size = stream.read(bytes);
+            while(size >= 0) {
+                if(size > 0) {
+                    output.write(bytes, 0, size);
+                }
+                size = stream.read(bytes);
+            }
+        } finally {
+            close(output, IO.class);
+        }
+        return output.toByteArray();
     }
 }

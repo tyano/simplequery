@@ -27,12 +27,15 @@ import com.amazonaws.services.s3.transfer.Upload;
 import com.shelfmap.simplequery.Client;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.PipedInputStream;
+import java.io.PipedOutputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  *
- * @param <T> 
+ * @param <T>
  * @author Tsutomu YANO
  */
 public class DefaultBlobReference<T> implements BlobReference<T> {
@@ -76,34 +79,8 @@ public class DefaultBlobReference<T> implements BlobReference<T> {
 
     @Override
     public void setContent(Client client, T object, ObjectMetadata metadata) throws BlobOutputException {
-        String bucket = resourceInfo.getBucketName();
-        String key = resourceInfo.getKey();
-
-        InputStream source = null;
-        try {
-            source = getContentConverter().objectToStream(object);
-            PutObjectRequest request = new PutObjectRequest(bucket, key, source, metadata);
-            
-            TransferManager transfer = new TransferManager(client.getCredentials());
-            Upload upload = transfer.upload(request);
-            upload.waitForCompletion();
-        } catch (AmazonServiceException ex) {
-            throw new BlobOutputException("a problem occured in Amazon S3.", ex);
-        } catch (AmazonClientException ex) {
-            throw new BlobOutputException("Client had an problem when uploading data.", ex);
-        } catch (InterruptedException ex) {
-            LOGGER.warn("Thead is interrupted.", ex);
-            Thread.currentThread().interrupt();
-        } finally {
-            if(source != null) {
-                try {
-                    source.close();
-                } catch (IOException ex) {
-                    LOGGER.error("Could not close an stream.", ex);
-                }
-            }
-        }
-
+        InputStream source = getContentConverter().objectToStream(object);
+        uploadFrom(client, source, metadata);
     }
 
     @Override
@@ -118,5 +95,61 @@ public class DefaultBlobReference<T> implements BlobReference<T> {
     @Override
     public BlobContentConverter<T> getContentConverter() {
         return converter;
+    }
+
+    @Override
+    public void uploadFrom(Client client, InputStream uploadSource, ObjectMetadata metadata) throws BlobOutputException {
+        String bucket = resourceInfo.getBucketName();
+        String key = resourceInfo.getKey();
+
+        try {
+            PutObjectRequest request = new PutObjectRequest(bucket, key, uploadSource, metadata);
+
+            TransferManager transfer = new TransferManager(client.getCredentials());
+            Upload upload = transfer.upload(request);
+            upload.waitForCompletion();
+        } catch (AmazonServiceException ex) {
+            throw new BlobOutputException("a problem occured in Amazon S3.", ex);
+        } catch (AmazonClientException ex) {
+            throw new BlobOutputException("Client had an problem when uploading data.", ex);
+        } catch (InterruptedException ex) {
+            LOGGER.warn("Thead is interrupted.", ex);
+            Thread.currentThread().interrupt();
+        }
+    }
+
+
+    private static final int BUFFER_SIZE = 1024 * 500;
+
+    @Override
+    public OutputStream getUploadStream(Client client, ObjectMetadata metadata) throws BlobOutputException {
+        PipedOutputStream output = null;
+        PipedInputStream source = null;
+        try {
+            source = new PipedInputStream(BUFFER_SIZE);
+            output = new PipedOutputStream(source);
+        } catch (IOException ex) {
+            if(output != null) {
+                try {
+                    output.close();
+                } catch(IOException e) {
+                    LOGGER.error("Could not close a stream.", e);
+                }
+            }
+
+            if(source != null) {
+                try {
+                    source.close();
+                } catch(IOException e) {
+                    LOGGER.error("Could not close a stream.", e);
+                }
+            }
+            throw new BlobOutputException("Could not create a PipedStream.", ex);
+        }
+
+        //Uploading is handled by another thread.
+        uploadFrom(client, source, metadata);
+
+        return output;
     }
 }

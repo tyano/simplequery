@@ -27,6 +27,8 @@ import java.io.Serializable;
  */
 public interface BlobReference<T> extends Serializable {
     T getContent() throws BlobRestoreException;
+    InputStream getInputStream();
+    ObjectMetadata getObjectMetadata();
     void setContent(T object, ObjectMetadata metadata) throws BlobOutputException;
     void uploadFrom(InputStream uploadSource, ObjectMetadata metadata) throws BlobOutputException;
     OutputStream getUploadStream(ObjectMetadata metadata) throws BlobOutputException;

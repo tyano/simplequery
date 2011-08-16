@@ -25,6 +25,7 @@ import com.amazonaws.services.s3.model.S3Object;
 import com.amazonaws.services.s3.transfer.TransferManager;
 import com.amazonaws.services.s3.transfer.Upload;
 import com.shelfmap.simplequery.Client;
+import com.shelfmap.simplequery.util.IO;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -47,6 +48,8 @@ public class DefaultBlobReference<T> implements BlobReference<T> {
     private final BlobContentConverter<T> converter;
     private final Client client;
 
+    private ObjectMetadata metadata;
+
     public DefaultBlobReference(Client client, S3ResourceInfo resourceInfo, Class<T> targetClass, BlobContentConverter<T> converter) {
         this.resourceInfo = resourceInfo;
         this.targetClass = targetClass;
@@ -56,27 +59,39 @@ public class DefaultBlobReference<T> implements BlobReference<T> {
 
     @Override
     public T getContent() throws BlobRestoreException {
+        InputStream resourceStream = null;
+        try {
+            resourceStream = getInputStream();
+            T content = getContentConverter().restoreObject(getObjectMetadata(), resourceStream);
+            return content;
+        } finally {
+            IO.close(resourceStream, this);
+        }
+    }
+
+    @Override
+    public InputStream getInputStream() {
+        S3Object resource = getS3ObjectRemote();
+        this.metadata = resource.getObjectMetadata();
+        return resource.getObjectContent();
+    }
+
+    @Override
+    public ObjectMetadata getObjectMetadata() {
+        if(this.metadata == null) {
+            S3Object resource = getS3ObjectRemote();
+            this.metadata = resource.getObjectMetadata();
+        }
+        return this.metadata;
+    }
+
+    private S3Object getS3ObjectRemote() {
         String bucket = resourceInfo.getBucketName();
         String key = resourceInfo.getKey();
         AmazonS3 s3 = getClient().getS3();
 
         GetObjectRequest request = new GetObjectRequest(bucket, key);
-        InputStream resourceStream = null;
-        try {
-            S3Object resource = s3.getObject(request);
-            ObjectMetadata metadata = resource.getObjectMetadata();
-            resourceStream = resource.getObjectContent();
-            T content = getContentConverter().restoreObject(metadata, resourceStream);
-            return content;
-        } finally {
-            try {
-                if (resourceStream != null) {
-                    resourceStream.close();
-                }
-            } catch (IOException ex) {
-                LOGGER.error("could not close a stream.", ex);
-            }
-        }
+        return s3.getObject(request);
     }
 
     @Override
@@ -131,21 +146,8 @@ public class DefaultBlobReference<T> implements BlobReference<T> {
             source = new PipedInputStream(BUFFER_SIZE);
             output = new PipedOutputStream(source);
         } catch (IOException ex) {
-            if(output != null) {
-                try {
-                    output.close();
-                } catch(IOException e) {
-                    LOGGER.error("Could not close a stream.", e);
-                }
-            }
-
-            if(source != null) {
-                try {
-                    source.close();
-                } catch(IOException e) {
-                    LOGGER.error("Could not close a stream.", e);
-                }
-            }
+            IO.close(output, this);
+            IO.close(source, this);
             throw new BlobOutputException("Could not create a PipedStream.", ex);
         }
 

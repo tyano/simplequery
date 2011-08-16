@@ -120,12 +120,12 @@ public class BlobReferenceTest extends BaseStoryRunner {
         Map<String, Object> metadata = new HashMap<String, Object>();
         metadata.put(ImageContentConverter.BUFFER_SIZE_KEY, 1024 * 1000);
         metadata.put(ImageContentConverter.IMAGE_FORMAT_KEY, "jpeg");
-        blob = new DefaultBlobReference<BufferedImage>(new S3Resource(BUCKET_NAME, KEY_NAME), BufferedImage.class, new ImageContentConverter(metadata));
+        blob = new DefaultBlobReference<BufferedImage>(ctx.getClient(), new S3Resource(BUCKET_NAME, KEY_NAME), BufferedImage.class, new ImageContentConverter(metadata));
     }
 
     @Then("we can get a deserialized java object.")
     public void assertRerource() throws BlobRestoreException, IOException {
-        BufferedImage image = blob.getContent(ctx.getClient());
+        BufferedImage image = blob.getContent();
 
         ByteArrayOutputStream source = new ByteArrayOutputStream();
         ByteArrayOutputStream target = new ByteArrayOutputStream();
@@ -172,12 +172,12 @@ public class BlobReferenceTest extends BaseStoryRunner {
             ObjectMetadata metadata = new ObjectMetadata();
             metadata.addUserMetadata("format", "jpeg");
 
-            BlobReference<BufferedImage> imageReference = new DefaultBlobReference<BufferedImage>(new S3Resource(BUCKET_NAME, testKeyName), BufferedImage.class, new ImageContentConverter(conversionInfo));
+            BlobReference<BufferedImage> imageReference = new DefaultBlobReference<BufferedImage>(ctx.getClient(), new S3Resource(BUCKET_NAME, testKeyName), BufferedImage.class, new ImageContentConverter(conversionInfo));
 
             //Here we use testImage (not sourceImage) for setContent().
             //setContent() will create binary stream with ImageIO.write().
             //so the data is same with the source binary data of sourceImage.
-            imageReference.setContent(ctx.getClient(), testImage, metadata);
+            imageReference.setContent(testImage, metadata);
         } finally {
             IOUtils.closeQuietly(source);
             IOUtils.closeQuietly(byteInput);
@@ -188,9 +188,9 @@ public class BlobReferenceTest extends BaseStoryRunner {
     @Then("the put object must immediately be uploaded to S3 storage")
     public void assertTheUploadResult() throws Exception {
         Map<String, Object> conversionInfo = createConversionInfo();
-        BlobReference<BufferedImage> imageRestoreReference = new DefaultBlobReference<BufferedImage>(new S3Resource(BUCKET_NAME, testKeyName), BufferedImage.class, new ImageContentConverter(conversionInfo));
+        BlobReference<BufferedImage> imageRestoreReference = new DefaultBlobReference<BufferedImage>(ctx.getClient(), new S3Resource(BUCKET_NAME, testKeyName), BufferedImage.class, new ImageContentConverter(conversionInfo));
 
-        BufferedImage image = imageRestoreReference.getContent(ctx.getClient());
+        BufferedImage image = imageRestoreReference.getContent();
 
         ByteArrayOutputStream source = new ByteArrayOutputStream();
         ByteArrayOutputStream target = new ByteArrayOutputStream();
@@ -270,14 +270,14 @@ public class BlobReferenceTest extends BaseStoryRunner {
 
     @When("putting a string object through BlobReference")
     public void writeStringToS3() throws BlobOutputException {
-        BlobReference<String> stringBlob = new DefaultBlobReference<String>(new S3Resource(BUCKET_NAME, TEXT_KEY), String.class, new StringContentConverter(createStringConversionInfo()));
-        stringBlob.setContent(ctx.getClient(), TEST_STRING, new ObjectMetadata());
+        BlobReference<String> stringBlob = new DefaultBlobReference<String>(ctx.getClient(), new S3Resource(BUCKET_NAME, TEXT_KEY), String.class, new StringContentConverter(createStringConversionInfo()));
+        stringBlob.setContent(TEST_STRING, new ObjectMetadata());
     }
 
     @Then("it must be regeneratable by the other BlobReference of same key and bucket.")
     public void readTheStringFromS3() throws BlobRestoreException {
-        BlobReference<String> inputBlob = new DefaultBlobReference<String>(new S3Resource(BUCKET_NAME, TEXT_KEY), String.class, new StringContentConverter(createStringConversionInfo()));
-        String content = inputBlob.getContent(ctx.getClient());
+        BlobReference<String> inputBlob = new DefaultBlobReference<String>(ctx.getClient(), new S3Resource(BUCKET_NAME, TEXT_KEY), String.class, new StringContentConverter(createStringConversionInfo()));
+        String content = inputBlob.getContent();
 
         assertThat(content, is(TEST_STRING));
     }

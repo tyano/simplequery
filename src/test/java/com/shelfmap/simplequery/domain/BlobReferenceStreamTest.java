@@ -44,7 +44,7 @@ import org.jbehave.core.annotations.When;
  *
  * @author Tsutomu YANO
  */
-@StoryPath("stories/BlobRefenreceStreamSupport.story")
+@StoryPath("stories/BlobReferenceStreamSupport.story")
 public class BlobReferenceStreamTest extends BaseStoryRunner {
 
     @Override
@@ -102,7 +102,7 @@ public class BlobReferenceStreamTest extends BaseStoryRunner {
     BlobReference<BufferedImage> blob;
     @When("we have a BlobReference object which point to a key in S3 storage")
     public void createBlob() {
-        blob = new DefaultBlobReference<BufferedImage>(new S3Resource(BUCKET_NAME, KEY_NAME), BufferedImage.class, new ImageContentConverter(null));
+        blob = new DefaultBlobReference<BufferedImage>(ctx.getClient(), new S3Resource(BUCKET_NAME, KEY_NAME), BufferedImage.class, new ImageContentConverter(null));
     }
 
     @Then("we must be able to retrieve the data though an InputStream as a byte stream.")

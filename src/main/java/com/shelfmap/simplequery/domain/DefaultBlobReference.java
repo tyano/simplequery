@@ -45,18 +45,20 @@ public class DefaultBlobReference<T> implements BlobReference<T> {
     private final S3ResourceInfo resourceInfo;
     private final Class<T> targetClass;
     private final BlobContentConverter<T> converter;
+    private final Client client;
 
-    public DefaultBlobReference(S3ResourceInfo resourceInfo, Class<T> targetClass, BlobContentConverter<T> converter) {
+    public DefaultBlobReference(Client client, S3ResourceInfo resourceInfo, Class<T> targetClass, BlobContentConverter<T> converter) {
         this.resourceInfo = resourceInfo;
         this.targetClass = targetClass;
         this.converter = converter;
+        this.client = client;
     }
 
     @Override
-    public T getContent(Client client) throws BlobRestoreException {
+    public T getContent() throws BlobRestoreException {
         String bucket = resourceInfo.getBucketName();
         String key = resourceInfo.getKey();
-        AmazonS3 s3 = client.getS3();
+        AmazonS3 s3 = getClient().getS3();
 
         GetObjectRequest request = new GetObjectRequest(bucket, key);
         InputStream resourceStream = null;
@@ -78,9 +80,9 @@ public class DefaultBlobReference<T> implements BlobReference<T> {
     }
 
     @Override
-    public void setContent(Client client, T object, ObjectMetadata metadata) throws BlobOutputException {
+    public void setContent(T object, ObjectMetadata metadata) throws BlobOutputException {
         InputStream source = getContentConverter().objectToStream(object);
-        uploadFrom(client, source, metadata);
+        uploadFrom(source, metadata);
     }
 
     @Override
@@ -98,14 +100,14 @@ public class DefaultBlobReference<T> implements BlobReference<T> {
     }
 
     @Override
-    public void uploadFrom(Client client, InputStream uploadSource, ObjectMetadata metadata) throws BlobOutputException {
+    public void uploadFrom(InputStream uploadSource, ObjectMetadata metadata) throws BlobOutputException {
         String bucket = resourceInfo.getBucketName();
         String key = resourceInfo.getKey();
 
         try {
             PutObjectRequest request = new PutObjectRequest(bucket, key, uploadSource, metadata);
 
-            TransferManager transfer = new TransferManager(client.getCredentials());
+            TransferManager transfer = new TransferManager(getClient().getCredentials());
             Upload upload = transfer.upload(request);
             upload.waitForCompletion();
         } catch (AmazonServiceException ex) {
@@ -122,7 +124,7 @@ public class DefaultBlobReference<T> implements BlobReference<T> {
     private static final int BUFFER_SIZE = 1024 * 500;
 
     @Override
-    public OutputStream getUploadStream(Client client, ObjectMetadata metadata) throws BlobOutputException {
+    public OutputStream getUploadStream(ObjectMetadata metadata) throws BlobOutputException {
         PipedOutputStream output = null;
         PipedInputStream source = null;
         try {
@@ -148,8 +150,13 @@ public class DefaultBlobReference<T> implements BlobReference<T> {
         }
 
         //Uploading is handled by another thread.
-        uploadFrom(client, source, metadata);
+        uploadFrom(source, metadata);
 
         return output;
+    }
+
+    @Override
+    public Client getClient() {
+        return this.client;
     }
 }

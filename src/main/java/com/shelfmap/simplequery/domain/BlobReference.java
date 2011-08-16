@@ -26,10 +26,11 @@ import java.io.Serializable;
  * @author Tsutomu YANO
  */
 public interface BlobReference<T> extends Serializable {
-    T getContent(Client client) throws BlobRestoreException;
-    void setContent(Client client, T object, ObjectMetadata metadata) throws BlobOutputException;
-    void uploadFrom(Client client, InputStream uploadSource, ObjectMetadata metadata) throws BlobOutputException;
-    OutputStream getUploadStream(Client client, ObjectMetadata metadata) throws BlobOutputException;
+    T getContent() throws BlobRestoreException;
+    void setContent(T object, ObjectMetadata metadata) throws BlobOutputException;
+    void uploadFrom(InputStream uploadSource, ObjectMetadata metadata) throws BlobOutputException;
+    OutputStream getUploadStream(ObjectMetadata metadata) throws BlobOutputException;
     S3ResourceInfo getResourceInfo();
     BlobContentConverter<T> getContentConverter();
+    Client getClient();
 }

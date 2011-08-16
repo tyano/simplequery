@@ -27,6 +27,14 @@ import java.io.Serializable;
  */
 public interface BlobReference<T> extends Serializable {
     T getContent() throws BlobRestoreException;
+
+    /**
+     * An InputStream instance for reading bytes from remote s3 object.
+     * Tt depends on the implementation that the returned stream is buffered or not,
+     * so users should wrap the returned stream with BufferedInputStream if needed.
+     *
+     * @return an InputStream instance for reading bytes from remote s3 object.
+     */
     InputStream getInputStream();
     ObjectMetadata getObjectMetadata();
     void setContent(T object, ObjectMetadata metadata) throws BlobOutputException;

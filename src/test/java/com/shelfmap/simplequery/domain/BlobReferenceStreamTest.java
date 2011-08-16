@@ -15,6 +15,8 @@
  */
 package com.shelfmap.simplequery.domain;
 
+import static org.junit.Assert.assertThat;
+import static org.hamcrest.Matchers.is;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.ObjectListing;
 import com.amazonaws.services.s3.model.ObjectMetadata;
@@ -29,6 +31,7 @@ import com.shelfmap.simplequery.IClientHolder;
 import com.shelfmap.simplequery.StoryPath;
 import com.shelfmap.simplequery.TestContext;
 import com.shelfmap.simplequery.domain.impl.ImageContentConverter;
+import com.shelfmap.simplequery.util.IO;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
@@ -77,12 +80,12 @@ public class BlobReferenceStreamTest extends BaseStoryRunner {
             }
         }
 
-        InputStream is = getClass().getResourceAsStream("/images/testimage.jpg");
-        try {
-            testImage = ImageIO.read(is);
-        } finally {
-            IOUtils.closeQuietly(is);
-        }
+//        InputStream is = getClass().getResourceAsStream("/images/testimage.jpg");
+//        try {
+//            testImage = ImageIO.read(is);
+//        } finally {
+//            IOUtils.closeQuietly(is);
+//        }
 
         InputStream uploadSource = null;
         try {
@@ -100,6 +103,7 @@ public class BlobReferenceStreamTest extends BaseStoryRunner {
     }
 
     BlobReference<BufferedImage> blob;
+
     @When("we have a BlobReference object which point to a key in S3 storage")
     public void createBlob() {
         blob = new DefaultBlobReference<BufferedImage>(ctx.getClient(), new S3Resource(BUCKET_NAME, KEY_NAME), BufferedImage.class, new ImageContentConverter(null));
@@ -107,5 +111,18 @@ public class BlobReferenceStreamTest extends BaseStoryRunner {
 
     @Then("we must be able to retrieve the data though an InputStream as a byte stream.")
     public void inputDataFromBlob() throws Exception {
+        InputStream stream = null;
+        InputStream source = null;
+        try {
+            stream = blob.getInputStream();
+            source = getClass().getResourceAsStream("/images/testimage.jpg");
+            byte[] data = IO.readBytes(stream);
+            byte[] sourceData = IO.readBytes(source);
+
+            assertThat(data, is(sourceData));
+        } finally {
+            IO.close(stream, this);
+            IO.close(source, this);
+        }
     }
 }

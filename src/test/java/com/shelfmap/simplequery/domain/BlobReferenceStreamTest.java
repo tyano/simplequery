@@ -24,6 +24,7 @@ import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.amazonaws.services.s3.model.S3Object;
 import com.amazonaws.services.s3.model.S3ObjectSummary;
+import com.amazonaws.services.s3.transfer.Upload;
 import com.google.inject.Binder;
 import com.google.inject.Inject;
 import com.google.inject.Scopes;
@@ -42,11 +43,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
 import org.apache.commons.io.IOUtils;
 import org.jbehave.core.annotations.Given;
 import org.jbehave.core.annotations.Then;
@@ -135,8 +131,10 @@ public class BlobReferenceStreamTest extends BaseStoryRunner {
 
     @Then("we must be able to put data into S3 storage through an OutputStream gotten by BlobReference#getUploadStream() method.")
     public void assertPuttingData() throws Exception {
-        Future<byte[]> future = uploadTestData();
-        byte[] data = future.get();//(10, TimeUnit.SECONDS);
+        byte[] data = uploadTestData();
+
+        Upload upload = blob.getLastUpload();
+        upload.waitForCompletion();
 
         Client client = ctx.getClient();
         AmazonS3 s3 = client.getS3();
@@ -156,32 +154,24 @@ public class BlobReferenceStreamTest extends BaseStoryRunner {
         assertThat(uploadedData, is(data));
     }
 
-    private Future<byte[]> uploadTestData() throws BlobOutputException, IOException {
+    private byte[] uploadTestData() throws BlobOutputException, IOException {
 
-        ExecutorService service = Executors.newSingleThreadExecutor();
-        Future<byte[]> result = service.submit(new Callable<byte[]>() {
-            @Override
-            public byte[] call() throws Exception {
-                ObjectMetadata metadata = new ObjectMetadata();
-                metadata.addUserMetadata("format", "jpeg");
+        ObjectMetadata metadata = new ObjectMetadata();
+        metadata.addUserMetadata("format", "jpeg");
 
-                OutputStream output = null;
-                InputStream source = null;
-                try {
-                    source = getClass().getResourceAsStream("/images/testimage.jpg");
-                    byte[] data = IO.readBytes(source);
+        OutputStream output = null;
+        InputStream source = null;
+        try {
+            source = getClass().getResourceAsStream("/images/testimage.jpg");
+            byte[] data = IO.readBytes(source);
 
-                    output = new BufferedOutputStream(blob.getUploadStream(metadata));
-                    output.write(data);
-                    output.flush();
-                    return data;
-                } finally {
-                    IO.close(output, this);
-                    IO.close(source, this);
-                }
-            }
-        });
-        service.shutdown();
-        return result;
+            output = new BufferedOutputStream(blob.getUploadStream(metadata));
+            output.write(data);
+            output.flush();
+            return data;
+        } finally {
+            IO.close(output, this);
+            IO.close(source, this);
+        }
     }
 }

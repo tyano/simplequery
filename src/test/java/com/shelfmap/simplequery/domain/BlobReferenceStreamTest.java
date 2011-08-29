@@ -15,6 +15,7 @@
  */
 package com.shelfmap.simplequery.domain;
 
+import com.shelfmap.simplequery.domain.impl.DefaultBlobReference;
 import static org.junit.Assert.assertThat;
 import static org.hamcrest.Matchers.is;
 import com.amazonaws.services.s3.AmazonS3;

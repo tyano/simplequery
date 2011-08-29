@@ -19,7 +19,6 @@ import com.shelfmap.simplequery.Client;
 import com.shelfmap.simplequery.domain.AttributeConverter;
 import com.shelfmap.simplequery.domain.BlobContentConverter;
 import com.shelfmap.simplequery.domain.BlobReference;
-import com.shelfmap.simplequery.domain.DefaultBlobReference;
 import com.shelfmap.simplequery.domain.S3Resource;
 import com.shelfmap.simplequery.domain.S3ResourceInfo;
 import com.shelfmap.simplequery.expression.CanNotRestoreAttributeException;

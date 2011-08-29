@@ -15,6 +15,7 @@
  */
 package com.shelfmap.simplequery.domain;
 
+import com.shelfmap.simplequery.domain.impl.DefaultBlobReference;
 import com.shelfmap.simplequery.domain.impl.ImageContentConverter;
 import static org.junit.Assert.assertThat;
 import static org.hamcrest.Matchers.is;

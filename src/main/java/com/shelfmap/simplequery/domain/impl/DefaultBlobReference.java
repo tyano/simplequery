@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.shelfmap.simplequery.domain;
+package com.shelfmap.simplequery.domain.impl;
 
 import com.amazonaws.AmazonClientException;
 import com.amazonaws.AmazonServiceException;
@@ -25,6 +25,11 @@ import com.amazonaws.services.s3.model.S3Object;
 import com.amazonaws.services.s3.transfer.TransferManager;
 import com.amazonaws.services.s3.transfer.Upload;
 import com.shelfmap.simplequery.Client;
+import com.shelfmap.simplequery.domain.BlobContentConverter;
+import com.shelfmap.simplequery.domain.BlobOutputException;
+import com.shelfmap.simplequery.domain.BlobReference;
+import com.shelfmap.simplequery.domain.BlobRestoreException;
+import com.shelfmap.simplequery.domain.S3ResourceInfo;
 import com.shelfmap.simplequery.util.IO;
 import java.io.IOException;
 import java.io.InputStream;

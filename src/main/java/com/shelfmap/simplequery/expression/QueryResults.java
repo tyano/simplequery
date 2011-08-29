@@ -16,12 +16,11 @@
 
 package com.shelfmap.simplequery.expression;
 
-import java.util.List;
-
 /**
  *
  * @author Tsutomu YANO
  */
-public interface QueryResults<T> extends List<T> {
-
+public interface QueryResults<T> extends Iterable<T> {
+    int size();
+    boolean isEmpty();
 }

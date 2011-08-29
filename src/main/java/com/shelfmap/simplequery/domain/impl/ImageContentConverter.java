@@ -50,6 +50,10 @@ public class ImageContentConverter implements BlobContentConverter<BufferedImage
         this.conversionInfo = conversionInfo;
     }
 
+    public ImageContentConverter() {
+        this(null);
+    }
+
     @Override
     public BufferedImage restoreObject(ObjectMetadata metadata, InputStream stream) throws BlobRestoreException {
         try {

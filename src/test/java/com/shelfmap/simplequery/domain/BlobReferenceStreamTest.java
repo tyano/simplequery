@@ -18,14 +18,17 @@ package com.shelfmap.simplequery.domain;
 import static org.junit.Assert.assertThat;
 import static org.hamcrest.Matchers.is;
 import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.model.GetObjectRequest;
 import com.amazonaws.services.s3.model.ObjectListing;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
+import com.amazonaws.services.s3.model.S3Object;
 import com.amazonaws.services.s3.model.S3ObjectSummary;
 import com.google.inject.Binder;
 import com.google.inject.Inject;
 import com.google.inject.Scopes;
 import com.shelfmap.simplequery.BaseStoryRunner;
+import com.shelfmap.simplequery.Client;
 import com.shelfmap.simplequery.ClientFactory;
 import com.shelfmap.simplequery.IClientHolder;
 import com.shelfmap.simplequery.StoryPath;
@@ -33,11 +36,17 @@ import com.shelfmap.simplequery.TestContext;
 import com.shelfmap.simplequery.domain.impl.ImageContentConverter;
 import com.shelfmap.simplequery.util.IO;
 import java.awt.image.BufferedImage;
+import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.Arrays;
 import java.util.List;
-import javax.imageio.ImageIO;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 import org.apache.commons.io.IOUtils;
 import org.jbehave.core.annotations.Given;
 import org.jbehave.core.annotations.Then;
@@ -66,6 +75,7 @@ public class BlobReferenceStreamTest extends BaseStoryRunner {
     BufferedImage testImage;
     private static final String BUCKET_NAME = "simplequery-tokyo-test-bucket";
     private static final String KEY_NAME = "test-key-name";
+    private static final String PUT_KEY_NAME = "put-key-name";
 
     @Given("a S3 resource")
     public void createTestS3Resource() throws IOException {
@@ -80,13 +90,6 @@ public class BlobReferenceStreamTest extends BaseStoryRunner {
             }
         }
 
-//        InputStream is = getClass().getResourceAsStream("/images/testimage.jpg");
-//        try {
-//            testImage = ImageIO.read(is);
-//        } finally {
-//            IOUtils.closeQuietly(is);
-//        }
-
         InputStream uploadSource = null;
         try {
             if (!found) {
@@ -99,14 +102,13 @@ public class BlobReferenceStreamTest extends BaseStoryRunner {
         } finally {
             IOUtils.closeQuietly(uploadSource);
         }
-
     }
 
     BlobReference<BufferedImage> blob;
 
     @When("we have a BlobReference object which point to a key in S3 storage")
     public void createBlob() {
-        blob = new DefaultBlobReference<BufferedImage>(ctx.getClient(), new S3Resource(BUCKET_NAME, KEY_NAME), BufferedImage.class, new ImageContentConverter(null));
+        blob = new DefaultBlobReference<BufferedImage>(ctx.getClient(), new S3Resource(BUCKET_NAME, KEY_NAME), BufferedImage.class, new ImageContentConverter());
     }
 
     @Then("we must be able to retrieve the data though an InputStream as a byte stream.")
@@ -124,5 +126,62 @@ public class BlobReferenceStreamTest extends BaseStoryRunner {
             IO.close(stream, this);
             IO.close(source, this);
         }
+    }
+
+    @When("we have a BlobReference object which have no data but point to a key in S3 storage")
+    public void createBlobReference() {
+        blob = new DefaultBlobReference<BufferedImage>(ctx.getClient(), new S3Resource(BUCKET_NAME, PUT_KEY_NAME), BufferedImage.class, new ImageContentConverter());
+    }
+
+    @Then("we must be able to put data into S3 storage through an OutputStream gotten by BlobReference#getUploadStream() method.")
+    public void assertPuttingData() throws Exception {
+        Future<byte[]> future = uploadTestData();
+        byte[] data = future.get();//(10, TimeUnit.SECONDS);
+
+        Client client = ctx.getClient();
+        AmazonS3 s3 = client.getS3();
+
+        GetObjectRequest request = new GetObjectRequest(BUCKET_NAME, PUT_KEY_NAME);
+        S3Object object = s3.getObject(request);
+
+        InputStream stream = null;
+        byte[] uploadedData = null;
+        try {
+            stream = object.getObjectContent();
+            uploadedData = IO.readBytes(stream);
+        } finally {
+            IO.close(stream, this);
+        }
+
+        assertThat(uploadedData, is(data));
+    }
+
+    private Future<byte[]> uploadTestData() throws BlobOutputException, IOException {
+
+        ExecutorService service = Executors.newSingleThreadExecutor();
+        Future<byte[]> result = service.submit(new Callable<byte[]>() {
+            @Override
+            public byte[] call() throws Exception {
+                ObjectMetadata metadata = new ObjectMetadata();
+                metadata.addUserMetadata("format", "jpeg");
+
+                OutputStream output = null;
+                InputStream source = null;
+                try {
+                    source = getClass().getResourceAsStream("/images/testimage.jpg");
+                    byte[] data = IO.readBytes(source);
+
+                    output = new BufferedOutputStream(blob.getUploadStream(metadata));
+                    output.write(data);
+                    output.flush();
+                    return data;
+                } finally {
+                    IO.close(output, this);
+                    IO.close(source, this);
+                }
+            }
+        });
+        service.shutdown();
+        return result;
     }
 }

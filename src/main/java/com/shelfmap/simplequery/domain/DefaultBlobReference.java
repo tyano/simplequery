@@ -143,8 +143,9 @@ public class DefaultBlobReference<T> implements BlobReference<T> {
         PipedOutputStream output = null;
         PipedInputStream source = null;
         try {
+            output = new PipedOutputStream();
             source = new PipedInputStream(BUFFER_SIZE);
-            output = new PipedOutputStream(source);
+            output.connect(source);
         } catch (IOException ex) {
             IO.close(output, this);
             IO.close(source, this);

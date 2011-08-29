@@ -47,6 +47,7 @@ public class DefaultBlobReference<T> implements BlobReference<T> {
     private final Class<T> targetClass;
     private final BlobContentConverter<T> converter;
     private final Client client;
+    private Upload lastUpload;
 
     private ObjectMetadata metadata;
 
@@ -115,26 +116,21 @@ public class DefaultBlobReference<T> implements BlobReference<T> {
     }
 
     @Override
-    public void uploadFrom(InputStream uploadSource, ObjectMetadata metadata) throws BlobOutputException {
+    public Upload uploadFrom(InputStream uploadSource, ObjectMetadata metadata) throws BlobOutputException {
         String bucket = resourceInfo.getBucketName();
         String key = resourceInfo.getKey();
 
         try {
             PutObjectRequest request = new PutObjectRequest(bucket, key, uploadSource, metadata);
-
             TransferManager transfer = new TransferManager(getClient().getCredentials());
-            Upload upload = transfer.upload(request);
-            upload.waitForCompletion();
+            this.lastUpload = transfer.upload(request);
+            return this.lastUpload;
         } catch (AmazonServiceException ex) {
             throw new BlobOutputException("a problem occured in Amazon S3.", ex);
         } catch (AmazonClientException ex) {
             throw new BlobOutputException("Client had an problem when uploading data.", ex);
-        } catch (InterruptedException ex) {
-            LOGGER.warn("Thead is interrupted.", ex);
-            Thread.currentThread().interrupt();
         }
     }
-
 
     private static final int BUFFER_SIZE = 1024 * 500;
 
@@ -152,7 +148,6 @@ public class DefaultBlobReference<T> implements BlobReference<T> {
             throw new BlobOutputException("Could not create a PipedStream.", ex);
         }
 
-        //Uploading is handled by another thread.
         uploadFrom(source, metadata);
 
         return output;
@@ -161,5 +156,10 @@ public class DefaultBlobReference<T> implements BlobReference<T> {
     @Override
     public Client getClient() {
         return this.client;
+    }
+
+    @Override
+    public Upload getLastUpload() {
+        return this.lastUpload;
     }
 }

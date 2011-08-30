@@ -15,32 +15,32 @@
  */
 package com.shelfmap.simplequery.domain.impl;
 
+import static com.shelfmap.simplequery.expression.matcher.MatcherFactory.is;
+import static com.shelfmap.simplequery.attribute.Attributes.attr;
 import com.shelfmap.simplequery.Client;
-import com.shelfmap.simplequery.attribute.Attributes;
 import com.shelfmap.simplequery.domain.DomainReference;
 import com.shelfmap.simplequery.expression.Expression;
 import com.shelfmap.simplequery.expression.MultipleResultsExistException;
 import com.shelfmap.simplequery.expression.QueryResults;
 import com.shelfmap.simplequery.expression.SimpleQueryException;
-import com.shelfmap.simplequery.expression.matcher.MatcherFactory;
 
 /**
  *
  * @author Tsutomu YANO
  */
-public class DefaultToManyDomainReference<T> implements DomainReference<T> {
-
+public abstract class ReverseDomainReference<T> implements DomainReference<T> {
     private final Client client;
     private final String masterItemName;
     private final Class<T> targetDomainClass;
     private final String targetAttributeName;
 
-    public DefaultToManyDomainReference(Client client, String masterItemName, Class<T> targetDomainClass, String targetAttributeName) {
+    public ReverseDomainReference(Client client, String masterItemName, Class<T> targetDomainClass, String targetAttributeName) {
         this.client = client;
         this.masterItemName = masterItemName;
         this.targetDomainClass = targetDomainClass;
         this.targetAttributeName = targetAttributeName;
     }
+
 
     @Override
     public Class<T> getDomainClass() {
@@ -58,7 +58,7 @@ public class DefaultToManyDomainReference<T> implements DomainReference<T> {
     }
 
     private Expression<T> createExpression() {
-        return getClient().select().from(getDomainClass()).where(Attributes.attr(getTargetAttributeName()), MatcherFactory.is(getMasterItemName()));
+        return getClient().select().from(getDomainClass()).where(attr(getTargetAttributeName()), is(getMasterItemName()));
     }
 
     public String getTargetAttributeName() {

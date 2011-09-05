@@ -18,7 +18,6 @@ package com.shelfmap.simplequery.domain.impl;
 import static com.amazonaws.services.simpledb.util.SimpleDBUtils.*;
 import static com.shelfmap.simplequery.util.Assertion.isNotNull;
 import com.shelfmap.simplequery.domain.AttributeConverter;
-import com.shelfmap.simplequery.domain.AttributeConverter;
 import com.shelfmap.simplequery.expression.CanNotRestoreAttributeException;
 
 /**
@@ -52,7 +51,7 @@ public class IntAttributeConverter implements AttributeConverter<Integer> {
     @Override
     public Integer restoreValue(String targetValue)  throws CanNotRestoreAttributeException {
         isNotNull("targetValue", targetValue);
-        return (offset > 0) 
+        return (offset > 0)
             ? decodeRealNumberRangeInt(targetValue, offset)
             : decodeZeroPaddingInt(targetValue);
     }

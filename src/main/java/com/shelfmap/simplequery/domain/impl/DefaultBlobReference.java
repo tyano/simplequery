@@ -102,8 +102,23 @@ public class DefaultBlobReference<T> implements BlobReference<T> {
 
     @Override
     public void setContent(T object, ObjectMetadata metadata) throws BlobOutputException {
+        Upload upload = setContentAsync(object, metadata);
+        try {
+            upload.waitForCompletion();
+        } catch (AmazonServiceException ex) {
+            throw new BlobOutputException("AWS returned an error response, or client can not understand the response.", ex);
+        } catch (AmazonClientException ex) {
+            throw new BlobOutputException("Client could not send request, or could not receive the response.", ex);
+        } catch (InterruptedException ex) {
+            LOGGER.warn("Thread was interrupted. Program will continue but something wrong might be occured.", ex);
+            Thread.currentThread().interrupt();
+        }
+    }
+
+    @Override
+    public Upload setContentAsync(T object, ObjectMetadata metadata) throws BlobOutputException {
         InputStream source = getContentConverter().objectToStream(object);
-        uploadFrom(source, metadata);
+        return uploadFrom(source, metadata);
     }
 
     @Override

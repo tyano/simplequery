@@ -39,6 +39,7 @@ public interface BlobReference<T> extends Serializable {
     InputStream getInputStream();
     ObjectMetadata getObjectMetadata();
     void setContent(T object, ObjectMetadata metadata) throws BlobOutputException;
+    Upload setContentAsync(T object, ObjectMetadata metadata) throws BlobOutputException;
     Upload uploadFrom(InputStream uploadSource, ObjectMetadata metadata) throws BlobOutputException;
     OutputStream getUploadStream(ObjectMetadata metadata) throws BlobOutputException;
     S3ResourceInfo getResourceInfo();

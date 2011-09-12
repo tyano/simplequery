@@ -15,6 +15,8 @@
  */
 package com.shelfmap.simplequery;
 
+import com.shelfmap.simplequery.domain.AttributeConverterFactory;
+import com.shelfmap.simplequery.domain.DefaultAttributeConverterFactory;
 import com.shelfmap.simplequery.domain.DomainAttributes;
 import com.shelfmap.simplequery.expression.ItemConverter;
 import com.shelfmap.simplequery.domain.impl.BeanDomainAttributes;
@@ -39,5 +41,10 @@ public class DefaultConfiguration implements Configuration {
     @Override
     public DomainAttributes getDomainAttributes(Class<?> domainClass, String domainName) {
         return new BeanDomainAttributes(domainClass, domainName, this);
+    }
+
+    @Override
+    public AttributeConverterFactory getAttributeConverterFactory() {
+        return new DefaultAttributeConverterFactory();
     }
 }

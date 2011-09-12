@@ -22,7 +22,6 @@ import com.amazonaws.services.simpledb.AmazonSimpleDB;
 import com.shelfmap.simplequery.Configuration;
 import com.shelfmap.simplequery.attribute.ConditionAttribute;
 import com.shelfmap.simplequery.attribute.SelectAttribute;
-import com.shelfmap.simplequery.attribute.impl.DefaultAttribute;
 import com.shelfmap.simplequery.domain.AttributeConverter;
 import com.shelfmap.simplequery.domain.DomainAttribute;
 import com.shelfmap.simplequery.domain.DomainAttributes;

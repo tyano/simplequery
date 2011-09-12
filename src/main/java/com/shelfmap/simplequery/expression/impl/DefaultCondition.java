@@ -20,7 +20,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import com.shelfmap.simplequery.attribute.ConditionAttribute;
-import com.shelfmap.simplequery.attribute.impl.DefaultAttribute;
 import com.shelfmap.simplequery.domain.AttributeConverter;
 import com.shelfmap.simplequery.expression.Condition;
 import com.shelfmap.simplequery.expression.Operator;

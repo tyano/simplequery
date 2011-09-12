@@ -27,6 +27,7 @@ import com.shelfmap.simplequery.annotation.Container;
 import com.shelfmap.simplequery.annotation.ItemName;
 import com.shelfmap.simplequery.domain.AttributeAccessor;
 import com.shelfmap.simplequery.domain.AttributeConverter;
+import com.shelfmap.simplequery.domain.AttributeConverterFactory;
 import com.shelfmap.simplequery.domain.AttributeKey;
 import com.shelfmap.simplequery.domain.CanNotWriteAttributeException;
 import com.shelfmap.simplequery.domain.DomainAttributes;
@@ -144,7 +145,9 @@ public class BeanDomainAttributes implements DomainAttributes {
             result = processAttribute(annotation, propertyName, valueType, containerType, getter);
         } else {
             //No Annotation. the attribute name of this property become same with the property name.
-            result = new DefaultDomainAttribute<VT,CT>(getDomainName(), propertyName, valueType, containerType, newAttributeConverter(valueType), newAttributeAccessor(containerType, fullPropertyPath(propertyName)));
+            //AttributeConverter is created by the type of this attribute.
+            AttributeConverter<VT> converter = createConverter(valueType);
+            result = new DefaultDomainAttribute<VT,CT>(getDomainName(), propertyName, valueType, containerType, converter, newAttributeAccessor(containerType, fullPropertyPath(propertyName)));
         }
 
         return result;
@@ -200,6 +203,11 @@ public class BeanDomainAttributes implements DomainAttributes {
         return new LongAttributeConverter(annotation.padding(), annotation.offset());
     }
 
+    private <VT> AttributeConverter<VT> createConverter(Class<VT> attributeType) {
+        AttributeConverterFactory factory = configuration.getAttributeConverterFactory();
+        return factory.getAttributeConverter(attributeType);
+    }
+
     @SuppressWarnings("unchecked")
     private <VT,CT> DomainAttribute<VT,CT> processAttribute(Attribute annotation, String propertyName, Class<VT> valueType, Class<CT> containerType, Method getter) {
         try {
@@ -210,7 +218,7 @@ public class BeanDomainAttributes implements DomainAttributes {
 
             AttributeConverter<?> converter =
                     (converterClass.equals(NullAttributeConverter.class))
-                    ? new DefaultAttributeConverter<VT>(valueType)
+                    ? createConverter(valueType)
                     : converterClass.newInstance();
             return new DefaultDomainAttribute<VT,CT>(getDomainName(), attributeName, valueType, containerType, (AttributeConverter<VT>) converter, newAttributeAccessor(containerType, fullPropertyPath(propertyName)));
         } catch (InstantiationException ex) {

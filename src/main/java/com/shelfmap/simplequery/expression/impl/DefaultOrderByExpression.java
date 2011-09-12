@@ -18,7 +18,6 @@ package com.shelfmap.simplequery.expression.impl;
 
 import com.shelfmap.simplequery.attribute.SelectAttribute;
 import com.amazonaws.services.simpledb.AmazonSimpleDB;
-import com.amazonaws.services.simpledb.util.SimpleDBUtils;
 
 import com.shelfmap.simplequery.Configuration;
 import com.shelfmap.simplequery.attribute.ConditionAttribute;
@@ -113,7 +112,7 @@ public class DefaultOrderByExpression<T> extends BaseExpression<T> implements Or
     }
 
     private String orderByExpression() {
-        return " order by " + SimpleDBUtils.quoteName(attribute.describe()) + " " + sortOrder.describe();
+        return " order by " + attribute.describe() + " " + sortOrder.describe();
     }
 
     @Override

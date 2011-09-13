@@ -16,6 +16,9 @@
 package com.shelfmap.simplequery.domain.impl;
 
 import com.shelfmap.simplequery.Client;
+import com.shelfmap.simplequery.attribute.ConditionAttribute;
+import com.shelfmap.simplequery.domain.Domain;
+import com.shelfmap.simplequery.domain.DomainAttribute;
 import com.shelfmap.simplequery.domain.ToManyDomainReference;
 
 /**
@@ -23,12 +26,17 @@ import com.shelfmap.simplequery.domain.ToManyDomainReference;
  * @author Tsutomu YANO
  */
 public class ReverseToManyDomainReference<T> extends ReverseDomainReference<T> implements ToManyDomainReference<T> {
-    public ReverseToManyDomainReference(Client client, String masterItemName, Class<T> targetDomainClass, String targetAttributeName) {
-        super(client, masterItemName, targetDomainClass, targetAttributeName);
+    public ReverseToManyDomainReference(Client client, String masterItemName, Domain<T> targetDomain, ConditionAttribute targetAttribute) {
+        super(client, masterItemName, targetDomain, targetAttribute);
     }
 
     @Override
     public void add(T... objects) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        if(objects == null || objects.length == 0) return;
+        
+        for (T target : objects) {
+            DomainAttribute<String,String> targetAttribute = getTargetDomainAttribute(getTargetDomain(), getTargetAttribute());
+            targetAttribute.getAttributeAccessor().write(target, getMasterItemName());
+        }
     }
 }

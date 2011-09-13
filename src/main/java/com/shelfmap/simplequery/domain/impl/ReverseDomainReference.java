@@ -16,8 +16,12 @@
 package com.shelfmap.simplequery.domain.impl;
 
 import static com.shelfmap.simplequery.expression.matcher.MatcherFactory.is;
-import static com.shelfmap.simplequery.attribute.Attributes.attr;
 import com.shelfmap.simplequery.Client;
+import com.shelfmap.simplequery.Configuration;
+import com.shelfmap.simplequery.attribute.ConditionAttribute;
+import com.shelfmap.simplequery.domain.Domain;
+import com.shelfmap.simplequery.domain.DomainAttribute;
+import com.shelfmap.simplequery.domain.DomainAttributes;
 import com.shelfmap.simplequery.domain.DomainReference;
 import com.shelfmap.simplequery.expression.Expression;
 import com.shelfmap.simplequery.expression.MultipleResultsExistException;
@@ -31,20 +35,20 @@ import com.shelfmap.simplequery.expression.SimpleQueryException;
 public abstract class ReverseDomainReference<T> implements DomainReference<T> {
     private final Client client;
     private final String masterItemName;
-    private final Class<T> targetDomainClass;
-    private final String targetAttributeName;
+    private final Domain<T> targetDomain;
+    private final ConditionAttribute targetAttribute;
 
-    public ReverseDomainReference(Client client, String masterItemName, Class<T> targetDomainClass, String targetAttributeName) {
+    public ReverseDomainReference(Client client, String masterItemName, Domain<T> targetDomain, ConditionAttribute targetAttribute) {
         this.client = client;
         this.masterItemName = masterItemName;
-        this.targetDomainClass = targetDomainClass;
-        this.targetAttributeName = targetAttributeName;
+        this.targetDomain = targetDomain;
+        this.targetAttribute = targetAttribute;
     }
 
 
     @Override
-    public Class<T> getDomainClass() {
-        return this.targetDomainClass;
+    public Domain<T> getTargetDomain() {
+        return this.targetDomain;
     }
 
     @Override
@@ -58,11 +62,11 @@ public abstract class ReverseDomainReference<T> implements DomainReference<T> {
     }
 
     private Expression<T> createExpression() {
-        return getClient().select().from(getDomainClass()).where(attr(getTargetAttributeName()), is(getMasterItemName()));
+        return getClient().select().from(getTargetDomain().getDomainClass()).where(getTargetAttribute(), is(getMasterItemName()));
     }
 
-    public String getTargetAttributeName() {
-        return targetAttributeName;
+    public ConditionAttribute getTargetAttribute() {
+        return targetAttribute;
     }
 
     public Client getClient() {
@@ -71,5 +75,11 @@ public abstract class ReverseDomainReference<T> implements DomainReference<T> {
 
     public String getMasterItemName() {
         return masterItemName;
+    }
+
+    protected <T> DomainAttribute<String,String> getTargetDomainAttribute(Domain<T> targetDomain, ConditionAttribute attribute) {
+        Configuration configuration = getClient().getConfiguration();
+        DomainAttributes attributes = configuration.getDomainAttributes(targetDomain);
+        return attributes.getAttribute(attribute.getAttributeName(), String.class, String.class);
     }
 }

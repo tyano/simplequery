@@ -24,7 +24,7 @@ import com.shelfmap.simplequery.expression.SimpleQueryException;
  * @author Tsutomu YANO
  */
 public interface DomainReference<T> {
-    Class<T> getDomainClass();
+    Domain<T> getTargetDomain();
     T get(boolean consistent) throws SimpleQueryException, MultipleResultsExistException;
     QueryResults<T> getResults(boolean consistent) throws SimpleQueryException;
 }

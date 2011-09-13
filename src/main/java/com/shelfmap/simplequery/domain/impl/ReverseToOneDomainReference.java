@@ -16,6 +16,9 @@
 package com.shelfmap.simplequery.domain.impl;
 
 import com.shelfmap.simplequery.Client;
+import com.shelfmap.simplequery.attribute.ConditionAttribute;
+import com.shelfmap.simplequery.domain.Domain;
+import com.shelfmap.simplequery.domain.DomainAttribute;
 import com.shelfmap.simplequery.domain.ToOneDomainReference;
 import com.shelfmap.simplequery.expression.QueryResults;
 import com.shelfmap.simplequery.expression.SimpleQueryException;
@@ -29,8 +32,8 @@ import java.util.List;
  */
 public class ReverseToOneDomainReference<T> extends ReverseDomainReference<T> implements ToOneDomainReference<T> {
 
-    public ReverseToOneDomainReference(Client client, String masterItemName, Class<T> targetDomainClass, String targetAttributeName) {
-        super(client, masterItemName, targetDomainClass, targetAttributeName);
+    public ReverseToOneDomainReference(Client client, String masterItemName, Domain<T> targetDomain, ConditionAttribute targetAttribute) {
+        super(client, masterItemName, targetDomain, targetAttribute);
     }
 
     @Override
@@ -46,6 +49,9 @@ public class ReverseToOneDomainReference<T> extends ReverseDomainReference<T> im
 
     @Override
     public void set(T object) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        if(object == null) return;
+
+        DomainAttribute<String,String> targetAttribute = getTargetDomainAttribute(getTargetDomain(), getTargetAttribute());
+        targetAttribute.getAttributeAccessor().write(object, getMasterItemName());
     }
 }

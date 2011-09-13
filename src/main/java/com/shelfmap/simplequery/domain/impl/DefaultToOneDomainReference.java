@@ -17,18 +17,15 @@ package com.shelfmap.simplequery.domain.impl;
 
 import static com.shelfmap.simplequery.expression.matcher.MatcherFactory.is;
 import com.shelfmap.simplequery.Client;
-import com.shelfmap.simplequery.annotation.ItemName;
+import com.shelfmap.simplequery.Configuration;
+import com.shelfmap.simplequery.domain.Domain;
+import com.shelfmap.simplequery.domain.DomainAttribute;
+import com.shelfmap.simplequery.domain.DomainAttributes;
 import com.shelfmap.simplequery.domain.ToOneDomainReference;
 import com.shelfmap.simplequery.expression.Expression;
 import com.shelfmap.simplequery.expression.MultipleResultsExistException;
 import com.shelfmap.simplequery.expression.QueryResults;
 import com.shelfmap.simplequery.expression.SimpleQueryException;
-import java.beans.BeanInfo;
-import java.beans.IntrospectionException;
-import java.beans.Introspector;
-import java.beans.PropertyDescriptor;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 
 /**
  *
@@ -38,19 +35,19 @@ import java.lang.reflect.Method;
 public class DefaultToOneDomainReference<T> implements ToOneDomainReference<T> {
 
     private final Client client;
-    private final Class<T> domainClass;
+    private final Domain<T> targetDomain;
     private String targetItemName = null;
 
-    private Method itemNameReader;
+    private DomainAttribute<String,String> itemNameAttribute;
 
-    public DefaultToOneDomainReference(Client client, Class<T> domainClass) {
+    public DefaultToOneDomainReference(Client client, Domain<T> targetDomain) {
         this.client = client;
-        this.domainClass = domainClass;
+        this.targetDomain = targetDomain;
     }
 
     @Override
-    public Class<T> getDomainClass() {
-        return domainClass;
+    public Domain<T> getTargetDomain() {
+        return targetDomain;
     }
 
     @Override
@@ -64,7 +61,7 @@ public class DefaultToOneDomainReference<T> implements ToOneDomainReference<T> {
     }
 
     private Expression<T> createExpression() {
-        return client.select().from(getDomainClass()).whereItemName(is(getTargetItemName()));
+        return client.select().from(getTargetDomain().getDomainClass()).whereItemName(is(getTargetItemName()));
     }
 
     public Client getClient() {
@@ -77,39 +74,15 @@ public class DefaultToOneDomainReference<T> implements ToOneDomainReference<T> {
 
     @Override
     public void set(T object) {
-        if(this.itemNameReader == null) {
-            this.itemNameReader = findItemNameReader();
+        if(this.itemNameAttribute == null) {
+            this.itemNameAttribute = findItemNameAttribute();
         }
-        try {
-            Object o = this.itemNameReader.invoke(object, new Object[0]);
-            this.targetItemName = (String)o;
-        } catch (IllegalAccessException ex) {
-            throw new RuntimeException(ex);
-        } catch (IllegalArgumentException ex) {
-            throw new RuntimeException(ex);
-        } catch (InvocationTargetException ex) {
-            throw new RuntimeException(ex);
-        }
+        this.targetItemName = this.itemNameAttribute.getAttributeAccessor().read(object);
     }
 
-    private Method findItemNameReader() {
-        try {
-            BeanInfo info = Introspector.getBeanInfo(domainClass);
-            PropertyDescriptor[] descriptors = info.getPropertyDescriptors();
-            for (PropertyDescriptor descriptor : descriptors) {
-                //do not handle the properties of Object class.
-                //(Object class have only one property 'getClass()')
-                if (!descriptor.getName().equals("class")) {
-                    Method getter = descriptor.getReadMethod();
-
-                    if (getter.isAnnotationPresent(ItemName.class)) {
-                        return getter;
-                    }
-                }
-            }
-            throw new IllegalStateException("@ItemName annotation is not found on the domain-class: " + domainClass.getName());
-        } catch (IntrospectionException ex) {
-            throw new IllegalStateException(ex);
-        }
+    private DomainAttribute<String,String> findItemNameAttribute() {
+        Configuration configuration = getClient().getConfiguration();
+        DomainAttributes attributes = configuration.getDomainAttributes(getTargetDomain());
+        return attributes.getItemNameAttribute();
     }
 }

@@ -15,10 +15,13 @@
  */
 package com.shelfmap.simplequery.domain;
 
+import com.shelfmap.simplequery.annotation.SimpleDbDomain;
+
 /**
  *
  * @author Tsutomu YANO
  */
+@SimpleDbDomain("flatattribute-test")
 public class TelInfo {
     private String telNo;
     private String faxNo;

@@ -15,7 +15,7 @@
  */
 package com.shelfmap.simplequery.domain;
 
-import com.shelfmap.simplequery.annotation.Domain;
+import com.shelfmap.simplequery.annotation.SimpleDbDomain;
 import com.shelfmap.simplequery.annotation.FlatAttribute;
 import com.shelfmap.simplequery.annotation.IntAttribute;
 
@@ -23,7 +23,7 @@ import com.shelfmap.simplequery.annotation.IntAttribute;
  *
  * @author Tsutomu YANO
  */
-@Domain(value = "flatattribute-test")
+@SimpleDbDomain(value = "flatattribute-test")
 public class User {
     private int age;
     private String name;

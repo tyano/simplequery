@@ -28,7 +28,7 @@ import java.lang.annotation.Target;
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface Domain {
+public @interface SimpleDbDomain {
     String value();
     AttributeType attributeType() default AttributeType.PROPERTY;
 }

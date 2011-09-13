@@ -20,7 +20,7 @@ import static org.hamcrest.Matchers.nullValue;
 import static com.shelfmap.simplequery.expression.matcher.MatcherFactory.is;
 import static org.junit.Assert.assertThat;
 import static org.hamcrest.Matchers.notNullValue;
-import com.shelfmap.simplequery.annotation.Domain;
+import com.shelfmap.simplequery.annotation.SimpleDbDomain;
 import com.amazonaws.services.simpledb.AmazonSimpleDB;
 import com.amazonaws.services.simpledb.model.BatchPutAttributesRequest;
 import com.amazonaws.services.simpledb.model.CreateDomainRequest;
@@ -188,7 +188,7 @@ public class ListPropertyTest extends BaseStoryRunner {
         assertThat(arrayResult.getTags().length, Matchers.is(0));
     }
 
-    @Domain(value = DOMAIN_NAME)
+    @SimpleDbDomain(value = DOMAIN_NAME)
     public static class ListPropertyDomain {
 
         private String itemName;
@@ -240,7 +240,7 @@ public class ListPropertyTest extends BaseStoryRunner {
         }
     }
 
-    @Domain(DOMAIN_NAME)
+    @SimpleDbDomain(DOMAIN_NAME)
     public static class ArrayDomain {
 
         private String domainName;
@@ -270,7 +270,7 @@ public class ListPropertyTest extends BaseStoryRunner {
         }
     }
 
-    @Domain(DOMAIN_NAME)
+    @SimpleDbDomain(DOMAIN_NAME)
     public static class DomainWithoutList {
 
         private String domainName;

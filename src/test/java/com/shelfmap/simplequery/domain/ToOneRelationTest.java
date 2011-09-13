@@ -32,7 +32,7 @@ import com.shelfmap.simplequery.IClientHolder;
 import com.shelfmap.simplequery.StoryPath;
 import com.shelfmap.simplequery.TestContext;
 import com.shelfmap.simplequery.annotation.Attribute;
-import com.shelfmap.simplequery.annotation.Domain;
+import com.shelfmap.simplequery.annotation.SimpleDbDomain;
 import com.shelfmap.simplequery.annotation.ItemName;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -106,7 +106,7 @@ public class ToOneRelationTest extends BaseStoryRunner {
     }
 
 
-    @Domain(PARENT_DOMAIN)
+    @SimpleDbDomain(PARENT_DOMAIN)
     public interface PurchaseRecord {
         @ItemName
         String getItemName();
@@ -119,7 +119,7 @@ public class ToOneRelationTest extends BaseStoryRunner {
         void setDetail(ToOneDomainReference<Detail> detail);
     }
 
-    @Domain(CHILD_DOMAIN)
+    @SimpleDbDomain(CHILD_DOMAIN)
     public interface Detail {
         @ItemName
         String getItemName();

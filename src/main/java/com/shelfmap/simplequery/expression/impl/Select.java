@@ -23,7 +23,7 @@ import java.util.List;
 import com.amazonaws.services.simpledb.AmazonSimpleDB;
 
 import com.shelfmap.simplequery.Configuration;
-import com.shelfmap.simplequery.annotation.Domain;
+import com.shelfmap.simplequery.annotation.SimpleDbDomain;
 import com.shelfmap.simplequery.attribute.SelectAttribute;
 import com.shelfmap.simplequery.attribute.impl.AllAttribute;
 import com.shelfmap.simplequery.expression.DomainExpression;
@@ -46,7 +46,7 @@ public class Select implements SelectQuery {
 
     @Override
     public <T> DomainExpression<T> from(Class<T> target) {
-        Domain annotation = target.getAnnotation(Domain.class);
+        SimpleDbDomain annotation = target.getAnnotation(SimpleDbDomain.class);
         if (annotation == null) {
             throw new IllegalArgumentException("the class object must have @Domain annotation.");
         }

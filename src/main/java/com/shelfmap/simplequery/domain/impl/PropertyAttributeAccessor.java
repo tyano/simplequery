@@ -16,7 +16,7 @@
 package com.shelfmap.simplequery.domain.impl;
 
 import com.shelfmap.simplequery.Configuration;
-import com.shelfmap.simplequery.annotation.Domain;
+import com.shelfmap.simplequery.annotation.SimpleDbDomain;
 import com.shelfmap.simplequery.InstanceFactory;
 import static com.shelfmap.simplequery.util.Assertion.*;
 import com.shelfmap.simplequery.domain.AttributeAccessor;
@@ -88,7 +88,7 @@ public class PropertyAttributeAccessor<T> implements AttributeAccessor<T> {
     private Object generateNewPropertyValueForNullProperty(PropertyDescriptor descriptor, Object current) throws InvocationTargetException, IllegalArgumentException, IllegalAccessException {
         Object target;
         Class<?> propertyType = descriptor.getPropertyType();
-        Domain annotation = propertyType.getAnnotation(Domain.class);
+        SimpleDbDomain annotation = propertyType.getAnnotation(SimpleDbDomain.class);
         Object newInstance = annotation != null
                 ? newDomainInstance(propertyType, annotation.value())
                 : newObjectInstance(propertyType);

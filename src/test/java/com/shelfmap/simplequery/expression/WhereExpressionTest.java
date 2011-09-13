@@ -24,7 +24,7 @@ import com.amazonaws.services.simpledb.AmazonSimpleDB;
 import com.amazonaws.services.simpledb.AmazonSimpleDBClient;
 import com.shelfmap.simplequery.BaseStoryRunner;
 import com.shelfmap.simplequery.Configuration;
-import com.shelfmap.simplequery.annotation.Domain;
+import com.shelfmap.simplequery.annotation.SimpleDbDomain;
 import com.shelfmap.simplequery.annotation.IntAttribute;
 import com.shelfmap.simplequery.StoryPath;
 import com.shelfmap.simplequery.expression.impl.Select;
@@ -85,20 +85,20 @@ public class WhereExpressionTest extends BaseStoryRunner {
     }
 
 
-    @Domain("testdomain")
+    @SimpleDbDomain("testdomain")
     public static interface DomainWithoutAttribute {
 
         int getSaving();
     }
 
-    @Domain("with-attribute")
+    @SimpleDbDomain("with-attribute")
     public static interface DomainWithAttribute {
 
         @IntAttribute(attributeName = "saving", padding = 8, offset = 1000000)
         int getAccountSaving();
     }
 
-    @Domain("without-attributename")
+    @SimpleDbDomain("without-attributename")
     public static interface DomainWithoutAttributeName {
         @IntAttribute(padding=7, offset=200000)
         int getSaving();

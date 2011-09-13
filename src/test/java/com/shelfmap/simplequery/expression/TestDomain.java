@@ -1,6 +1,6 @@
 package com.shelfmap.simplequery.expression;
 
-import com.shelfmap.simplequery.annotation.Domain;
+import com.shelfmap.simplequery.annotation.SimpleDbDomain;
 import com.shelfmap.simplequery.annotation.IntAttribute;
 
 /*
@@ -23,10 +23,10 @@ import com.shelfmap.simplequery.annotation.IntAttribute;
  *
  * @author Tsutomu YANO
  */
-@Domain("test-domain")
+@SimpleDbDomain("test-domain")
 public interface TestDomain {
     String getName();
-    
+
     @IntAttribute(padding=3)
     int getAge();
 }

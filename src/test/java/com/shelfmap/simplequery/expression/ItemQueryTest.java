@@ -38,7 +38,7 @@ import com.shelfmap.simplequery.IClientHolder;
 import com.shelfmap.simplequery.StoryPath;
 import com.shelfmap.simplequery.TestContext;
 import com.shelfmap.simplequery.annotation.Attribute;
-import com.shelfmap.simplequery.annotation.Domain;
+import com.shelfmap.simplequery.annotation.SimpleDbDomain;
 import com.shelfmap.simplequery.annotation.ItemName;
 import com.shelfmap.simplequery.attribute.impl.AllAttribute;
 import com.shelfmap.simplequery.expression.impl.Select;
@@ -89,7 +89,7 @@ public class ItemQueryTest extends BaseStoryRunner {
     }
 
     ItemTestDomain result;
-    
+
     @When("querying with the item name from a test domain")
     public void selectByItemName() throws SimpleQueryException, MultipleResultsExistException {
         result = ctx.getClient().select().from(ItemTestDomain.class).whereItemName(is("firstItem")).getSingleResult(true);
@@ -111,9 +111,9 @@ public class ItemQueryTest extends BaseStoryRunner {
     public void assertResultIsNull() {
         assertThat(result, Matchers.is(nullValue()));
     }
-    
+
     private Expression<ItemTestDomain> exp;
-    
+
     @When("the expression is created with 'is' matcher")
     public void createItemQueryWithIs() {
         exp = new Select(ctx.getSimpleDb(), ctx.getConfiguration(), AllAttribute.INSTANCE).from(ItemTestDomain.class).whereItemName(is("firstItem"));
@@ -129,7 +129,7 @@ public class ItemQueryTest extends BaseStoryRunner {
         exp = new Select(ctx.getSimpleDb(), ctx.getConfiguration(), AllAttribute.INSTANCE).from(ItemTestDomain.class).whereItemName(MatcherFactory.in("firstItem", "secondItem"));
     }
 
-    @Domain(DOMAIN_NAME)
+    @SimpleDbDomain(DOMAIN_NAME)
     public static class ItemTestDomain {
 
         private String itemName;

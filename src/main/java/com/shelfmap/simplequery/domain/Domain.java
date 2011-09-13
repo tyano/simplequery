@@ -19,6 +19,7 @@ package com.shelfmap.simplequery.domain;
  *
  * @author Tsutomu YANO
  */
-public interface Domain {
+public interface Domain<T> {
+    Class<T> getDomainClass();
     String getDomainName();
 }

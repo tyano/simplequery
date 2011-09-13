@@ -21,18 +21,19 @@ import static com.shelfmap.simplequery.util.Assertion.isNotNull;
 
 /**
  *
+ * @param <T> the type of domain-class.
  * @author Tsutomu YANO
  */
-public class SimpleNamedDomain implements Domain {
+public class SimpleNamedDomain<T> implements Domain<T> {
 
+    private final Class<T> domainClass;
     private final String domainName;
 
-    public SimpleNamedDomain(String domainName) {
-        isNotNull("domainName", domainName);
-        this.domainName = domainName;
+    public static <X> SimpleNamedDomain<X> of(final Class<X> domainClass) {
+        return new SimpleNamedDomain<X>(domainClass);
     }
 
-    public SimpleNamedDomain(Class<?> domainClass) {
+    public SimpleNamedDomain(final Class<T> domainClass) {
         isNotNull("domainClass", domainClass);
 
         if(!domainClass.isAnnotationPresent(SimpleDbDomain.class)) {
@@ -46,10 +47,16 @@ public class SimpleNamedDomain implements Domain {
         }
 
         this.domainName = value;
+        this.domainClass = domainClass;
     }
 
     @Override
     public String getDomainName() {
         return this.domainName;
+    }
+
+    @Override
+    public Class<T> getDomainClass() {
+        return this.domainClass;
     }
 }

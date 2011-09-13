@@ -21,7 +21,7 @@ package com.shelfmap.simplequery.domain;
  * @author Tsutomu YANO
  */
 public interface DomainAttribute<VT, CT> {
-    String getDomainName();
+    Domain<?> getDomain();
     String getAttributeName();
     Class<VT> getValueType();
     Class<CT> getContainerType();

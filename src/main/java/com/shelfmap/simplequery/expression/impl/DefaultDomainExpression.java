@@ -17,13 +17,13 @@
 package com.shelfmap.simplequery.expression.impl;
 
 
+import com.shelfmap.simplequery.domain.Domain;
 import com.shelfmap.simplequery.attribute.SelectAttribute;
 import com.amazonaws.services.simpledb.AmazonSimpleDB;
 import com.amazonaws.services.simpledb.util.SimpleDBUtils;
 
 import com.shelfmap.simplequery.Configuration;
 import com.shelfmap.simplequery.attribute.ConditionAttribute;
-import com.shelfmap.simplequery.attribute.impl.DefaultAttribute;
 import com.shelfmap.simplequery.attribute.impl.ItemNameAttribute;
 import com.shelfmap.simplequery.expression.Condition;
 import com.shelfmap.simplequery.expression.DomainExpression;
@@ -42,17 +42,11 @@ import static com.shelfmap.simplequery.util.Assertion.isNotNull;
  */
 public class DefaultDomainExpression<T> extends BaseExpression<T> implements DomainExpression<T>, Cloneable {
     private SelectQuery selectObject;
-    private String domainName;
-    private Class<T> typeToken;
 
-    public DefaultDomainExpression(AmazonSimpleDB simpleDB, Configuration configuration, SelectQuery selectObject, String domainName, Class<T> typeToken) {
-        super(simpleDB, configuration, typeToken, domainName);
+    public DefaultDomainExpression(AmazonSimpleDB simpleDB, Configuration configuration, SelectQuery selectObject, Domain<T> domain) {
+        super(simpleDB, configuration, domain);
         isNotNull("selectObject", selectObject);
-        isNotNull("domainName", domainName);
-        isNotNull("typeToken", typeToken);
         this.selectObject = selectObject;
-        this.domainName = domainName;
-        this.typeToken = typeToken;
     }
 
     @Override
@@ -77,17 +71,7 @@ public class DefaultDomainExpression<T> extends BaseExpression<T> implements Dom
 
     @Override
     public String describe() {
-        return selectObject.describe() + " from " + SimpleDBUtils.quoteName(domainName);
-    }
-
-    @Override
-    public String getDomainName() {
-        return domainName;
-    }
-
-    @Override
-    public Class<T> getDomainClass() {
-        return typeToken;
+        return selectObject.describe() + " from " + SimpleDBUtils.quoteName(getDomain().getDomainName());
     }
 
     @Override
@@ -113,7 +97,7 @@ public class DefaultDomainExpression<T> extends BaseExpression<T> implements Dom
 
     @Override
     public DomainExpression<T> rebuildWith(SelectQuery select) {
-        return new DefaultDomainExpression<T>(getAmazonSimpleDB(), getConfiguration(), select, domainName, typeToken);
+        return new DefaultDomainExpression<T>(getAmazonSimpleDB(), getConfiguration(), select, getDomain());
     }
 
     @Override

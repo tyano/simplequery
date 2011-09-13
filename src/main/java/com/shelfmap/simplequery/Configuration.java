@@ -17,7 +17,9 @@
 package com.shelfmap.simplequery;
 
 import com.shelfmap.simplequery.domain.AttributeConverterFactory;
+import com.shelfmap.simplequery.domain.Domain;
 import com.shelfmap.simplequery.domain.DomainAttributes;
+import com.shelfmap.simplequery.domain.DomainFactory;
 import com.shelfmap.simplequery.expression.ItemConverter;
 
 /**
@@ -25,8 +27,9 @@ import com.shelfmap.simplequery.expression.ItemConverter;
  * @author Tsutomu YANO
  */
 public interface Configuration {
-    <T> ItemConverter<T> getItemConverter(Class<T> domainClass, String domainName);
-    <T> InstanceFactory<T> getInstanceFactory(Class<T> domainClass, String domainName);
-    DomainAttributes getDomainAttributes(Class<?> domainClass, String domainName);
+    <T> ItemConverter<T> getItemConverter(Domain<T> domain);
+    <T> InstanceFactory<T> getInstanceFactory(Domain<T> domain);
+    DomainFactory getDomainFactory();
+    DomainAttributes getDomainAttributes(Domain<?> domain);
     AttributeConverterFactory getAttributeConverterFactory();
 }

@@ -22,6 +22,7 @@ import com.amazonaws.services.simpledb.model.Item;
 import com.shelfmap.simplequery.Configuration;
 import com.shelfmap.simplequery.InstanceFactory;
 import com.shelfmap.simplequery.domain.AttributeAccessor;
+import com.shelfmap.simplequery.domain.Domain;
 import com.shelfmap.simplequery.domain.DomainAttribute;
 import com.shelfmap.simplequery.domain.DomainAttributes;
 import com.shelfmap.simplequery.expression.CanNotConvertItemException;
@@ -34,34 +35,32 @@ import org.slf4j.LoggerFactory;
 
 /**
  * <b>this class is NOT THREAD SAFE</b>
+ * @param <T> 
  * @author Tsutomu YANO
  */
 public class DefaultItemConverter<T> implements ItemConverter<T> {
     private static final Logger LOGGER = LoggerFactory.getLogger(DefaultItemConverter.class);
 
-    private final Class<T> domainClass;
-    private final String domainName;
+    private final Domain<T> domain;
     private final Configuration configuration;
     private final InstanceFactory<T> instanceFactory;
     private DomainAttributes domainAttributes;
 
-    public DefaultItemConverter(Class<T> domainClass, String domainName, Configuration configuration) {
-        isNotNull("domainClass", domainClass);
-        isNotNull("domainName", domainName);
+    public DefaultItemConverter(Domain<T> domain, Configuration configuration) {
+        isNotNull("domain", domain);
         isNotNull("configuration", configuration);
-        this.domainClass = domainClass;
-        this.domainName = domainName;
+        this.domain = domain;
         this.configuration = configuration;
-        this.instanceFactory = configuration.getInstanceFactory(domainClass, domainName);
+        this.instanceFactory = configuration.getInstanceFactory(domain);
     }
 
     @Override
     public T convert(Item item) throws CanNotConvertItemException {
         if(domainAttributes == null) {
-            domainAttributes = getConfiguration().getDomainAttributes(domainClass, domainName);
+            domainAttributes = getConfiguration().getDomainAttributes(getDomain());
         }
 
-        T instance = instanceFactory.createInstance(getDomainClass());
+        T instance = instanceFactory.createInstance(getDomain().getDomainClass());
         for (Attribute attr : item.getAttributes()) {
             DomainAttribute<?,?> domainAttribute = null;
             try {
@@ -73,7 +72,7 @@ public class DefaultItemConverter<T> implements ItemConverter<T> {
                 throw new CanNotConvertItemException("could not write a attribute: " + domainAttribute.getAttributeName() + " for the item: " + item.getName(), ex, item);
             }
         }
-        
+
         //Fill all collection properties with empty collection
         for (DomainAttribute<?,?> domainAttribute : domainAttributes) {
             if(domainAttribute.getContainerType().isArray() || Collection.class.isAssignableFrom(domainAttribute.getContainerType())) {
@@ -87,13 +86,13 @@ public class DefaultItemConverter<T> implements ItemConverter<T> {
                 }
             }
         }
-        
+
         DomainAttribute<String,String> itemNameAttribute = domainAttributes.getItemNameAttribute();
         String itemNameValue = item.getName();
         if(itemNameAttribute != null) {
            itemNameAttribute.getAttributeAccessor().write(instance, itemNameValue);
         }
-        
+
         return instance;
     }
 
@@ -129,7 +128,7 @@ public class DefaultItemConverter<T> implements ItemConverter<T> {
                 try {
                     @SuppressWarnings("unchecked")
                     Collection<VT> prev = (Collection<VT>) accessor.read(instance);
-                    
+
                     @SuppressWarnings("unchecked")
                     Collection<VT> newCol = (Collection<VT>) containerType.newInstance();
                     if(prev != null) {
@@ -150,18 +149,12 @@ public class DefaultItemConverter<T> implements ItemConverter<T> {
         }
     }
 
-    @Override
-    public Class<T> getDomainClass() {
-        return domainClass;
+    public Domain<T> getDomain() {
+        return domain;
     }
 
     @Override
     public Configuration getConfiguration() {
         return configuration;
-    }
-
-    @Override
-    public String getDomainName() {
-        return domainName;
     }
 }

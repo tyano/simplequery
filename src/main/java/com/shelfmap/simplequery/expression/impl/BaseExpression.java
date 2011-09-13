@@ -23,6 +23,7 @@ import com.amazonaws.services.simpledb.model.SelectRequest;
 import com.amazonaws.services.simpledb.model.SelectResult;
 import com.shelfmap.simplequery.Configuration;
 import com.shelfmap.simplequery.attribute.impl.CountAttribute;
+import com.shelfmap.simplequery.domain.Domain;
 import com.shelfmap.simplequery.expression.CanNotConvertItemException;
 import com.shelfmap.simplequery.expression.Expression;
 import com.shelfmap.simplequery.expression.MultipleResultsExistException;
@@ -32,25 +33,23 @@ import java.util.List;
 
 /**
  *
+ * @param <T> the type of the domain-class on which this expression has been created.
  * @author Tsutomu YANO
  */
 public abstract class BaseExpression<T> implements Expression<T> {
     private final Configuration configuration;
     private final AmazonSimpleDB simpleDB;
-    private final Class<T> domainClass;
-    private final String domainName;
+    private final Domain<T> domain;
 
-    public BaseExpression(AmazonSimpleDB simpleDB, Configuration configuration, Class<T> domainClass, String domainName) {
+    public BaseExpression(AmazonSimpleDB simpleDB, Configuration configuration, Domain<T> domain) {
         isNotNull("simpleDB", simpleDB);
         isNotNull("configuration", configuration);
-        isNotNull("domainClass", domainClass);
-        isNotNull("domainName", domainName);
+        isNotNull("domain", domain);
         this.simpleDB = simpleDB;
         this.configuration = configuration;
-        this.domainClass = domainClass;
-        this.domainName = domainName;
+        this.domain = domain;
     }
-    
+
     @Override
     public T getSingleResult(boolean consistent) throws SimpleQueryException, MultipleResultsExistException {
         String expression = describe();
@@ -59,10 +58,10 @@ public abstract class BaseExpression<T> implements Expression<T> {
         List<Item> items = result.getItems();
         if(items.size() > 1) throw new MultipleResultsExistException("more than 1 results returned by the expression: " + expression);
         if(items.isEmpty()) return null;
-        
+
         Item first = items.get(0);
         try {
-            return getConfiguration().getItemConverter(domainClass, domainName).convert(first);
+            return getConfiguration().getItemConverter(getDomain()).convert(first);
         } catch (CanNotConvertItemException ex) {
             throw new SimpleQueryException("Can not convert an item", ex);
         }
@@ -72,7 +71,7 @@ public abstract class BaseExpression<T> implements Expression<T> {
     public QueryResults<T> getResults(boolean consistent) throws SimpleQueryException {
         SelectRequest selectReq = new SelectRequest(describe(), consistent);
         SelectResult result = simpleDB.select(selectReq);
-        return new DefaultQueryResult<T>(simpleDB, this, result, getConfiguration().getItemConverter(domainClass, domainName));
+        return new DefaultQueryResult<T>(simpleDB, this, result, getConfiguration().getItemConverter(getDomain()));
     }
 
     @Override
@@ -82,11 +81,11 @@ public abstract class BaseExpression<T> implements Expression<T> {
         SelectResult selectResult = simpleDB.select(req);
         List<Item> items = selectResult.getItems();
         if(items.isEmpty()) throw new SimpleQueryException("can not count records. expression was: " + rebuilt.describe());
-        
+
         String value  = items.get(0).getAttributes().get(0).getValue();
         return Integer.parseInt(value);
     }
-    
+
     public AmazonSimpleDB getAmazonSimpleDB() {
         return this.simpleDB;
     }
@@ -94,7 +93,11 @@ public abstract class BaseExpression<T> implements Expression<T> {
     public Configuration getConfiguration() {
         return configuration;
     }
-    
+
+    public Domain<T> getDomain() {
+        return domain;
+    }
+
     @Override
     public Object clone() {
         try {

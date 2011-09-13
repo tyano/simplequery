@@ -20,6 +20,8 @@ import com.shelfmap.simplequery.annotation.SimpleDbDomain;
 import com.shelfmap.simplequery.InstanceFactory;
 import static com.shelfmap.simplequery.util.Assertion.*;
 import com.shelfmap.simplequery.domain.AttributeAccessor;
+import com.shelfmap.simplequery.domain.Domain;
+import com.shelfmap.simplequery.domain.DomainFactory;
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
@@ -89,8 +91,9 @@ public class PropertyAttributeAccessor<T> implements AttributeAccessor<T> {
         Object target;
         Class<?> propertyType = descriptor.getPropertyType();
         SimpleDbDomain annotation = propertyType.getAnnotation(SimpleDbDomain.class);
+
         Object newInstance = annotation != null
-                ? newDomainInstance(propertyType, annotation.value())
+                ? newDomainInstance(propertyType)
                 : newObjectInstance(propertyType);
         Method writeMethod = descriptor.getWriteMethod();
         writeMethod.invoke(current, newInstance);
@@ -98,9 +101,11 @@ public class PropertyAttributeAccessor<T> implements AttributeAccessor<T> {
         return target;
     }
 
-    private <T> T newDomainInstance(Class<T> domainClass, String domainName) {
-        InstanceFactory<T> factory = configuration.getInstanceFactory(domainClass, domainName);
-        return factory.createInstance(domainClass);
+    private <T> T newDomainInstance(Class<T> propertyType) {
+        DomainFactory factory = getConfiguration().getDomainFactory();
+        Domain<T> domain = factory.createDomain(propertyType);
+        InstanceFactory<T> instanceFactory = getConfiguration().getInstanceFactory(domain);
+        return instanceFactory.createInstance(domain.getDomainClass());
     }
 
     private <T> T newObjectInstance(Class<T> clazz) {
@@ -158,5 +163,9 @@ public class PropertyAttributeAccessor<T> implements AttributeAccessor<T> {
         } catch (PropertyNotFoundException ex) {
             return null;
         }
+    }
+
+    public Configuration getConfiguration() {
+        return configuration;
     }
 }

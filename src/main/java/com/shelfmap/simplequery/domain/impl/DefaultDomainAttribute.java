@@ -16,6 +16,7 @@
 
 package com.shelfmap.simplequery.domain.impl;
 
+import com.shelfmap.simplequery.domain.Domain;
 import com.shelfmap.simplequery.domain.DomainAttribute;
 import com.shelfmap.simplequery.domain.AttributeAccessor;
 import com.shelfmap.simplequery.domain.AttributeConverter;
@@ -26,28 +27,28 @@ import static com.shelfmap.simplequery.util.Assertion.isNotNull;
  * @author Tsutomu YANO
  */
 public class DefaultDomainAttribute<VT,CT> implements DomainAttribute<VT,CT> {
-    private final String domainName;
+    private final Domain<?> domain;
     private final String attributeName;
     private final Class<VT> valueType;
     private final Class<CT> containerType;
     private final AttributeConverter<VT> attributeConverter;
     private final AttributeAccessor<CT> attributeAccessor;
 
-    public DefaultDomainAttribute(String domainName, String attributeName, Class<VT> valueType, Class<CT> containerType, AttributeConverter<VT> attributeConverter, AttributeAccessor<CT> attributeAccessor) {
-        isNotNull("domainName", domainName);
+    public DefaultDomainAttribute(Domain<?> domain, String attributeName, Class<VT> valueType, Class<CT> containerType, AttributeConverter<VT> attributeConverter, AttributeAccessor<CT> attributeAccessor) {
+        isNotNull("domain", domain);
         isNotNull("attributeName", attributeName);
         isNotNull("valueType", valueType);
         isNotNull("containerType", containerType);
         isNotNull("attributeConverter", attributeConverter);
         isNotNull("attributeAccessor", attributeAccessor);
-        this.domainName = domainName;
+        this.domain = domain;
         this.attributeName = attributeName;
         this.valueType = valueType;
         this.containerType = containerType;
         this.attributeConverter = attributeConverter;
         this.attributeAccessor = attributeAccessor;
     }
-    
+
     @Override
     public String getAttributeName() {
         return attributeName;
@@ -67,10 +68,10 @@ public class DefaultDomainAttribute<VT,CT> implements DomainAttribute<VT,CT> {
     public AttributeAccessor<CT> getAttributeAccessor() {
         return attributeAccessor;
     }
-    
+
     @Override
-    public String getDomainName() {
-        return domainName;
+    public Domain<?> getDomain() {
+        return domain;
     }
 
     @Override

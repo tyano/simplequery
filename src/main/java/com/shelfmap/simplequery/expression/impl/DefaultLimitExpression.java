@@ -19,6 +19,7 @@ import static com.shelfmap.simplequery.util.Assertion.*;
 import com.amazonaws.services.simpledb.AmazonSimpleDB;
 import com.shelfmap.simplequery.Configuration;
 import com.shelfmap.simplequery.attribute.SelectAttribute;
+import com.shelfmap.simplequery.domain.Domain;
 import com.shelfmap.simplequery.expression.DomainExpression;
 import com.shelfmap.simplequery.expression.LimitExpression;
 import com.shelfmap.simplequery.expression.OrderByExpression;
@@ -37,16 +38,15 @@ public class DefaultLimitExpression<T> extends BaseExpression<T> implements Limi
     private OrderByExpression<T> orderByExpression;
 
     protected DefaultLimitExpression(AmazonSimpleDB simpleDB, Configuration configuration, final DomainExpression<T> domainExpression, WhereExpression<T> whereExpression, OrderByExpression<T> orderByExpression, int limitCount) {
-        super(simpleDB, 
-              configuration, 
-              Assertion.isNotNullAndGet("domainExpression", domainExpression, new Assertion.Accessor<Class<T>>() {
+        super(simpleDB,
+              configuration,
+              Assertion.isNotNullAndGet("domainExpression", domainExpression, new Assertion.Accessor<Domain<T>>() {
                 @Override
-                public Class<T> get() {
-                    return domainExpression.getDomainClass();
+                public Domain<T> get() {
+                    return domainExpression.getDomain();
                 }
-              }),
-              domainExpression.getDomainName());
-        
+              }));
+
         this.limitCount = limitCount;
         this.domainExpression = domainExpression;
         this.whereExpression = whereExpression;
@@ -79,7 +79,7 @@ public class DefaultLimitExpression<T> extends BaseExpression<T> implements Limi
     public DefaultLimitExpression(AmazonSimpleDB simpleDB, Configuration configuration, final OrderByExpression<T> orderByExpression, int limitCount) {
         this(simpleDB,
              configuration,
-             isNotNullAndGet("orderByExpression", orderByExpression, 
+             isNotNullAndGet("orderByExpression", orderByExpression,
                  new Assertion.Accessor<DomainExpression<T>>() {
                      @Override
                      public DomainExpression<T> get() {

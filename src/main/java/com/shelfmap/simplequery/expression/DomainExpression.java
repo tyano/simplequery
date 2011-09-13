@@ -18,6 +18,7 @@ package com.shelfmap.simplequery.expression;
 
 import com.shelfmap.simplequery.attribute.ConditionAttribute;
 import com.shelfmap.simplequery.attribute.SelectAttribute;
+import com.shelfmap.simplequery.domain.Domain;
 import com.shelfmap.simplequery.expression.matcher.Matcher;
 
 /**
@@ -26,8 +27,7 @@ import com.shelfmap.simplequery.expression.matcher.Matcher;
  */
 public interface DomainExpression<T> extends Expression<T>{
     SelectQuery getSelectQuery();
-    String getDomainName();
-    Class<T> getDomainClass();
+    Domain<T> getDomain();
     WhereExpression<T> whereItemName(Matcher<?> matcher);
     WhereExpression<T> where(Condition<?> expression);
     WhereExpression<T> where(ConditionAttribute attribute, Matcher<?> matcher);

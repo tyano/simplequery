@@ -17,6 +17,7 @@ package com.shelfmap.simplequery.expression.impl;
 
 
 
+import com.shelfmap.simplequery.domain.Domain;
 import com.amazonaws.services.simpledb.AmazonSimpleDB;
 
 import com.shelfmap.simplequery.Configuration;
@@ -48,13 +49,12 @@ public class DefaultWhereExpression<T> extends BaseExpression<T> implements Wher
     public DefaultWhereExpression(AmazonSimpleDB simpleDB, Configuration configuration, final DomainExpression<T> domainExpression, Condition<?> condition) {
         super(simpleDB,
                 configuration,
-                Assertion.isNotNullAndGet("domainExpression", domainExpression, new Assertion.Accessor<Class<T>>() {
+                Assertion.isNotNullAndGet("domainExpression", domainExpression, new Assertion.Accessor<Domain<T>>() {
                     @Override
-                    public Class<T> get() {
-                        return domainExpression.getDomainClass();
+                    public Domain<T> get() {
+                        return domainExpression.getDomain();
                     }
-                }),
-                domainExpression.getDomainName());
+                }));
 
         isNotNull("condition", condition);
         this.domainExpression = domainExpression;
@@ -70,9 +70,7 @@ public class DefaultWhereExpression<T> extends BaseExpression<T> implements Wher
     @SuppressWarnings("unchecked")
     public String describe() {
         StringBuilder sb = new StringBuilder();
-        Class<T> domainClass = getDomainExpression().getDomainClass();
-        String domainName = getDomainExpression().getDomainName();
-        DomainAttributes domainAttributes = getConfiguration().getDomainAttributes(domainClass, domainName);
+        DomainAttributes domainAttributes = getConfiguration().getDomainAttributes(getDomain());
 
         Condition<?> current = condition;
         while (current.getParent() != null) {

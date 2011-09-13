@@ -17,9 +17,12 @@ package com.shelfmap.simplequery;
 
 import com.shelfmap.simplequery.domain.AttributeConverterFactory;
 import com.shelfmap.simplequery.domain.DefaultAttributeConverterFactory;
+import com.shelfmap.simplequery.domain.Domain;
 import com.shelfmap.simplequery.domain.DomainAttributes;
+import com.shelfmap.simplequery.domain.DomainFactory;
 import com.shelfmap.simplequery.expression.ItemConverter;
 import com.shelfmap.simplequery.domain.impl.BeanDomainAttributes;
+import com.shelfmap.simplequery.domain.impl.DefaultDomainFactory;
 import com.shelfmap.simplequery.expression.impl.DefaultItemConverter;
 
 /**
@@ -29,22 +32,27 @@ import com.shelfmap.simplequery.expression.impl.DefaultItemConverter;
 public class DefaultConfiguration implements Configuration {
 
     @Override
-    public <T> ItemConverter<T> getItemConverter(Class<T> domainClass, String domainName) {
-        return new DefaultItemConverter<T>(domainClass, domainName, this);
+    public <T> ItemConverter<T> getItemConverter(Domain<T> domain) {
+        return new DefaultItemConverter<T>(domain, this);
     }
 
     @Override
-    public <T> InstanceFactory<T> getInstanceFactory(Class<T> domainClass, String domainName) {
+    public <T> InstanceFactory<T> getInstanceFactory(Domain<T> domain) {
         return new DefaultInstanceFactory<T>();
     }
 
     @Override
-    public DomainAttributes getDomainAttributes(Class<?> domainClass, String domainName) {
-        return new BeanDomainAttributes(domainClass, domainName, this);
+    public DomainAttributes getDomainAttributes(Domain<?> domain) {
+        return new BeanDomainAttributes(domain, this);
     }
 
     @Override
     public AttributeConverterFactory getAttributeConverterFactory() {
         return new DefaultAttributeConverterFactory();
+    }
+
+    @Override
+    public DomainFactory getDomainFactory() {
+        return new DefaultDomainFactory();
     }
 }

@@ -16,6 +16,7 @@
 package com.shelfmap.simplequery.expression.impl;
 
 
+import com.shelfmap.simplequery.domain.Domain;
 import com.shelfmap.simplequery.attribute.SelectAttribute;
 import com.amazonaws.services.simpledb.AmazonSimpleDB;
 
@@ -67,13 +68,12 @@ public class DefaultOrderByExpression<T> extends BaseExpression<T> implements Or
     protected DefaultOrderByExpression(AmazonSimpleDB simpleDB, Configuration configuration, final DomainExpression<T> domainExpression, WhereExpression<T> whereExpression, ConditionAttribute attribute, SortOrder sortOrder) {
         super(simpleDB,
                 configuration,
-                Assertion.isNotNullAndGet("domainExpression", domainExpression, new Assertion.Accessor<Class<T>>() {
+                Assertion.isNotNullAndGet("domainExpression", domainExpression, new Assertion.Accessor<Domain<T>>() {
                     @Override
-                    public Class<T> get() {
-                        return domainExpression.getDomainClass();
+                    public Domain<T> get() {
+                        return domainExpression.getDomain();
                     }
-                }),
-                domainExpression.getDomainName());
+                }));
 
         isNotNull("attributeName", attribute);
         isNotNull("sortOrder", sortOrder);

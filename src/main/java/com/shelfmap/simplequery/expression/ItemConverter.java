@@ -18,14 +18,14 @@ package com.shelfmap.simplequery.expression;
 
 import com.amazonaws.services.simpledb.model.Item;
 import com.shelfmap.simplequery.Configuration;
+import com.shelfmap.simplequery.domain.Domain;
 
 /**
  *
  * @author Tsutomu YANO
  */
 public interface ItemConverter<T> {
-    Class<T> getDomainClass();
-    String getDomainName();
+    Domain<T> getDomain();
     Configuration getConfiguration();
     T convert(Item item) throws CanNotConvertItemException;
 }

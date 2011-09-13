@@ -30,8 +30,10 @@ import com.shelfmap.simplequery.domain.AttributeConverter;
 import com.shelfmap.simplequery.domain.AttributeConverterFactory;
 import com.shelfmap.simplequery.domain.AttributeKey;
 import com.shelfmap.simplequery.domain.CanNotWriteAttributeException;
+import com.shelfmap.simplequery.domain.Domain;
 import com.shelfmap.simplequery.domain.DomainAttributes;
 import com.shelfmap.simplequery.domain.DomainAttribute;
+import com.shelfmap.simplequery.domain.DomainFactory;
 import java.beans.BeanInfo;
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
@@ -46,27 +48,24 @@ import java.util.Iterator;
  */
 public class BeanDomainAttributes implements DomainAttributes {
     private final AttributeStore attributeStore = new DefaultAttributeStore();
-    private final Class<?> domainClass;
-    private final String domainName;
+    private final Domain<?> domain;
     private final String parentPropertyPath;
     private final Configuration configuration;
     private String itemNameProperty;
 
-    public BeanDomainAttributes(Class<?> domainClass, String domainName, Configuration configuration) {
-        this(domainClass, domainName, configuration, null);
+    public BeanDomainAttributes(Domain<?> domain, Configuration configuration) {
+        this(domain, configuration, null);
     }
 
-    public BeanDomainAttributes(Class<?> domainClass, String domainName, Configuration configuration, String parentPropertyPath) {
-        isNotNull("domainClass", domainClass);
-        isNotNull("domainName", domainName);
+    public BeanDomainAttributes(Domain<?> domain, Configuration configuration, String parentPropertyPath) {
+        isNotNull("domain", domain);
         isNotNull("configuration", configuration);
 
-        this.domainClass = domainClass;
-        this.domainName = domainName;
+        this.domain = domain;
         this.configuration = configuration;
         this.parentPropertyPath = parentPropertyPath == null ? "" : parentPropertyPath;
         try {
-            BeanInfo info = Introspector.getBeanInfo(domainClass);
+            BeanInfo info = Introspector.getBeanInfo(domain.getDomainClass());
             PropertyDescriptor[] descriptors = info.getPropertyDescriptors();
             for (PropertyDescriptor descriptor : descriptors) {
                 //do not handle the properties of Object class.
@@ -108,7 +107,7 @@ public class BeanDomainAttributes implements DomainAttributes {
 
     private void handleItemName(Class<?> type, String propertyName, Method getter) {
         if(!String.class.isAssignableFrom(type)) {
-            throw new IllegalStateException("Can not handle a domain class: " + domainClass.getCanonicalName() + " - The type of @ItemName property must be String.class.");
+            throw new IllegalStateException("Can not handle a domain class: " + getDomain().getDomainClass().getName() + " - The type of @ItemName property must be String.class.");
         }
         DomainAttribute<String,String> itemNameAttribute = createAttribute(propertyName, String.class, String.class, getter);
         attributeStore.putAttribute(propertyName, String.class, String.class, itemNameAttribute);
@@ -147,7 +146,7 @@ public class BeanDomainAttributes implements DomainAttributes {
             //No Annotation. the attribute name of this property become same with the property name.
             //AttributeConverter is created by the type of this attribute.
             AttributeConverter<VT> converter = createConverter(valueType);
-            result = new DefaultDomainAttribute<VT,CT>(getDomainName(), propertyName, valueType, containerType, converter, newAttributeAccessor(containerType, fullPropertyPath(propertyName)));
+            result = new DefaultDomainAttribute<VT,CT>(getDomain(), propertyName, valueType, containerType, converter, newAttributeAccessor(containerType, fullPropertyPath(propertyName)));
         }
 
         return result;
@@ -168,7 +167,7 @@ public class BeanDomainAttributes implements DomainAttributes {
 
         AttributeConverter<Float> converter = createFloatConverter(annotation);
         AttributeAccessor<CT> accessor = newAttributeAccessor(containerType, fullPropertyPath(propertyName));
-        return new DefaultDomainAttribute<Float, CT>(getDomainName(), attributeName, Float.class, containerType, converter, accessor);
+        return new DefaultDomainAttribute<Float, CT>(getDomain(), attributeName, Float.class, containerType, converter, accessor);
     }
 
     private AttributeConverter<Float> createFloatConverter(FloatAttribute annotation) {
@@ -182,7 +181,7 @@ public class BeanDomainAttributes implements DomainAttributes {
 
         AttributeConverter<Integer> converter = createIntConverter(annotation);
         AttributeAccessor<CT> accessor = newAttributeAccessor(containerType, fullPropertyPath(propertyName));
-        return new DefaultDomainAttribute<Integer, CT>(getDomainName(), attributeName, Integer.class, containerType, converter, accessor);
+        return new DefaultDomainAttribute<Integer, CT>(getDomain(), attributeName, Integer.class, containerType, converter, accessor);
     }
 
     private AttributeConverter<Integer> createIntConverter(IntAttribute annotation) {
@@ -196,7 +195,7 @@ public class BeanDomainAttributes implements DomainAttributes {
 
         AttributeConverter<Long> converter = createLongConverter(annotation);
         AttributeAccessor<CT> accessor = newAttributeAccessor(containerType, fullPropertyPath(propertyName));
-        return new DefaultDomainAttribute<Long, CT>(getDomainName(), attributeName, Long.class, containerType, converter, accessor);
+        return new DefaultDomainAttribute<Long, CT>(getDomain(), attributeName, Long.class, containerType, converter, accessor);
     }
 
     private AttributeConverter<Long> createLongConverter(LongAttribute annotation) {
@@ -220,7 +219,7 @@ public class BeanDomainAttributes implements DomainAttributes {
                     (converterClass.equals(NullAttributeConverter.class))
                     ? createConverter(valueType)
                     : converterClass.newInstance();
-            return new DefaultDomainAttribute<VT,CT>(getDomainName(), attributeName, valueType, containerType, (AttributeConverter<VT>) converter, newAttributeAccessor(containerType, fullPropertyPath(propertyName)));
+            return new DefaultDomainAttribute<VT,CT>(getDomain(), attributeName, valueType, containerType, (AttributeConverter<VT>) converter, newAttributeAccessor(containerType, fullPropertyPath(propertyName)));
         } catch (InstantiationException ex) {
             throw new IllegalArgumentException("Can not instanciate a converter. possible cause is that the converter class specified in @Attribute do not have a default constructor.", ex);
         } catch (IllegalAccessException ex) {
@@ -238,8 +237,10 @@ public class BeanDomainAttributes implements DomainAttributes {
      *
      * @param type the return type of the method on which FlatAttribute annotation is applied.
      */
-    private void buildFlatAttribute(Class<?> type, String propertyName) {
-        BeanDomainAttributes attributes = new BeanDomainAttributes(type, getDomainName(), this.configuration, fullPropertyPath(propertyName));
+    private void buildFlatAttribute(Class<?> propertyType, String propertyName) {
+        DomainFactory domainFactory = getConfiguration().getDomainFactory();
+        Domain<?> childDomain = domainFactory.createDomain(propertyType);
+        BeanDomainAttributes attributes = new BeanDomainAttributes(childDomain, getConfiguration(), fullPropertyPath(propertyName));
         copy(this, attributes);
     }
 
@@ -247,7 +248,7 @@ public class BeanDomainAttributes implements DomainAttributes {
     private void copy(BeanDomainAttributes dest, BeanDomainAttributes source) {
         for (AttributeKey key : source.attributeStore.keySet()) {
             if(dest.attributeStore.isAttributeDefined(key.getAttributeName())) {
-                throw new IllegalArgumentException("The name of the attribute '" + key.getAttributeName() + "' of " + source.getDomainClass().getCanonicalName() + " is duplicated with the parent domainClass '" + dest.getDomainClass().getCanonicalName() + "'.");
+                throw new IllegalArgumentException("The name of the attribute '" + key.getAttributeName() + "' of " + source.getDomain().getDomainClass().getName() + " is duplicated with the parent domainClass '" + dest.getDomain().getDomainClass().getName() + "'.");
             }
             copyAttribute(dest, source, key.getValueType(), key.getContainerType(), key.getAttributeName());
         }
@@ -273,14 +274,8 @@ public class BeanDomainAttributes implements DomainAttributes {
         return attributeStore.getAttribute(attributeName);
     }
 
-    @Override
-    public Class<?> getDomainClass() {
-        return domainClass;
-    }
-
-    @Override
-    public String getDomainName() {
-        return domainName;
+    public Domain<?> getDomain() {
+        return domain;
     }
 
     @Override
@@ -302,6 +297,11 @@ public class BeanDomainAttributes implements DomainAttributes {
     @Override
     public Class<?> getContainerType(String attributeName) {
         return attributeStore.getContainerType(attributeName);
+    }
+
+    @Override
+    public Configuration getConfiguration() {
+        return configuration;
     }
 
     @Override

@@ -27,13 +27,19 @@ import com.google.inject.Binder;
 import com.google.inject.Inject;
 import com.google.inject.Scopes;
 import com.shelfmap.simplequery.BaseStoryRunner;
+import com.shelfmap.simplequery.Client;
 import com.shelfmap.simplequery.ClientFactory;
 import com.shelfmap.simplequery.IClientHolder;
 import com.shelfmap.simplequery.StoryPath;
 import com.shelfmap.simplequery.TestContext;
 import com.shelfmap.simplequery.annotation.Attribute;
+import com.shelfmap.simplequery.annotation.IntAttribute;
 import com.shelfmap.simplequery.annotation.SimpleDbDomain;
 import com.shelfmap.simplequery.annotation.ItemName;
+import com.shelfmap.simplequery.attribute.Attributes;
+import com.shelfmap.simplequery.attribute.ConditionAttribute;
+import com.shelfmap.simplequery.domain.impl.DefaultToOneDomainReference;
+import com.shelfmap.simplequery.domain.impl.ReverseToManyDomainReference;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
@@ -115,8 +121,7 @@ public class ToOneRelationTest extends BaseStoryRunner {
         Date getRequestDate();
         void setRequestDate(Date requestDate);
 
-        ToOneDomainReference<Detail> getDetail();
-        void setDetail(ToOneDomainReference<Detail> detail);
+        ToManyDomainReference<Detail> getDetailReference();
     }
 
     @SimpleDbDomain(CHILD_DOMAIN)
@@ -128,8 +133,11 @@ public class ToOneRelationTest extends BaseStoryRunner {
         String getName();
         void setName(String name);
 
+        @IntAttribute(padding=5)
         int getAmount();
         void setAmount(int amount);
+
+        ToOneDomainReference<PurchaseRecord> getParentRecordReference();
     }
 
 
@@ -137,7 +145,17 @@ public class ToOneRelationTest extends BaseStoryRunner {
 
         private String itemName;
         private Date requestDate;
-        private ToOneDomainReference<Detail> detailReference;
+        private final ToManyDomainReference<Detail> detailReference;
+
+        public DefaultPurchaseRecord(Client client, String itemName, Date requestDate) {
+            super();
+            this.itemName = itemName;
+            this.requestDate = new Date(requestDate.getTime());
+            DomainFactory factory = client.getConfiguration().getDomainFactory();
+            Domain<Detail> detailDomain = factory.createDomain(Detail.class);
+            ConditionAttribute targetAttribute = Attributes.attr("parentItemName");
+            this.detailReference = new ReverseToManyDomainReference<Detail>(client, itemName, detailDomain, targetAttribute);
+        }
 
         @Override
         public String getItemName() {
@@ -151,22 +169,17 @@ public class ToOneRelationTest extends BaseStoryRunner {
 
         @Override
         public Date getRequestDate() {
-            return this.requestDate;
+            return new Date(this.requestDate.getTime());
         }
 
         @Override
         public void setRequestDate(Date requestDate) {
-            this.requestDate = requestDate;
+            this.requestDate = new Date(requestDate.getTime());
         }
 
         @Override
-        public ToOneDomainReference<Detail> getDetail() {
+        public ToManyDomainReference<Detail> getDetailReference() {
             return this.detailReference;
-        }
-
-        @Override
-        public void setDetail(ToOneDomainReference<Detail> detail) {
-            this.detailReference = detail;
         }
     }
 
@@ -174,6 +187,17 @@ public class ToOneRelationTest extends BaseStoryRunner {
         private String itemName;
         private String name;
         private int amount;
+        private String parentId;
+        private final ToOneDomainReference<PurchaseRecord> parentReference;
+
+        public DefaultDetail(Client client, String itemName, String name, int amount) {
+            super();
+            this.itemName = itemName;
+            this.name = name;
+            this.amount = amount;
+            Domain<PurchaseRecord> domain = client.getConfiguration().getDomainFactory().createDomain(PurchaseRecord.class);
+            this.parentReference = new DefaultToOneDomainReference<PurchaseRecord>(client, domain);
+        }
 
         @Override
         public String getItemName() {
@@ -203,6 +227,12 @@ public class ToOneRelationTest extends BaseStoryRunner {
         @Override
         public void setAmount(int amount) {
             this.amount = amount;
+        }
+
+        @Attribute(attributeName = "parentItemName")
+        @Override
+        public ToOneDomainReference<PurchaseRecord> getParentRecordReference() {
+            return this.parentReference;
         }
     }
 }

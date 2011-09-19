@@ -21,6 +21,7 @@ import com.shelfmap.simplequery.Configuration;
 import com.shelfmap.simplequery.domain.Domain;
 import com.shelfmap.simplequery.domain.DomainAttribute;
 import com.shelfmap.simplequery.domain.DomainAttributes;
+import com.shelfmap.simplequery.domain.ForwardReference;
 import com.shelfmap.simplequery.domain.ToOneDomainReference;
 import com.shelfmap.simplequery.expression.Expression;
 import com.shelfmap.simplequery.expression.MultipleResultsExistException;
@@ -32,7 +33,7 @@ import com.shelfmap.simplequery.expression.SimpleQueryException;
  * @param <T>
  * @author Tsutomu YANO
  */
-public class DefaultToOneDomainReference<T> implements ToOneDomainReference<T> {
+public class DefaultToOneDomainReference<T> implements ToOneDomainReference<T>, ForwardReference {
 
     private final Client client;
     private final Domain<T> targetDomain;

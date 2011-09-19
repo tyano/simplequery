@@ -23,6 +23,7 @@ import com.shelfmap.simplequery.domain.Domain;
 import com.shelfmap.simplequery.domain.DomainAttribute;
 import com.shelfmap.simplequery.domain.DomainAttributes;
 import com.shelfmap.simplequery.domain.DomainReference;
+import com.shelfmap.simplequery.domain.ReverseReference;
 import com.shelfmap.simplequery.expression.Expression;
 import com.shelfmap.simplequery.expression.MultipleResultsExistException;
 import com.shelfmap.simplequery.expression.QueryResults;
@@ -32,7 +33,7 @@ import com.shelfmap.simplequery.expression.SimpleQueryException;
  *
  * @author Tsutomu YANO
  */
-public abstract class ReverseDomainReference<T> implements DomainReference<T> {
+public abstract class ReverseDomainReference<T> implements DomainReference<T>, ReverseReference {
     private final Client client;
     private final String masterItemName;
     private final Domain<T> targetDomain;

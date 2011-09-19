@@ -17,6 +17,7 @@ package com.shelfmap.simplequery.domain;
 
 /**
  *
+ * @param <T>
  * @author Tsutomu YANO
  */
 public interface ToManyDomainReference<T> extends DomainReference<T> {

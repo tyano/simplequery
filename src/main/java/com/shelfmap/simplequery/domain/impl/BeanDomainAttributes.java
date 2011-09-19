@@ -34,6 +34,8 @@ import com.shelfmap.simplequery.domain.Domain;
 import com.shelfmap.simplequery.domain.DomainAttributes;
 import com.shelfmap.simplequery.domain.DomainAttribute;
 import com.shelfmap.simplequery.domain.DomainFactory;
+import com.shelfmap.simplequery.domain.DomainReference;
+import com.shelfmap.simplequery.domain.ReverseReference;
 import java.beans.BeanInfo;
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
@@ -75,7 +77,11 @@ public class BeanDomainAttributes implements DomainAttributes {
                     String propertyName = descriptor.getName();
                     Method getter = descriptor.getReadMethod();
 
-                    if(getter.isAnnotationPresent(ItemName.class)) {
+                    if(ReverseReference.class.isAssignableFrom(propertyType)) {
+                        //ReverseReference do not have their own value in a domain.
+                        //because it programmatically retrieve the value from another domain.
+                        continue;
+                    } else if(getter.isAnnotationPresent(ItemName.class)) {
                         handleItemName(propertyType, propertyName, getter);
                     } else {
                         Class<?> valueType = propertyType;

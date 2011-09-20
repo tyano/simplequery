@@ -34,7 +34,6 @@ import com.shelfmap.simplequery.domain.Domain;
 import com.shelfmap.simplequery.domain.DomainAttributes;
 import com.shelfmap.simplequery.domain.DomainAttribute;
 import com.shelfmap.simplequery.domain.DomainFactory;
-import com.shelfmap.simplequery.domain.DomainReference;
 import com.shelfmap.simplequery.domain.ReverseReference;
 import java.beans.BeanInfo;
 import java.beans.IntrospectionException;

@@ -19,7 +19,6 @@ package com.shelfmap.simplequery.expression.impl;
 import com.amazonaws.services.simpledb.model.Attribute;
 import static com.shelfmap.simplequery.util.Assertion.isNotNull;
 import com.amazonaws.services.simpledb.model.Item;
-import com.shelfmap.simplequery.Configuration;
 import com.shelfmap.simplequery.Context;
 import com.shelfmap.simplequery.InstanceFactory;
 import com.shelfmap.simplequery.domain.AttributeAccessor;

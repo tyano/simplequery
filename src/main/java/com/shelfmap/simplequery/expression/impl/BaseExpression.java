@@ -21,7 +21,7 @@ import com.amazonaws.services.simpledb.AmazonSimpleDB;
 import com.amazonaws.services.simpledb.model.Item;
 import com.amazonaws.services.simpledb.model.SelectRequest;
 import com.amazonaws.services.simpledb.model.SelectResult;
-import com.shelfmap.simplequery.Configuration;
+import com.shelfmap.simplequery.Context;
 import com.shelfmap.simplequery.attribute.impl.CountAttribute;
 import com.shelfmap.simplequery.domain.Domain;
 import com.shelfmap.simplequery.expression.CanNotConvertItemException;
@@ -37,16 +37,16 @@ import java.util.List;
  * @author Tsutomu YANO
  */
 public abstract class BaseExpression<T> implements Expression<T> {
-    private final Configuration configuration;
+    private final Context context;
     private final AmazonSimpleDB simpleDB;
     private final Domain<T> domain;
 
-    public BaseExpression(AmazonSimpleDB simpleDB, Configuration configuration, Domain<T> domain) {
+    public BaseExpression(Context context, AmazonSimpleDB simpleDB, Domain<T> domain) {
         isNotNull("simpleDB", simpleDB);
-        isNotNull("configuration", configuration);
+        isNotNull("context", context);
         isNotNull("domain", domain);
         this.simpleDB = simpleDB;
-        this.configuration = configuration;
+        this.context = context;
         this.domain = domain;
     }
 
@@ -61,7 +61,7 @@ public abstract class BaseExpression<T> implements Expression<T> {
 
         Item first = items.get(0);
         try {
-            return getConfiguration().getItemConverter(getDomain()).convert(first);
+            return getContext().getItemConverter(getDomain()).convert(first);
         } catch (CanNotConvertItemException ex) {
             throw new SimpleQueryException("Can not convert an item", ex);
         }
@@ -71,7 +71,7 @@ public abstract class BaseExpression<T> implements Expression<T> {
     public QueryResults<T> getResults(boolean consistent) throws SimpleQueryException {
         SelectRequest selectReq = new SelectRequest(describe(), consistent);
         SelectResult result = simpleDB.select(selectReq);
-        return new DefaultQueryResult<T>(simpleDB, this, result, getConfiguration().getItemConverter(getDomain()));
+        return new DefaultQueryResult<T>(simpleDB, this, result, getContext().getItemConverter(getDomain()));
     }
 
     @Override
@@ -90,8 +90,8 @@ public abstract class BaseExpression<T> implements Expression<T> {
         return this.simpleDB;
     }
 
-    public Configuration getConfiguration() {
-        return configuration;
+    public Context getContext() {
+        return context;
     }
 
     public Domain<T> getDomain() {

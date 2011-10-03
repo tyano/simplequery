@@ -16,14 +16,14 @@
 
 package com.shelfmap.simplequery.domain;
 
-import com.shelfmap.simplequery.Configuration;
+import com.shelfmap.simplequery.Context;
 
 /**
  *
  * @author Tsutomu YANO
  */
 public interface DomainAttributes extends Iterable<DomainAttribute<?,?>> {
-    Configuration getConfiguration();
+    Context getContext();
     DomainAttribute<String,String> getItemNameAttribute();
     boolean isAttributeDefined(String attributeName);
     <VT,CT> DomainAttribute<VT,CT> getAttribute(String attributeName, Class<VT> valueType, Class<CT> containerType);

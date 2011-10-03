@@ -31,5 +31,5 @@ public interface Client {
     AmazonS3 getS3();
     SelectQuery select(SelectAttribute... attribute);
     AWSCredentials getCredentials();
-    Configuration getConfiguration();
+    Context getContext();
 }

@@ -40,16 +40,16 @@ public class SimpleQueryClient implements Client {
     private static final Logger LOGGER = LoggerFactory.getLogger(SimpleQueryClient.class);
     private final AWSCredentials credentials;
     private final AmazonSimpleDB simpleDB;
-    private final Configuration configuration;
+    private final Context context;
     private final AmazonS3 s3;
 
     @SuppressWarnings("OverridableMethodCallInConstructor")
-    public SimpleQueryClient(File securityCredencial, Configuration configuration) throws ClientConfigurationException {
+    public SimpleQueryClient(Context context, File securityCredencial) throws ClientConfigurationException {
         try {
             this.credentials = new PropertiesCredentials(securityCredencial);
             this.simpleDB = createSimpleDb(credentials);
             this.s3 = createS3(credentials);
-            this.configuration = configuration;
+            this.context = context;
         } catch (FileNotFoundException ex) {
             throw new ClientConfigurationException("security credential file ' + " + securityCredencial.getAbsolutePath() + "' does not exist.", ex);
         } catch (IOException ex) {
@@ -70,7 +70,7 @@ public class SimpleQueryClient implements Client {
     }
 
     protected SelectQuery newSelectQuery(SelectAttribute... attribute) {
-        return new Select(simpleDB, configuration, attribute);
+        return new Select(context, simpleDB, attribute);
     }
 
     @Override
@@ -101,8 +101,8 @@ public class SimpleQueryClient implements Client {
     }
 
     @Override
-    public Configuration getConfiguration() {
-        return configuration;
+    public Context getContext() {
+        return context;
     }
 
     @Override

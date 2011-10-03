@@ -28,6 +28,6 @@ public interface IClientHolder {
     Client getClient();
     void setClient(Client client);
 
-    Configuration getConfiguration();
-    void setConfiguration(Configuration configuration);
+    Context getContext();
+    void setContext(Context configuration);
 }

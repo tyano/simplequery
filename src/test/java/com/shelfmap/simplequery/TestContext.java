@@ -24,7 +24,7 @@ import com.amazonaws.services.simpledb.AmazonSimpleDB;
 public class TestContext implements IClientHolder {
     private AmazonSimpleDB simpleDb;
     private Client client;
-    private Configuration configuration;
+    private Context context;
 
     @Override
     public AmazonSimpleDB getSimpleDb() {
@@ -47,13 +47,13 @@ public class TestContext implements IClientHolder {
     }
 
     @Override
-    public Configuration getConfiguration() {
-        return configuration;
+    public Context getContext() {
+        return context;
     }
 
     @Override
-    public void setConfiguration(Configuration configuration) {
-        this.configuration = configuration;
+    public void setContext(Context configuration) {
+        this.context = configuration;
     }
 
 }

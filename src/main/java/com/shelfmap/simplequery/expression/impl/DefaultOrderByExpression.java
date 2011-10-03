@@ -16,11 +16,11 @@
 package com.shelfmap.simplequery.expression.impl;
 
 
+import com.shelfmap.simplequery.Context;
 import com.shelfmap.simplequery.domain.Domain;
 import com.shelfmap.simplequery.attribute.SelectAttribute;
 import com.amazonaws.services.simpledb.AmazonSimpleDB;
 
-import com.shelfmap.simplequery.Configuration;
 import com.shelfmap.simplequery.attribute.ConditionAttribute;
 import com.shelfmap.simplequery.expression.DomainExpression;
 import com.shelfmap.simplequery.expression.LimitExpression;
@@ -41,18 +41,16 @@ public class DefaultOrderByExpression<T> extends BaseExpression<T> implements Or
     private final ConditionAttribute attribute;
     private final SortOrder sortOrder;
 
-    public DefaultOrderByExpression(AmazonSimpleDB simpleDB, Configuration configuration, DomainExpression<T> domainExpression, ConditionAttribute attribute, SortOrder sortOrder) {
-        this(simpleDB,
-             configuration,
+    public DefaultOrderByExpression(Context context, AmazonSimpleDB simpleDB, DomainExpression<T> domainExpression, ConditionAttribute attribute, SortOrder sortOrder) {
+        this(context, simpleDB,
              isNotNullAndReturn("domainExpression", domainExpression),
              null,
              attribute,
              sortOrder);
     }
 
-    public DefaultOrderByExpression(AmazonSimpleDB simpleDB, Configuration configuration, final WhereExpression<T> whereExpression, ConditionAttribute attribute, SortOrder sortOrder) {
-        this(simpleDB,
-             configuration,
+    public DefaultOrderByExpression(Context context, AmazonSimpleDB simpleDB, final WhereExpression<T> whereExpression, ConditionAttribute attribute, SortOrder sortOrder) {
+        this(context, simpleDB,
             isNotNullAndGet("whereExpression", whereExpression,
                 new Assertion.Accessor<DomainExpression<T>>() {
                     @Override
@@ -65,9 +63,8 @@ public class DefaultOrderByExpression<T> extends BaseExpression<T> implements Or
             sortOrder);
     }
 
-    protected DefaultOrderByExpression(AmazonSimpleDB simpleDB, Configuration configuration, final DomainExpression<T> domainExpression, WhereExpression<T> whereExpression, ConditionAttribute attribute, SortOrder sortOrder) {
-        super(simpleDB,
-                configuration,
+    protected DefaultOrderByExpression(Context context, AmazonSimpleDB simpleDB, final DomainExpression<T> domainExpression, WhereExpression<T> whereExpression, ConditionAttribute attribute, SortOrder sortOrder) {
+        super(context, simpleDB,
                 Assertion.isNotNullAndGet("domainExpression", domainExpression, new Assertion.Accessor<Domain<T>>() {
                     @Override
                     public Domain<T> get() {
@@ -117,19 +114,19 @@ public class DefaultOrderByExpression<T> extends BaseExpression<T> implements Or
 
     @Override
     public LimitExpression<T> limit(int limitCount) {
-        return new DefaultLimitExpression<T>(getAmazonSimpleDB(), getConfiguration(), this, limitCount);
+        return new DefaultLimitExpression<T>(getContext(), getAmazonSimpleDB(), this, limitCount);
     }
 
     @Override
     public OrderByExpression<T> rebuildWith(SelectAttribute... attributes) {
         return (getWhereExpression() != null)
-                ? new DefaultOrderByExpression<T>(getAmazonSimpleDB(),
-                                                  getConfiguration(),
+                ? new DefaultOrderByExpression<T>(getContext(),
+                                                  getAmazonSimpleDB(),
                                                   getWhereExpression().rebuildWith(attributes),
                                                   attribute,
                                                   sortOrder)
-                : new DefaultOrderByExpression<T>(getAmazonSimpleDB(),
-                                                  getConfiguration(),
+                : new DefaultOrderByExpression<T>(getContext(),
+                                                  getAmazonSimpleDB(),
                                                   getDomainExpression().rebuildWith(attributes),
                                                   attribute,
                                                   sortOrder);

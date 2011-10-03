@@ -17,7 +17,7 @@ package com.shelfmap.simplequery.domain.impl;
 
 import static com.shelfmap.simplequery.expression.matcher.MatcherFactory.is;
 import com.shelfmap.simplequery.Client;
-import com.shelfmap.simplequery.Configuration;
+import com.shelfmap.simplequery.Context;
 import com.shelfmap.simplequery.attribute.ConditionAttribute;
 import com.shelfmap.simplequery.domain.Domain;
 import com.shelfmap.simplequery.domain.DomainAttribute;
@@ -79,8 +79,8 @@ public abstract class ReverseDomainReference<T> implements DomainReference<T>, R
     }
 
     protected <T> DomainAttribute<String,String> getTargetDomainAttribute(Domain<T> targetDomain, ConditionAttribute attribute) {
-        Configuration configuration = getClient().getConfiguration();
-        DomainAttributes attributes = configuration.getDomainAttributes(targetDomain);
+        Context context = getClient().getContext();
+        DomainAttributes attributes = context.getDomainAttributes(targetDomain);
         return attributes.getAttribute(attribute.getAttributeName(), String.class, String.class);
     }
 }

@@ -15,7 +15,7 @@
  */
 package com.shelfmap.simplequery.domain.impl;
 
-import com.shelfmap.simplequery.Configuration;
+import com.shelfmap.simplequery.Context;
 import com.shelfmap.simplequery.domain.AttributeStore;
 import static com.shelfmap.simplequery.util.Assertion.isNotNull;
 import com.shelfmap.simplequery.annotation.FlatAttribute;
@@ -51,19 +51,19 @@ public class BeanDomainAttributes implements DomainAttributes {
     private final AttributeStore attributeStore = new DefaultAttributeStore();
     private final Domain<?> domain;
     private final String parentPropertyPath;
-    private final Configuration configuration;
+    private final Context context;
     private String itemNameProperty;
 
-    public BeanDomainAttributes(Domain<?> domain, Configuration configuration) {
-        this(domain, configuration, null);
+    public BeanDomainAttributes(Domain<?> domain, Context context) {
+        this(domain, context, null);
     }
 
-    public BeanDomainAttributes(Domain<?> domain, Configuration configuration, String parentPropertyPath) {
+    public BeanDomainAttributes(Domain<?> domain, Context context, String parentPropertyPath) {
         isNotNull("domain", domain);
-        isNotNull("configuration", configuration);
+        isNotNull("context", context);
 
         this.domain = domain;
-        this.configuration = configuration;
+        this.context = context;
         this.parentPropertyPath = parentPropertyPath == null ? "" : parentPropertyPath;
         try {
             BeanInfo info = Introspector.getBeanInfo(domain.getDomainClass());
@@ -158,7 +158,7 @@ public class BeanDomainAttributes implements DomainAttributes {
     }
 
     protected <C> AttributeAccessor<C> newAttributeAccessor(Class<C> type, String propertyPath) {
-        return new PropertyAttributeAccessor<C>(propertyPath, configuration);
+        return new PropertyAttributeAccessor<C>(context, propertyPath);
     }
 
     protected <C> AttributeConverter<C> newAttributeConverter(Class<C> type) {
@@ -208,7 +208,7 @@ public class BeanDomainAttributes implements DomainAttributes {
     }
 
     private <VT> AttributeConverter<VT> createConverter(Class<VT> attributeType) {
-        AttributeConverterFactory factory = configuration.getAttributeConverterFactory();
+        AttributeConverterFactory factory = context.getAttributeConverterFactory();
         return factory.getAttributeConverter(attributeType);
     }
 
@@ -243,9 +243,9 @@ public class BeanDomainAttributes implements DomainAttributes {
      * @param type the return type of the method on which FlatAttribute annotation is applied.
      */
     private void buildFlatAttribute(Class<?> propertyType, String propertyName) {
-        DomainFactory domainFactory = getConfiguration().getDomainFactory();
+        DomainFactory domainFactory = getContext().getDomainFactory();
         Domain<?> childDomain = domainFactory.createDomain(propertyType);
-        BeanDomainAttributes attributes = new BeanDomainAttributes(childDomain, getConfiguration(), fullPropertyPath(propertyName));
+        BeanDomainAttributes attributes = new BeanDomainAttributes(childDomain, getContext(), fullPropertyPath(propertyName));
         copy(this, attributes);
     }
 
@@ -305,8 +305,8 @@ public class BeanDomainAttributes implements DomainAttributes {
     }
 
     @Override
-    public Configuration getConfiguration() {
-        return configuration;
+    public Context getContext() {
+        return context;
     }
 
     @Override

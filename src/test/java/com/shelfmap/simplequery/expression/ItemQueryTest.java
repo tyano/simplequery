@@ -116,7 +116,7 @@ public class ItemQueryTest extends BaseStoryRunner {
 
     @When("the expression is created with 'is' matcher")
     public void createItemQueryWithIs() {
-        exp = new Select(ctx.getSimpleDb(), ctx.getConfiguration(), AllAttribute.INSTANCE).from(ItemTestDomain.class).whereItemName(is("firstItem"));
+        exp = new Select(ctx.getContext(), ctx.getSimpleDb(), AllAttribute.INSTANCE).from(ItemTestDomain.class).whereItemName(is("firstItem"));
     }
 
     @Then("the result string must be -> $resultExp")
@@ -126,7 +126,7 @@ public class ItemQueryTest extends BaseStoryRunner {
 
     @When("the expression is created with 'in' matcher")
     public void createItemQueryWithIn() {
-        exp = new Select(ctx.getSimpleDb(), ctx.getConfiguration(), AllAttribute.INSTANCE).from(ItemTestDomain.class).whereItemName(MatcherFactory.in("firstItem", "secondItem"));
+        exp = new Select(ctx.getContext(), ctx.getSimpleDb(), AllAttribute.INSTANCE).from(ItemTestDomain.class).whereItemName(MatcherFactory.in("firstItem", "secondItem"));
     }
 
     @SimpleDbDomain(DOMAIN_NAME)

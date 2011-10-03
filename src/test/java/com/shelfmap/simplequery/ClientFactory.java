@@ -35,12 +35,12 @@ public class ClientFactory {
     public void createClinet() {
         LOGGER.debug("create client.");
 
-        Configuration conf = new com.shelfmap.simplequery.DefaultConfiguration();
+        Context context = new DefaultContext();
 
-        holder.setClient(new SimpleQueryClient(new File(getSecurityCredentialPath()), conf));
+        holder.setClient(new SimpleQueryClient(context, new File(getSecurityCredentialPath())));
         holder.setSimpleDb(holder.getClient().getSimpleDB());
-        holder.setConfiguration(conf);
-    
+        holder.setContext(context);
+
 //        holder.getClient().getS3().setEndpoint("s3-ap-northeast-1.amazonaws.com");
 //        holder.getSimpleDb().setEndpoint("sdb.ap-northeast-1.amazonaws.com");
     }

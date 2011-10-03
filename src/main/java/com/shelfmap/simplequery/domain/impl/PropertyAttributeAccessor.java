@@ -15,7 +15,7 @@
  */
 package com.shelfmap.simplequery.domain.impl;
 
-import com.shelfmap.simplequery.Configuration;
+import com.shelfmap.simplequery.Context;
 import com.shelfmap.simplequery.annotation.SimpleDbDomain;
 import com.shelfmap.simplequery.InstanceFactory;
 import static com.shelfmap.simplequery.util.Assertion.*;
@@ -39,13 +39,13 @@ import org.slf4j.LoggerFactory;
 public class PropertyAttributeAccessor<T> implements AttributeAccessor<T> {
     private static final Logger LOGGER = LoggerFactory.getLogger(PropertyAttributeAccessor.class);
     private final String propertyPath;
-    private final Configuration configuration;
+    private final Context context;
 
-    public PropertyAttributeAccessor(String propertyPath, Configuration configuration) {
+    public PropertyAttributeAccessor(Context context, String propertyPath) {
         isNotEmpty("propertyPath", propertyPath);
-        isNotNull("configuration", configuration);
+        isNotNull("context", context);
         this.propertyPath = propertyPath;
-        this.configuration = configuration;
+        this.context = context;
     }
 
     @Override
@@ -102,9 +102,9 @@ public class PropertyAttributeAccessor<T> implements AttributeAccessor<T> {
     }
 
     private <T> T newDomainInstance(Class<T> propertyType) {
-        DomainFactory factory = getConfiguration().getDomainFactory();
+        DomainFactory factory = getContext().getDomainFactory();
         Domain<T> domain = factory.createDomain(propertyType);
-        InstanceFactory<T> instanceFactory = getConfiguration().getInstanceFactory(domain);
+        InstanceFactory<T> instanceFactory = getContext().getInstanceFactory(domain);
         return instanceFactory.createInstance(domain.getDomainClass());
     }
 
@@ -165,7 +165,7 @@ public class PropertyAttributeAccessor<T> implements AttributeAccessor<T> {
         }
     }
 
-    public Configuration getConfiguration() {
-        return configuration;
+    public Context getContext() {
+        return context;
     }
 }

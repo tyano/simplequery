@@ -151,7 +151,7 @@ public class ToOneRelationTest extends BaseStoryRunner {
             super();
             this.itemName = itemName;
             this.requestDate = new Date(requestDate.getTime());
-            DomainFactory factory = client.getConfiguration().getDomainFactory();
+            DomainFactory factory = client.getContext().getDomainFactory();
             Domain<Detail> detailDomain = factory.createDomain(Detail.class);
             ConditionAttribute targetAttribute = Attributes.attr("parentItemName");
             this.detailReference = new ReverseToManyDomainReference<Detail>(client, itemName, detailDomain, targetAttribute);
@@ -195,7 +195,7 @@ public class ToOneRelationTest extends BaseStoryRunner {
             this.itemName = itemName;
             this.name = name;
             this.amount = amount;
-            Domain<PurchaseRecord> domain = client.getConfiguration().getDomainFactory().createDomain(PurchaseRecord.class);
+            Domain<PurchaseRecord> domain = client.getContext().getDomainFactory().createDomain(PurchaseRecord.class);
             this.parentReference = new DefaultToOneDomainReference<PurchaseRecord>(client, domain);
         }
 

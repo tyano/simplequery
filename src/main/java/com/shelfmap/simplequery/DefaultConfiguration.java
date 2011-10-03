@@ -21,9 +21,7 @@ import com.shelfmap.simplequery.domain.Domain;
 import com.shelfmap.simplequery.domain.DomainAttributes;
 import com.shelfmap.simplequery.domain.DomainFactory;
 import com.shelfmap.simplequery.expression.ItemConverter;
-import com.shelfmap.simplequery.domain.impl.BeanDomainAttributes;
 import com.shelfmap.simplequery.domain.impl.DefaultDomainFactory;
-import com.shelfmap.simplequery.expression.impl.DefaultItemConverter;
 
 /**
  *
@@ -33,7 +31,8 @@ public class DefaultConfiguration implements Configuration {
 
     @Override
     public <T> ItemConverter<T> getItemConverter(Domain<T> domain) {
-        return new DefaultItemConverter<T>(domain, this);
+//        return new DefaultItemConverter<T>(domain, this);
+        return null;
     }
 
     @Override
@@ -43,7 +42,8 @@ public class DefaultConfiguration implements Configuration {
 
     @Override
     public DomainAttributes getDomainAttributes(Domain<?> domain) {
-        return new BeanDomainAttributes(domain, this);
+//        return new BeanDomainAttributes(domain, this);
+        return null;
     }
 
     @Override

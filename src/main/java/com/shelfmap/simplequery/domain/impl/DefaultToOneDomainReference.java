@@ -17,7 +17,7 @@ package com.shelfmap.simplequery.domain.impl;
 
 import static com.shelfmap.simplequery.expression.matcher.MatcherFactory.is;
 import com.shelfmap.simplequery.Client;
-import com.shelfmap.simplequery.Configuration;
+import com.shelfmap.simplequery.Context;
 import com.shelfmap.simplequery.domain.Domain;
 import com.shelfmap.simplequery.domain.DomainAttribute;
 import com.shelfmap.simplequery.domain.DomainAttributes;
@@ -82,8 +82,8 @@ public class DefaultToOneDomainReference<T> implements ToOneDomainReference<T>, 
     }
 
     private DomainAttribute<String,String> findItemNameAttribute() {
-        Configuration configuration = getClient().getConfiguration();
-        DomainAttributes attributes = configuration.getDomainAttributes(getTargetDomain());
+        Context context = getClient().getContext();
+        DomainAttributes attributes = context.getDomainAttributes(getTargetDomain());
         return attributes.getItemNameAttribute();
     }
 }

@@ -22,7 +22,7 @@ import java.util.List;
 
 import com.amazonaws.services.simpledb.AmazonSimpleDB;
 
-import com.shelfmap.simplequery.Configuration;
+import com.shelfmap.simplequery.Context;
 import com.shelfmap.simplequery.attribute.SelectAttribute;
 import com.shelfmap.simplequery.attribute.impl.AllAttribute;
 import com.shelfmap.simplequery.domain.Domain;
@@ -36,20 +36,20 @@ import com.shelfmap.simplequery.expression.SelectQuery;
  */
 public class Select implements SelectQuery {
     private final AmazonSimpleDB simpleDB;
-    private final Configuration configuration;
+    private final Context context;
     private final List<SelectAttribute> attributes = new ArrayList<SelectAttribute>();
 
-    public Select(AmazonSimpleDB simpleDB, Configuration configuration, SelectAttribute... attribute) {
+    public Select(Context context, AmazonSimpleDB simpleDB, SelectAttribute... attribute) {
         this.simpleDB = simpleDB;
-        this.configuration = configuration;
+        this.context = context;
         innerAddAttribute(attribute);
     }
 
     @Override
     public <T> DomainExpression<T> from(Class<T> target) {
-        DomainFactory factory = getConfiguration().getDomainFactory();
+        DomainFactory factory = getContext().getDomainFactory();
         Domain<T> domain = factory.createDomain(target);
-        return new DefaultDomainExpression<T>(this.simpleDB, this.configuration, this, domain);
+        return new DefaultDomainExpression<T>(this.context, this.simpleDB, this, domain);
     }
 
     @Override
@@ -82,7 +82,7 @@ public class Select implements SelectQuery {
             newAttributes = new ArrayList<SelectAttribute>(this.attributes);
         }
         newAttributes.addAll(Arrays.asList(attributeArray));
-        return new Select(this.simpleDB, this.configuration, newAttributes.toArray(new SelectAttribute[newAttributes.size()]));
+        return new Select(this.context, this.simpleDB, newAttributes.toArray(new SelectAttribute[newAttributes.size()]));
     }
 
     @Override
@@ -107,7 +107,7 @@ public class Select implements SelectQuery {
         }
     }
 
-    public Configuration getConfiguration() {
-        return configuration;
+    public Context getContext() {
+        return context;
     }
 }

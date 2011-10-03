@@ -17,12 +17,12 @@
 package com.shelfmap.simplequery.expression.impl;
 
 
+import com.shelfmap.simplequery.Context;
 import com.shelfmap.simplequery.domain.Domain;
 import com.shelfmap.simplequery.attribute.SelectAttribute;
 import com.amazonaws.services.simpledb.AmazonSimpleDB;
 import com.amazonaws.services.simpledb.util.SimpleDBUtils;
 
-import com.shelfmap.simplequery.Configuration;
 import com.shelfmap.simplequery.attribute.ConditionAttribute;
 import com.shelfmap.simplequery.attribute.impl.ItemNameAttribute;
 import com.shelfmap.simplequery.expression.Condition;
@@ -43,15 +43,15 @@ import static com.shelfmap.simplequery.util.Assertion.isNotNull;
 public class DefaultDomainExpression<T> extends BaseExpression<T> implements DomainExpression<T>, Cloneable {
     private SelectQuery selectObject;
 
-    public DefaultDomainExpression(AmazonSimpleDB simpleDB, Configuration configuration, SelectQuery selectObject, Domain<T> domain) {
-        super(simpleDB, configuration, domain);
+    public DefaultDomainExpression(Context context, AmazonSimpleDB simpleDB, SelectQuery selectObject, Domain<T> domain) {
+        super(context, simpleDB, domain);
         isNotNull("selectObject", selectObject);
         this.selectObject = selectObject;
     }
 
     @Override
     public WhereExpression<T> where(Condition<?> expression) {
-        return new DefaultWhereExpression<T>(getAmazonSimpleDB(), getConfiguration(), this, expression);
+        return new DefaultWhereExpression<T>(getContext(), getAmazonSimpleDB(), this, expression);
     }
 
     private <T> Condition<T> newCondition(ConditionAttribute attribute, Matcher<T> matcher) {
@@ -81,23 +81,23 @@ public class DefaultDomainExpression<T> extends BaseExpression<T> implements Dom
 
     @Override
     public LimitExpression<T> limit(int limitCount) {
-        return new DefaultLimitExpression<T>(getAmazonSimpleDB(), getConfiguration(), this, limitCount);
+        return new DefaultLimitExpression<T>(getContext(), getAmazonSimpleDB(), this, limitCount);
     }
 
     @Override
     public OrderByExpression<T> orderBy(ConditionAttribute attribute, SortOrder sortOrder) {
-        return new DefaultOrderByExpression<T>(getAmazonSimpleDB(), getConfiguration(), this, attribute, sortOrder);
+        return new DefaultOrderByExpression<T>(getContext(), getAmazonSimpleDB(), this, attribute, sortOrder);
     }
 
     @Override
     public DomainExpression<T> rebuildWith(SelectAttribute... attributes) {
-        SelectQuery select = new Select(getAmazonSimpleDB(), getConfiguration(), attributes);
+        SelectQuery select = new Select(getContext(), getAmazonSimpleDB(), attributes);
         return rebuildWith(select);
     }
 
     @Override
     public DomainExpression<T> rebuildWith(SelectQuery select) {
-        return new DefaultDomainExpression<T>(getAmazonSimpleDB(), getConfiguration(), select, getDomain());
+        return new DefaultDomainExpression<T>(getContext(), getAmazonSimpleDB(), select, getDomain());
     }
 
     @Override

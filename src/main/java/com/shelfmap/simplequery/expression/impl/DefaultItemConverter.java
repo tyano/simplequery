@@ -20,6 +20,7 @@ import com.amazonaws.services.simpledb.model.Attribute;
 import static com.shelfmap.simplequery.util.Assertion.isNotNull;
 import com.amazonaws.services.simpledb.model.Item;
 import com.shelfmap.simplequery.Configuration;
+import com.shelfmap.simplequery.Context;
 import com.shelfmap.simplequery.InstanceFactory;
 import com.shelfmap.simplequery.domain.AttributeAccessor;
 import com.shelfmap.simplequery.domain.Domain;
@@ -35,29 +36,29 @@ import org.slf4j.LoggerFactory;
 
 /**
  * <b>this class is NOT THREAD SAFE</b>
- * @param <T> 
+ * @param <T>
  * @author Tsutomu YANO
  */
 public class DefaultItemConverter<T> implements ItemConverter<T> {
     private static final Logger LOGGER = LoggerFactory.getLogger(DefaultItemConverter.class);
 
     private final Domain<T> domain;
-    private final Configuration configuration;
+    private final Context context;
     private final InstanceFactory<T> instanceFactory;
     private DomainAttributes domainAttributes;
 
-    public DefaultItemConverter(Domain<T> domain, Configuration configuration) {
+    public DefaultItemConverter(Domain<T> domain, Context context) {
         isNotNull("domain", domain);
-        isNotNull("configuration", configuration);
+        isNotNull("context", context);
         this.domain = domain;
-        this.configuration = configuration;
-        this.instanceFactory = configuration.getInstanceFactory(domain);
+        this.context = context;
+        this.instanceFactory = context.getInstanceFactory(domain);
     }
 
     @Override
     public T convert(Item item) throws CanNotConvertItemException {
         if(domainAttributes == null) {
-            domainAttributes = getConfiguration().getDomainAttributes(getDomain());
+            domainAttributes = getContext().getDomainAttributes(getDomain());
         }
 
         T instance = instanceFactory.createInstance(getDomain().getDomainClass());
@@ -149,12 +150,13 @@ public class DefaultItemConverter<T> implements ItemConverter<T> {
         }
     }
 
+    @Override
     public Domain<T> getDomain() {
         return domain;
     }
 
     @Override
-    public Configuration getConfiguration() {
-        return configuration;
+    public Context getContext() {
+        return context;
     }
 }

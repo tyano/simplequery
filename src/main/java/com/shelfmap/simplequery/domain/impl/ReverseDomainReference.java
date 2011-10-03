@@ -16,7 +16,6 @@
 package com.shelfmap.simplequery.domain.impl;
 
 import static com.shelfmap.simplequery.expression.matcher.MatcherFactory.is;
-import com.shelfmap.simplequery.Client;
 import com.shelfmap.simplequery.Context;
 import com.shelfmap.simplequery.attribute.ConditionAttribute;
 import com.shelfmap.simplequery.domain.Domain;
@@ -34,13 +33,13 @@ import com.shelfmap.simplequery.expression.SimpleQueryException;
  * @author Tsutomu YANO
  */
 public abstract class ReverseDomainReference<T> implements DomainReference<T>, ReverseReference {
-    private final Client client;
+    private final Context context;
     private final String masterItemName;
     private final Domain<T> targetDomain;
     private final ConditionAttribute targetAttribute;
 
-    public ReverseDomainReference(Client client, String masterItemName, Domain<T> targetDomain, ConditionAttribute targetAttribute) {
-        this.client = client;
+    public ReverseDomainReference(Context context, String masterItemName, Domain<T> targetDomain, ConditionAttribute targetAttribute) {
+        this.context = context;
         this.masterItemName = masterItemName;
         this.targetDomain = targetDomain;
         this.targetAttribute = targetAttribute;
@@ -63,15 +62,15 @@ public abstract class ReverseDomainReference<T> implements DomainReference<T>, R
     }
 
     private Expression<T> createExpression() {
-        return getClient().select().from(getTargetDomain().getDomainClass()).where(getTargetAttribute(), is(getMasterItemName()));
+        return getContext().createNewClient().select().from(getTargetDomain().getDomainClass()).where(getTargetAttribute(), is(getMasterItemName()));
     }
 
     public ConditionAttribute getTargetAttribute() {
         return targetAttribute;
     }
 
-    public Client getClient() {
-        return client;
+    public Context getContext() {
+        return context;
     }
 
     public String getMasterItemName() {
@@ -79,8 +78,7 @@ public abstract class ReverseDomainReference<T> implements DomainReference<T>, R
     }
 
     protected <T> DomainAttribute<String,String> getTargetDomainAttribute(Domain<T> targetDomain, ConditionAttribute attribute) {
-        Context context = getClient().getContext();
-        DomainAttributes attributes = context.getDomainAttributes(targetDomain);
+        DomainAttributes attributes = getContext().getDomainAttributes(targetDomain);
         return attributes.getAttribute(attribute.getAttributeName(), String.class, String.class);
     }
 }

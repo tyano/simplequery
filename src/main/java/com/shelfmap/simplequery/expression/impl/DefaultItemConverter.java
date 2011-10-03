@@ -47,7 +47,7 @@ public class DefaultItemConverter<T> implements ItemConverter<T> {
     private final InstanceFactory<T> instanceFactory;
     private DomainAttributes domainAttributes;
 
-    public DefaultItemConverter(Domain<T> domain, Context context) {
+    public DefaultItemConverter(Context context, Domain<T> domain) {
         isNotNull("domain", domain);
         isNotNull("context", context);
         this.domain = domain;

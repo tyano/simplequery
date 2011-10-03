@@ -16,7 +16,6 @@
 package com.shelfmap.simplequery.domain.impl;
 
 import static com.shelfmap.simplequery.expression.matcher.MatcherFactory.is;
-import com.shelfmap.simplequery.Client;
 import com.shelfmap.simplequery.Context;
 import com.shelfmap.simplequery.domain.Domain;
 import com.shelfmap.simplequery.domain.DomainAttribute;
@@ -35,14 +34,14 @@ import com.shelfmap.simplequery.expression.SimpleQueryException;
  */
 public class DefaultToOneDomainReference<T> implements ToOneDomainReference<T>, ForwardReference {
 
-    private final Client client;
+    private final Context context;
     private final Domain<T> targetDomain;
     private String targetItemName = null;
 
     private DomainAttribute<String,String> itemNameAttribute;
 
-    public DefaultToOneDomainReference(Client client, Domain<T> targetDomain) {
-        this.client = client;
+    public DefaultToOneDomainReference(Context context, Domain<T> targetDomain) {
+        this.context = context;
         this.targetDomain = targetDomain;
     }
 
@@ -62,11 +61,11 @@ public class DefaultToOneDomainReference<T> implements ToOneDomainReference<T>, 
     }
 
     private Expression<T> createExpression() {
-        return client.select().from(getTargetDomain().getDomainClass()).whereItemName(is(getTargetItemName()));
+        return context.createNewClient().select().from(getTargetDomain().getDomainClass()).whereItemName(is(getTargetItemName()));
     }
 
-    public Client getClient() {
-        return client;
+    public Context getContext() {
+        return context;
     }
 
     public String getTargetItemName() {
@@ -82,8 +81,7 @@ public class DefaultToOneDomainReference<T> implements ToOneDomainReference<T>, 
     }
 
     private DomainAttribute<String,String> findItemNameAttribute() {
-        Context context = getClient().getContext();
-        DomainAttributes attributes = context.getDomainAttributes(getTargetDomain());
+        DomainAttributes attributes = getContext().getDomainAttributes(getTargetDomain());
         return attributes.getItemNameAttribute();
     }
 }

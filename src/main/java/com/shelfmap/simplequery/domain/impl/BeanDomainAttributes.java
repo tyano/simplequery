@@ -54,11 +54,11 @@ public class BeanDomainAttributes implements DomainAttributes {
     private final Context context;
     private String itemNameProperty;
 
-    public BeanDomainAttributes(Domain<?> domain, Context context) {
-        this(domain, context, null);
+    public BeanDomainAttributes(Context context, Domain<?> domain) {
+        this(context, domain, null);
     }
 
-    public BeanDomainAttributes(Domain<?> domain, Context context, String parentPropertyPath) {
+    public BeanDomainAttributes(Context context, Domain<?> domain, String parentPropertyPath) {
         isNotNull("domain", domain);
         isNotNull("context", context);
 
@@ -245,7 +245,7 @@ public class BeanDomainAttributes implements DomainAttributes {
     private void buildFlatAttribute(Class<?> propertyType, String propertyName) {
         DomainFactory domainFactory = getContext().getDomainFactory();
         Domain<?> childDomain = domainFactory.createDomain(propertyType);
-        BeanDomainAttributes attributes = new BeanDomainAttributes(childDomain, getContext(), fullPropertyPath(propertyName));
+        BeanDomainAttributes attributes = new BeanDomainAttributes(getContext(), childDomain, fullPropertyPath(propertyName));
         copy(this, attributes);
     }
 

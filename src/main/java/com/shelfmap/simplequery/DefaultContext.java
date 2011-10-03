@@ -39,7 +39,7 @@ public class DefaultContext implements Context {
 
     @Override
     public <T> ItemConverter<T> getItemConverter(Domain<T> domain) {
-        return new DefaultItemConverter<T>(domain, this);
+        return new DefaultItemConverter<T>(this, domain);
     }
 
     @Override
@@ -49,7 +49,7 @@ public class DefaultContext implements Context {
 
     @Override
     public DomainAttributes getDomainAttributes(Domain<?> domain) {
-        return new BeanDomainAttributes(domain, this);
+        return new BeanDomainAttributes(this, domain);
     }
 
     @Override

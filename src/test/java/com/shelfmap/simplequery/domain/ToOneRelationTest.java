@@ -27,8 +27,8 @@ import com.google.inject.Binder;
 import com.google.inject.Inject;
 import com.google.inject.Scopes;
 import com.shelfmap.simplequery.BaseStoryRunner;
-import com.shelfmap.simplequery.Client;
 import com.shelfmap.simplequery.ClientFactory;
+import com.shelfmap.simplequery.Context;
 import com.shelfmap.simplequery.IClientHolder;
 import com.shelfmap.simplequery.StoryPath;
 import com.shelfmap.simplequery.TestContext;
@@ -147,14 +147,14 @@ public class ToOneRelationTest extends BaseStoryRunner {
         private Date requestDate;
         private final ToManyDomainReference<Detail> detailReference;
 
-        public DefaultPurchaseRecord(Client client, String itemName, Date requestDate) {
+        public DefaultPurchaseRecord(Context context, String itemName, Date requestDate) {
             super();
             this.itemName = itemName;
             this.requestDate = new Date(requestDate.getTime());
-            DomainFactory factory = client.getContext().getDomainFactory();
+            DomainFactory factory = context.getDomainFactory();
             Domain<Detail> detailDomain = factory.createDomain(Detail.class);
             ConditionAttribute targetAttribute = Attributes.attr("parentItemName");
-            this.detailReference = new ReverseToManyDomainReference<Detail>(client, itemName, detailDomain, targetAttribute);
+            this.detailReference = new ReverseToManyDomainReference<Detail>(context, itemName, detailDomain, targetAttribute);
         }
 
         @Override
@@ -190,13 +190,13 @@ public class ToOneRelationTest extends BaseStoryRunner {
         private String parentId;
         private final ToOneDomainReference<PurchaseRecord> parentReference;
 
-        public DefaultDetail(Client client, String itemName, String name, int amount) {
+        public DefaultDetail(Context context, String itemName, String name, int amount) {
             super();
             this.itemName = itemName;
             this.name = name;
             this.amount = amount;
-            Domain<PurchaseRecord> domain = client.getContext().getDomainFactory().createDomain(PurchaseRecord.class);
-            this.parentReference = new DefaultToOneDomainReference<PurchaseRecord>(client, domain);
+            Domain<PurchaseRecord> domain = context.getDomainFactory().createDomain(PurchaseRecord.class);
+            this.parentReference = new DefaultToOneDomainReference<PurchaseRecord>(context, domain);
         }
 
         @Override

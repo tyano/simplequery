@@ -15,8 +15,11 @@
  */
 package com.shelfmap.simplequery;
 
+import com.amazonaws.auth.AWSCredentials;
+import com.amazonaws.auth.PropertiesCredentials;
 import com.google.inject.Inject;
 import java.io.File;
+import java.io.IOException;
 import org.jbehave.core.annotations.Given;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,16 +32,19 @@ public class ClientFactory {
     private static final Logger LOGGER = LoggerFactory.getLogger(ClientFactory.class);
 
     @Inject
-    IClientHolder holder;
+    ContextHolder holder;
 
     @Given("a SimpleQuery client")
-    public void createClinet() {
+    public void createClinet() throws IOException {
         LOGGER.debug("create client.");
 
-        Context context = new DefaultContext();
+        File securityFile = new File(getSecurityCredentialPath());
+        AWSCredentials credentials = new PropertiesCredentials(securityFile);
 
-        holder.setClient(new SimpleQueryClient(context, new File(getSecurityCredentialPath())));
-        holder.setSimpleDb(holder.getClient().getSimpleDB());
+        Context context = new DefaultContext(credentials);
+
+        Client client = new SimpleQueryClient(context, context.getCredentials());
+        holder.setSimpleDb(client.getSimpleDB());
         holder.setContext(context);
 
 //        holder.getClient().getS3().setEndpoint("s3-ap-northeast-1.amazonaws.com");

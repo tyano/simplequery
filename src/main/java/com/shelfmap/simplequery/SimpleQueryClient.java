@@ -18,7 +18,6 @@ package com.shelfmap.simplequery;
 
 import com.amazonaws.ClientConfiguration;
 import com.amazonaws.auth.AWSCredentials;
-import com.amazonaws.auth.PropertiesCredentials;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.simpledb.AmazonSimpleDB;
@@ -26,9 +25,6 @@ import com.amazonaws.services.simpledb.AmazonSimpleDBClient;
 import com.shelfmap.simplequery.attribute.SelectAttribute;
 import com.shelfmap.simplequery.expression.SelectQuery;
 import com.shelfmap.simplequery.expression.impl.Select;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,25 +34,15 @@ import org.slf4j.LoggerFactory;
  */
 public class SimpleQueryClient implements Client {
     private static final Logger LOGGER = LoggerFactory.getLogger(SimpleQueryClient.class);
-    private final AWSCredentials credentials;
     private final AmazonSimpleDB simpleDB;
     private final Context context;
     private final AmazonS3 s3;
 
     @SuppressWarnings("OverridableMethodCallInConstructor")
-    public SimpleQueryClient(Context context, File securityCredencial) throws ClientConfigurationException {
-        try {
-            this.credentials = new PropertiesCredentials(securityCredencial);
-            this.simpleDB = createSimpleDb(credentials);
-            this.s3 = createS3(credentials);
-            this.context = context;
-        } catch (FileNotFoundException ex) {
-            throw new ClientConfigurationException("security credential file ' + " + securityCredencial.getAbsolutePath() + "' does not exist.", ex);
-        } catch (IOException ex) {
-            throw new ClientConfigurationException("could not read the security credential file '" + securityCredencial.getAbsolutePath() + "'.", ex);
-        } catch (IllegalArgumentException ex) {
-            throw new ClientConfigurationException("the security information of security credential file ('" + securityCredencial.getAbsolutePath() + "') is not enough or not correct.");
-        }
+    public SimpleQueryClient(Context context, AWSCredentials securityCredencial) throws ClientConfigurationException {
+        this.simpleDB = createSimpleDb(securityCredencial);
+        this.s3 = createS3(securityCredencial);
+        this.context = context;
     }
 
     @Override
@@ -78,7 +64,7 @@ public class SimpleQueryClient implements Client {
         return this.s3;
     }
 
-    protected AmazonSimpleDB createSimpleDb(AWSCredentials securityCredential) throws FileNotFoundException, IOException {
+    protected AmazonSimpleDB createSimpleDb(AWSCredentials securityCredential) {
         ClientConfiguration clientConfig = configureSimpleDb();
         return clientConfig == null
                 ? new AmazonSimpleDBClient(securityCredential)
@@ -103,10 +89,5 @@ public class SimpleQueryClient implements Client {
     @Override
     public Context getContext() {
         return context;
-    }
-
-    @Override
-    public AWSCredentials getCredentials() {
-        return credentials;
     }
 }

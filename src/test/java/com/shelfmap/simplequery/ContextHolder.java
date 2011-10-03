@@ -21,12 +21,9 @@ import com.amazonaws.services.simpledb.AmazonSimpleDB;
  *
  * @author Tsutomu YANO
  */
-public interface IClientHolder {
+public interface ContextHolder {
     AmazonSimpleDB getSimpleDb();
     void setSimpleDb(AmazonSimpleDB client);
-
-    Client getClient();
-    void setClient(Client client);
 
     Context getContext();
     void setContext(Context configuration);

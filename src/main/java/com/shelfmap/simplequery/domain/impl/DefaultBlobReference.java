@@ -25,6 +25,7 @@ import com.amazonaws.services.s3.model.S3Object;
 import com.amazonaws.services.s3.transfer.TransferManager;
 import com.amazonaws.services.s3.transfer.Upload;
 import com.shelfmap.simplequery.Client;
+import com.shelfmap.simplequery.Context;
 import com.shelfmap.simplequery.domain.BlobContentConverter;
 import com.shelfmap.simplequery.domain.BlobOutputException;
 import com.shelfmap.simplequery.domain.BlobReference;
@@ -51,16 +52,16 @@ public class DefaultBlobReference<T> implements BlobReference<T> {
     private final S3ResourceInfo resourceInfo;
     private final Class<T> targetClass;
     private final BlobContentConverter<T> converter;
-    private final Client client;
+    private final Context context;
     private Upload lastUpload;
 
     private ObjectMetadata metadata;
 
-    public DefaultBlobReference(Client client, S3ResourceInfo resourceInfo, Class<T> targetClass, BlobContentConverter<T> converter) {
+    public DefaultBlobReference(Context context, S3ResourceInfo resourceInfo, Class<T> targetClass, BlobContentConverter<T> converter) {
         this.resourceInfo = resourceInfo;
         this.targetClass = targetClass;
         this.converter = converter;
-        this.client = client;
+        this.context = context;
     }
 
     @Override
@@ -94,7 +95,7 @@ public class DefaultBlobReference<T> implements BlobReference<T> {
     private S3Object getS3ObjectRemote() {
         String bucket = resourceInfo.getBucketName();
         String key = resourceInfo.getKey();
-        AmazonS3 s3 = getClient().getS3();
+        AmazonS3 s3 = getContext().createNewClient().getS3();
 
         GetObjectRequest request = new GetObjectRequest(bucket, key);
         return s3.getObject(request);
@@ -142,7 +143,7 @@ public class DefaultBlobReference<T> implements BlobReference<T> {
 
         try {
             PutObjectRequest request = new PutObjectRequest(bucket, key, uploadSource, metadata);
-            TransferManager transfer = new TransferManager(getClient().getCredentials());
+            TransferManager transfer = new TransferManager(getContext().getCredentials());
             this.lastUpload = transfer.upload(request);
             return this.lastUpload;
         } catch (AmazonServiceException ex) {
@@ -174,8 +175,8 @@ public class DefaultBlobReference<T> implements BlobReference<T> {
     }
 
     @Override
-    public Client getClient() {
-        return this.client;
+    public Context getContext() {
+        return this.context;
     }
 
     @Override

@@ -29,7 +29,7 @@ import com.google.inject.Scopes;
 import com.shelfmap.simplequery.BaseStoryRunner;
 import com.shelfmap.simplequery.ClientFactory;
 import com.shelfmap.simplequery.Context;
-import com.shelfmap.simplequery.IClientHolder;
+import com.shelfmap.simplequery.ContextHolder;
 import com.shelfmap.simplequery.StoryPath;
 import com.shelfmap.simplequery.TestContext;
 import com.shelfmap.simplequery.annotation.Attribute;
@@ -56,7 +56,7 @@ public class ToOneRelationTest extends BaseStoryRunner {
 
     @Override
     protected void configureTestContext(Binder binder) {
-        binder.bind(IClientHolder.class).to(TestContext.class).in(Scopes.SINGLETON);
+        binder.bind(ContextHolder.class).to(TestContext.class).in(Scopes.SINGLETON);
         binder.bind(TestContext.class).in(Scopes.SINGLETON);
     }
 
@@ -75,7 +75,7 @@ public class ToOneRelationTest extends BaseStoryRunner {
 
     @Given("domains where one-side have a relationship to another one.")
     public void setupDomains() {
-        AmazonSimpleDB simpleDb = ctx.getClient().getSimpleDB();
+        AmazonSimpleDB simpleDb = ctx.getContext().createNewClient().getSimpleDB();
 
         simpleDb.deleteDomain(new DeleteDomainRequest(PARENT_DOMAIN));
         simpleDb.deleteDomain(new DeleteDomainRequest(CHILD_DOMAIN));

@@ -34,7 +34,7 @@ import com.google.inject.Scopes;
 
 import com.shelfmap.simplequery.BaseStoryRunner;
 import com.shelfmap.simplequery.ClientFactory;
-import com.shelfmap.simplequery.IClientHolder;
+import com.shelfmap.simplequery.ContextHolder;
 import com.shelfmap.simplequery.StoryPath;
 import com.shelfmap.simplequery.TestContext;
 import com.shelfmap.simplequery.expression.Expression;
@@ -58,7 +58,7 @@ public class FlatAttributeTest extends BaseStoryRunner {
 
     @Override
     protected void configureTestContext(Binder binder) {
-        binder.bind(IClientHolder.class).to(TestContext.class).in(Scopes.SINGLETON);
+        binder.bind(ContextHolder.class).to(TestContext.class).in(Scopes.SINGLETON);
         binder.bind(TestContext.class).in(Scopes.SINGLETON);
     }
 
@@ -93,7 +93,7 @@ public class FlatAttributeTest extends BaseStoryRunner {
 
     @When("select an item whose name is 'test-1'")
     public void selectingTest1() throws Exception {
-        Expression<User> exp = ctx.getClient().select().from(User.class).where(Attributes.attr("name"), is("test-1"));
+        Expression<User> exp = ctx.getContext().createNewClient().select().from(User.class).where(Attributes.attr("name"), is("test-1"));
         user = exp.getSingleResult(true);
     }
 
@@ -108,7 +108,7 @@ public class FlatAttributeTest extends BaseStoryRunner {
 
     @When("selecting an item whose address1 of the address property is 'test2-Address1'")
     public void selectingTest2() throws Exception {
-        Expression<User> exp = ctx.getClient().select().from(User.class).where(Attributes.attr("address1"), is("test2-Address1"));
+        Expression<User> exp = ctx.getContext().createNewClient().select().from(User.class).where(Attributes.attr("address1"), is("test2-Address1"));
         user = exp.getSingleResult(true);
     }
 
@@ -120,7 +120,7 @@ public class FlatAttributeTest extends BaseStoryRunner {
 
     @When("selecting an item which have a FlatAttribute")
     public void selectingTest3() throws Exception {
-        Expression<User> exp = ctx.getClient().select().from(User.class).where(Attributes.attr("name"), is("test-3"));
+        Expression<User> exp = ctx.getContext().createNewClient().select().from(User.class).where(Attributes.attr("name"), is("test-3"));
         user = exp.getSingleResult(true);
     }
 
@@ -134,7 +134,7 @@ public class FlatAttributeTest extends BaseStoryRunner {
 
     @When("selecting an item with Address class as the domain class")
     public void selectingTest4() throws Exception {
-        Expression<Address> exp = ctx.getClient().select().from(Address.class).where(Attributes.attr("address1"), is("test4-Address1"));
+        Expression<Address> exp = ctx.getContext().createNewClient().select().from(Address.class).where(Attributes.attr("address1"), is("test4-Address1"));
         address = exp.getSingleResult(true);
     }
 

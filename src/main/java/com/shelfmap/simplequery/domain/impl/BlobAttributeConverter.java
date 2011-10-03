@@ -15,7 +15,7 @@
  */
 package com.shelfmap.simplequery.domain.impl;
 
-import com.shelfmap.simplequery.Client;
+import com.shelfmap.simplequery.Context;
 import com.shelfmap.simplequery.domain.AttributeConverter;
 import com.shelfmap.simplequery.domain.BlobContentConverter;
 import com.shelfmap.simplequery.domain.BlobReference;
@@ -30,13 +30,13 @@ import com.shelfmap.simplequery.expression.CanNotRestoreAttributeException;
  */
 public class BlobAttributeConverter<T> implements AttributeConverter<BlobReference<T>> {
 
-    private Client client;
+    private Context context;
     private Class<T> targetClass;
     private Class<? extends BlobContentConverter<T>> contentConverterClass;
 
-    public BlobAttributeConverter(Client client, Class<T> targetClass, Class<? extends BlobContentConverter<T>> contentConverterClass) {
+    public BlobAttributeConverter(Context context, Class<T> targetClass, Class<? extends BlobContentConverter<T>> contentConverterClass) {
         super();
-        this.client = client;
+        this.context = context;
         this.targetClass = targetClass;
         this.contentConverterClass = contentConverterClass;
     }
@@ -82,15 +82,15 @@ public class BlobAttributeConverter<T> implements AttributeConverter<BlobReferen
         try {
             contentConverter = contentConverterClass.newInstance();
         } catch (InstantiationException ex) {
-            throw new IllegalStateException("Could not instantiate the converter-class: " + this.contentConverterClass.getCanonicalName());
+            throw new IllegalStateException("Could not instantiate the converter-class: " + this.contentConverterClass.getCanonicalName(), ex);
         } catch (IllegalAccessException ex) {
-            throw new IllegalStateException("Could not access the default constructor of converter-class: " + this.contentConverterClass.getCanonicalName());
+            throw new IllegalStateException("Could not access the default constructor of converter-class: " + this.contentConverterClass.getCanonicalName(), ex);
         }
 
-        return new DefaultBlobReference<T>(getClient(), new S3Resource(bucketName, key), getTargetClass(), contentConverter);
+        return new DefaultBlobReference<T>(getContext(), new S3Resource(bucketName, key), getTargetClass(), contentConverter);
     }
 
-    public Client getClient() {
-        return client;
+    public Context getContext() {
+        return context;
     }
 }

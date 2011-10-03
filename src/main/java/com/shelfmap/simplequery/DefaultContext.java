@@ -15,6 +15,7 @@
  */
 package com.shelfmap.simplequery;
 
+import com.amazonaws.auth.AWSCredentials;
 import com.shelfmap.simplequery.domain.AttributeConverterFactory;
 import com.shelfmap.simplequery.domain.DefaultAttributeConverterFactory;
 import com.shelfmap.simplequery.domain.Domain;
@@ -32,9 +33,15 @@ import com.shelfmap.simplequery.expression.impl.DefaultItemConverter;
 public class DefaultContext implements Context {
     private static final long serialVersionUID = 1L;
 
+    private AWSCredentials credentials;
+
+    public DefaultContext(AWSCredentials credentials) {
+        this.credentials = credentials;
+    }
+
     @Override
     public Client createNewClient() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return new SimpleQueryClient(this, credentials);
     }
 
     @Override
@@ -62,4 +69,8 @@ public class DefaultContext implements Context {
         return new DefaultDomainFactory();
     }
 
+    @Override
+    public AWSCredentials getCredentials() {
+        return this.credentials;
+    }
 }

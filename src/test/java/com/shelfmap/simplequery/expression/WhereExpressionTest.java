@@ -44,7 +44,11 @@ import org.jbehave.core.annotations.When;
 public class WhereExpressionTest extends BaseStoryRunner {
     Expression<?> expression;
     AmazonSimpleDB simpleDB;
-    Context context = new DefaultContext();
+    Context context;
+
+    public WhereExpressionTest() throws IOException {
+        this.context = new DefaultContext(new PropertiesCredentials(new File(getSecurityCredentialPath())));
+    }
 
     private String getSecurityCredentialPath() {
         return "/Users/t_yano/aws.credential.properties";
@@ -52,7 +56,7 @@ public class WhereExpressionTest extends BaseStoryRunner {
 
     @Given("a AmazonSimpleDB client")
     public void createClient() throws IOException {
-        simpleDB = new AmazonSimpleDBClient(new PropertiesCredentials(new File(getSecurityCredentialPath())));
+        simpleDB = new AmazonSimpleDBClient(context.getCredentials());
     }
 
     @When("TestDomain don't have any @Attribute annotation on it's properties,")

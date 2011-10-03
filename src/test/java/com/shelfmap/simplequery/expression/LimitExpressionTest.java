@@ -23,7 +23,7 @@ import com.google.inject.Inject;
 import com.google.inject.Scopes;
 import com.shelfmap.simplequery.BaseStoryRunner;
 import com.shelfmap.simplequery.ClientFactory;
-import com.shelfmap.simplequery.IClientHolder;
+import com.shelfmap.simplequery.ContextHolder;
 import com.shelfmap.simplequery.StoryPath;
 import com.shelfmap.simplequery.TestContext;
 import com.shelfmap.simplequery.attribute.impl.AllAttribute;
@@ -42,7 +42,7 @@ import org.jbehave.core.annotations.When;
 public class LimitExpressionTest extends BaseStoryRunner {
     @Override
     protected void configureTestContext(Binder binder) {
-        binder.bind(IClientHolder.class).to(TestContext.class).in(Scopes.SINGLETON);
+        binder.bind(ContextHolder.class).to(TestContext.class).in(Scopes.SINGLETON);
         binder.bind(TestContext.class).in(Scopes.SINGLETON);
     }
 

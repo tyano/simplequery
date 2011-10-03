@@ -34,7 +34,7 @@ import com.google.inject.Scopes;
 
 import com.shelfmap.simplequery.BaseStoryRunner;
 import com.shelfmap.simplequery.ClientFactory;
-import com.shelfmap.simplequery.IClientHolder;
+import com.shelfmap.simplequery.ContextHolder;
 import com.shelfmap.simplequery.StoryPath;
 import com.shelfmap.simplequery.TestContext;
 import com.shelfmap.simplequery.annotation.Attribute;
@@ -66,7 +66,7 @@ public class ItemQueryTest extends BaseStoryRunner {
 
     @Override
     protected void configureTestContext(Binder binder) {
-        binder.bind(IClientHolder.class).to(TestContext.class).in(Scopes.SINGLETON);
+        binder.bind(ContextHolder.class).to(TestContext.class).in(Scopes.SINGLETON);
         binder.bind(TestContext.class).in(Scopes.SINGLETON);
     }
 
@@ -92,7 +92,7 @@ public class ItemQueryTest extends BaseStoryRunner {
 
     @When("querying with the item name from a test domain")
     public void selectByItemName() throws SimpleQueryException, MultipleResultsExistException {
-        result = ctx.getClient().select().from(ItemTestDomain.class).whereItemName(is("firstItem")).getSingleResult(true);
+        result = ctx.getContext().createNewClient().select().from(ItemTestDomain.class).whereItemName(is("firstItem")).getSingleResult(true);
     }
 
     @Then("we can get the only one record from the test domain")
@@ -104,7 +104,7 @@ public class ItemQueryTest extends BaseStoryRunner {
 
     @When("there is no record matching the specified item's name")
     public void selectNonExistingItem() throws SimpleQueryException, MultipleResultsExistException {
-        result = ctx.getClient().select().from(ItemTestDomain.class).whereItemName(is("secondItem")).getSingleResult(true);
+        result = ctx.getContext().createNewClient().select().from(ItemTestDomain.class).whereItemName(is("secondItem")).getSingleResult(true);
     }
 
     @Then("the return value must be a null")

@@ -21,9 +21,8 @@ import com.amazonaws.services.simpledb.AmazonSimpleDB;
  *
  * @author Tsutomu YANO
  */
-public class TestContext implements IClientHolder {
+public class TestContext implements ContextHolder {
     private AmazonSimpleDB simpleDb;
-    private Client client;
     private Context context;
 
     @Override
@@ -34,16 +33,6 @@ public class TestContext implements IClientHolder {
     @Override
     public void setSimpleDb(AmazonSimpleDB client) {
         this.simpleDb = client;
-    }
-
-    @Override
-    public Client getClient() {
-        return client;
-    }
-
-    @Override
-    public void setClient(Client client) {
-        this.client = client;
     }
 
     @Override

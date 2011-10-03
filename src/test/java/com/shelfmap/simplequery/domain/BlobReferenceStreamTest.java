@@ -32,7 +32,7 @@ import com.google.inject.Scopes;
 import com.shelfmap.simplequery.BaseStoryRunner;
 import com.shelfmap.simplequery.Client;
 import com.shelfmap.simplequery.ClientFactory;
-import com.shelfmap.simplequery.IClientHolder;
+import com.shelfmap.simplequery.ContextHolder;
 import com.shelfmap.simplequery.StoryPath;
 import com.shelfmap.simplequery.TestContext;
 import com.shelfmap.simplequery.domain.impl.ImageContentConverter;
@@ -58,7 +58,7 @@ public class BlobReferenceStreamTest extends BaseStoryRunner {
 
     @Override
     protected void configureTestContext(Binder binder) {
-        binder.bind(IClientHolder.class).to(TestContext.class).in(Scopes.SINGLETON);
+        binder.bind(ContextHolder.class).to(TestContext.class).in(Scopes.SINGLETON);
         binder.bind(TestContext.class).in(Scopes.SINGLETON);
     }
 
@@ -76,7 +76,7 @@ public class BlobReferenceStreamTest extends BaseStoryRunner {
 
     @Given("a S3 resource")
     public void createTestS3Resource() throws IOException {
-        AmazonS3 s3 = ctx.getClient().getS3();
+        AmazonS3 s3 = ctx.getContext().createNewClient().getS3();
 
         boolean found = false;
         ObjectListing listing = s3.listObjects(BUCKET_NAME);
@@ -105,7 +105,7 @@ public class BlobReferenceStreamTest extends BaseStoryRunner {
 
     @When("we have a BlobReference object which point to a key in S3 storage")
     public void createBlob() {
-        blob = new DefaultBlobReference<BufferedImage>(ctx.getClient(), new S3Resource(BUCKET_NAME, KEY_NAME), BufferedImage.class, new ImageContentConverter());
+        blob = new DefaultBlobReference<BufferedImage>(ctx.getContext(), new S3Resource(BUCKET_NAME, KEY_NAME), BufferedImage.class, new ImageContentConverter());
     }
 
     @Then("we must be able to retrieve the data though an InputStream as a byte stream.")
@@ -127,7 +127,7 @@ public class BlobReferenceStreamTest extends BaseStoryRunner {
 
     @When("we have a BlobReference object which have no data but point to a key in S3 storage")
     public void createBlobReference() {
-        blob = new DefaultBlobReference<BufferedImage>(ctx.getClient(), new S3Resource(BUCKET_NAME, PUT_KEY_NAME), BufferedImage.class, new ImageContentConverter());
+        blob = new DefaultBlobReference<BufferedImage>(ctx.getContext(), new S3Resource(BUCKET_NAME, PUT_KEY_NAME), BufferedImage.class, new ImageContentConverter());
     }
 
     @Then("we must be able to put data into S3 storage through an OutputStream gotten by BlobReference#getUploadStream() method.")
@@ -137,7 +137,7 @@ public class BlobReferenceStreamTest extends BaseStoryRunner {
         Upload upload = blob.getLastUpload();
         upload.waitForCompletion();
 
-        Client client = ctx.getClient();
+        Client client = ctx.getContext().createNewClient();
         AmazonS3 s3 = client.getS3();
 
         GetObjectRequest request = new GetObjectRequest(BUCKET_NAME, PUT_KEY_NAME);

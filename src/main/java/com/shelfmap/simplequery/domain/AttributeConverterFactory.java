@@ -15,10 +15,13 @@
  */
 package com.shelfmap.simplequery.domain;
 
+import com.shelfmap.simplequery.Context;
+
 /**
  *
  * @author Tsutomu YANO
  */
 public interface AttributeConverterFactory {
+    Context getContext();
     <T> AttributeConverter<T> getAttributeConverter(Class<T> attributeType);
 }

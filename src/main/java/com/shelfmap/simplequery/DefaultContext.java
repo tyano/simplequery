@@ -57,7 +57,7 @@ public class DefaultContext implements Context {
 
     @Override
     public AttributeConverterFactory getAttributeConverterFactory() {
-        return new DefaultAttributeConverterFactory();
+        return new DefaultAttributeConverterFactory(this);
     }
 
     @Override

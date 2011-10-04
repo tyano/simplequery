@@ -15,6 +15,7 @@
  */
 package com.shelfmap.simplequery.domain;
 
+import com.shelfmap.simplequery.Context;
 import com.shelfmap.simplequery.domain.impl.DateAttributeConverter;
 import com.shelfmap.simplequery.domain.impl.DefaultAttributeConverter;
 import java.util.Date;
@@ -24,6 +25,13 @@ import java.util.Date;
  * @author Tsutomu YANO
  */
 public class DefaultAttributeConverterFactory implements AttributeConverterFactory {
+    
+    private Context context;
+
+    public DefaultAttributeConverterFactory(Context context) {
+        this.context = context;
+    }
+    
     @Override
     @SuppressWarnings("unchecked")
     public <T> AttributeConverter<T> getAttributeConverter(Class<T> attributeType) {
@@ -32,7 +40,12 @@ public class DefaultAttributeConverterFactory implements AttributeConverterFacto
         if(Date.class.isAssignableFrom(attributeType)) {
             return (AttributeConverter<T>) new DateAttributeConverter();
         }
-
+        
         return new DefaultAttributeConverter<T>(attributeType);
+    }
+
+    @Override
+    public Context getContext() {
+        return this.context;
     }
 }

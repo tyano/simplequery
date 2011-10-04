@@ -30,7 +30,7 @@ import java.util.List;
  *
  * @author Tsutomu YANO
  */
-public class ReverseToOneDomainReference<T> extends ReverseDomainReference<T> implements ToOneDomainReference<T> {
+public class ReverseToOneDomainReference<T> extends AbstractReverseDomainReference<T> implements ToOneDomainReference<T> {
 
     public ReverseToOneDomainReference(Context context, String masterItemName, Domain<T> targetDomain, ConditionAttribute targetAttribute) {
         super(context, masterItemName, targetDomain, targetAttribute);

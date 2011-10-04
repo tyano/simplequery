@@ -28,13 +28,13 @@ import static com.shelfmap.simplequery.expression.matcher.MatcherFactory.is;
  *
  * @author Tsutomu YANO
  */
-public abstract class ReverseDomainReference<T> implements DomainReference<T>, ReverseReference {
+public abstract class AbstractReverseDomainReference<T> implements DomainReference<T>, ReverseReference {
     private final Context context;
     private final String masterItemName;
     private final Domain<T> targetDomain;
     private final ConditionAttribute targetAttribute;
 
-    public ReverseDomainReference(Context context, String masterItemName, Domain<T> targetDomain, ConditionAttribute targetAttribute) {
+    public AbstractReverseDomainReference(Context context, String masterItemName, Domain<T> targetDomain, ConditionAttribute targetAttribute) {
         this.context = context;
         this.masterItemName = masterItemName;
         this.targetDomain = targetDomain;

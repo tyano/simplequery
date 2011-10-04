@@ -33,8 +33,8 @@ import com.shelfmap.simplequery.annotation.ItemName;
 import com.shelfmap.simplequery.annotation.SimpleDbDomain;
 import static com.shelfmap.simplequery.attribute.Attributes.attr;
 import com.shelfmap.simplequery.attribute.ConditionAttribute;
+import com.shelfmap.simplequery.domain.impl.DefaultReverseToManyDomainReference;
 import com.shelfmap.simplequery.domain.impl.DefaultToOneDomainReference;
-import com.shelfmap.simplequery.domain.impl.ReverseToManyDomainReference;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
@@ -116,7 +116,7 @@ public class ToOneRelationTest extends BaseStoryRunner {
         Date getRequestDate();
         void setRequestDate(Date requestDate);
 
-        ToManyDomainReference<Detail> getDetailReference();
+        ReverseToManyDomainReference<Detail> getDetailReference();
     }
 
     @SimpleDbDomain(CHILD_DOMAIN)
@@ -143,7 +143,7 @@ public class ToOneRelationTest extends BaseStoryRunner {
 
         private String itemName;
         private Date requestDate;
-        private final ToManyDomainReference<Detail> detailReference;
+        private final ReverseToManyDomainReference<Detail> detailReference;
 
         public DefaultPurchaseRecord(Context context, String itemName, Date requestDate) {
             super();
@@ -152,7 +152,7 @@ public class ToOneRelationTest extends BaseStoryRunner {
             DomainFactory factory = context.getDomainFactory();
             Domain<Detail> detailDomain = factory.createDomain(Detail.class);
             ConditionAttribute targetAttribute = attr("parentItemName");
-            this.detailReference = new ReverseToManyDomainReference<Detail>(context, itemName, detailDomain, targetAttribute);
+            this.detailReference = new DefaultReverseToManyDomainReference<Detail>(context, itemName, detailDomain, targetAttribute);
         }
 
         @Override
@@ -176,7 +176,7 @@ public class ToOneRelationTest extends BaseStoryRunner {
         }
 
         @Override
-        public ToManyDomainReference<Detail> getDetailReference() {
+        public ReverseToManyDomainReference<Detail> getDetailReference() {
             return this.detailReference;
         }
     }

@@ -19,7 +19,7 @@ import com.shelfmap.simplequery.Context;
 import com.shelfmap.simplequery.attribute.ConditionAttribute;
 import com.shelfmap.simplequery.domain.Domain;
 import com.shelfmap.simplequery.domain.DomainAttribute;
-import com.shelfmap.simplequery.domain.ToOneDomainReference;
+import com.shelfmap.simplequery.domain.ReverseToOneDomainReference;
 import com.shelfmap.simplequery.expression.QueryResults;
 import com.shelfmap.simplequery.expression.SimpleQueryException;
 import com.shelfmap.simplequery.expression.impl.InstanceQueryResult;
@@ -30,9 +30,9 @@ import java.util.List;
  *
  * @author Tsutomu YANO
  */
-public class ReverseToOneDomainReference<T> extends AbstractReverseDomainReference<T> implements ToOneDomainReference<T> {
+public class DefaultReverseToOneDomainReference<T> extends AbstractReverseDomainReference<T> implements ReverseToOneDomainReference<T> {
 
-    public ReverseToOneDomainReference(Context context, String masterItemName, Domain<T> targetDomain, ConditionAttribute targetAttribute) {
+    public DefaultReverseToOneDomainReference(Context context, String masterItemName, Domain<T> targetDomain, ConditionAttribute targetAttribute) {
         super(context, masterItemName, targetDomain, targetAttribute);
     }
 

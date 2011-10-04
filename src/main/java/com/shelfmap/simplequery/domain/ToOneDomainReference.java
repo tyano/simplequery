@@ -20,6 +20,6 @@ package com.shelfmap.simplequery.domain;
  * @param <T>
  * @author Tsutomu YANO
  */
-public interface ToOneDomainReference<T> extends DomainReference<T> {
+public interface ToOneDomainReference<T> extends DomainReference<T>, ForwardReference {
     void set(T object);
 }

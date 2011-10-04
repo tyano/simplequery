@@ -27,11 +27,10 @@ import com.google.inject.Scopes;
 import static com.shelfmap.simplequery.SimpleDbUtil.attr;
 import static com.shelfmap.simplequery.SimpleDbUtil.item;
 import com.shelfmap.simplequery.*;
-import com.shelfmap.simplequery.annotation.Attribute;
+import com.shelfmap.simplequery.annotation.ForwardDomainReference;
 import com.shelfmap.simplequery.annotation.IntAttribute;
 import com.shelfmap.simplequery.annotation.ItemName;
 import com.shelfmap.simplequery.annotation.SimpleDbDomain;
-import com.shelfmap.simplequery.attribute.Attributes;
 import static com.shelfmap.simplequery.attribute.Attributes.attr;
 import com.shelfmap.simplequery.attribute.ConditionAttribute;
 import com.shelfmap.simplequery.domain.impl.DefaultToOneDomainReference;
@@ -133,7 +132,10 @@ public class ToOneRelationTest extends BaseStoryRunner {
         int getAmount();
         void setAmount(int amount);
 
+        @ForwardDomainReference(attributeName = "parentItemName", targetDomainClass=PurchaseRecord.class)
         ToOneDomainReference<PurchaseRecord> getParentRecordReference();
+        void setParentRecordReference(ToOneDomainReference<PurchaseRecord> reference);
+        
     }
 
 
@@ -183,8 +185,7 @@ public class ToOneRelationTest extends BaseStoryRunner {
         private String itemName;
         private String name;
         private int amount;
-        private String parentId;
-        private final ToOneDomainReference<PurchaseRecord> parentReference;
+        private ToOneDomainReference<PurchaseRecord> parentReference;
 
         public DefaultDetail(Context context, String itemName, String name, int amount) {
             super();
@@ -225,10 +226,14 @@ public class ToOneRelationTest extends BaseStoryRunner {
             this.amount = amount;
         }
 
-        @Attribute(attributeName = "parentItemName")
         @Override
         public ToOneDomainReference<PurchaseRecord> getParentRecordReference() {
             return this.parentReference;
+        }
+
+        @Override
+        public void setParentRecordReference(ToOneDomainReference<PurchaseRecord> reference) {
+            this.parentReference = reference;
         }
     }
 }

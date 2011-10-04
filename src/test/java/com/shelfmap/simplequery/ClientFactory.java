@@ -31,6 +31,8 @@ import org.slf4j.LoggerFactory;
 public class ClientFactory {
     private static final Logger LOGGER = LoggerFactory.getLogger(ClientFactory.class);
 
+    public static final String CREDENTIAL_PATH = "/Users/t_yano/aws.credential.properties";
+    
     @Inject
     ContextHolder holder;
 
@@ -52,6 +54,6 @@ public class ClientFactory {
     }
 
     public String getSecurityCredentialPath() {
-        return "/Users/t_yano/aws.credential.properties";
+        return CREDENTIAL_PATH;
     }
 }

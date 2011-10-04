@@ -69,6 +69,10 @@ public class DefaultToOneDomainReference<T> implements ToOneDomainReference<T>, 
         return targetItemName;
     }
 
+    public void setTargetItemName(String targetItemName) {
+        this.targetItemName = targetItemName;
+    }
+
     @Override
     public void set(T object) {
         if(this.itemNameAttribute == null) {

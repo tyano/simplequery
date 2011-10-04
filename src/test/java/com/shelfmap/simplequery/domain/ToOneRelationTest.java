@@ -15,17 +15,13 @@
  */
 package com.shelfmap.simplequery.domain;
 
+import com.amazonaws.auth.PropertiesCredentials;
 import com.amazonaws.services.simpledb.AmazonSimpleDB;
 import com.amazonaws.services.simpledb.model.CreateDomainRequest;
 import com.amazonaws.services.simpledb.model.DeleteDomainRequest;
 import com.amazonaws.services.simpledb.model.PutAttributesRequest;
-import com.amazonaws.services.simpledb.model.ReplaceableItem;
 import com.amazonaws.services.simpledb.util.SimpleDBUtils;
-import com.google.inject.Binder;
-import com.google.inject.Inject;
-import com.google.inject.Scopes;
 import static com.shelfmap.simplequery.SimpleDbUtil.attr;
-import static com.shelfmap.simplequery.SimpleDbUtil.item;
 import com.shelfmap.simplequery.*;
 import com.shelfmap.simplequery.annotation.ForwardDomainReference;
 import com.shelfmap.simplequery.annotation.IntAttribute;
@@ -35,12 +31,19 @@ import static com.shelfmap.simplequery.attribute.Attributes.attr;
 import com.shelfmap.simplequery.attribute.ConditionAttribute;
 import com.shelfmap.simplequery.domain.impl.DefaultReverseToManyDomainReference;
 import com.shelfmap.simplequery.domain.impl.DefaultToOneDomainReference;
+import com.shelfmap.simplequery.expression.MultipleResultsExistException;
+import com.shelfmap.simplequery.expression.SimpleQueryException;
+import static com.shelfmap.simplequery.expression.matcher.MatcherFactory.is;
+import java.io.File;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.List;
+import org.hamcrest.Matchers;
+import static org.hamcrest.Matchers.notNullValue;
 import org.jbehave.core.annotations.Given;
 import org.jbehave.core.annotations.Then;
+import static org.junit.Assert.assertThat;
 
 /**
  *
@@ -49,28 +52,38 @@ import org.jbehave.core.annotations.Then;
 @StoryPath("stories/ToOneRelation.story")
 public class ToOneRelationTest extends BaseStoryRunner {
 
-    @Override
-    protected void configureTestContext(Binder binder) {
-        binder.bind(ContextHolder.class).to(TestContext.class).in(Scopes.SINGLETON);
-        binder.bind(TestContext.class).in(Scopes.SINGLETON);
-    }
-
-    @Override
-    @SuppressWarnings("unchecked")
-    protected List<? extends Class<?>> getStepsClasses() {
-        return Arrays.asList(ClientFactory.class);
-    }
-
-    @Inject
-    TestContext ctx;
-
     private static final String PARENT_DOMAIN = "ToOneRelationTest-parent";
     private static final String CHILD_DOMAIN = "ToOneRelationTest-child";
 
+    private Context context;
+    private Date targetDate = new Date(2011, Calendar.AUGUST, 2);
 
+    @Given("a test-specific context")
+    public void createContext() throws IOException {
+        context = new DefaultContext(new PropertiesCredentials(new File(ClientFactory.CREDENTIAL_PATH))) {
+            private static final long serialVersionUID = 1L;
+
+            @Override
+            @SuppressWarnings("unchecked")
+            public <T> InstanceFactory<T> getInstanceFactory(Domain<T> domain) {
+                Class<T> domainClass = domain.getDomainClass();
+                
+                if(Detail.class.isAssignableFrom(domainClass)) {
+                    return (InstanceFactory<T>) new DetailInstanceFactory(this);
+                }
+                
+                if(PurchaseRecord.class.isAssignableFrom(domainClass)) {
+                    return (InstanceFactory<T>) new ParentInstanceFactory(this);
+                }
+                return super.getInstanceFactory(domain);
+            }
+            
+        };
+    }
+    
     @Given("domains where one-side have a relationship to another one.")
     public void setupDomains() {
-        AmazonSimpleDB simpleDb = ctx.getContext().createNewClient().getSimpleDB();
+        AmazonSimpleDB simpleDb = context.createNewClient().getSimpleDB();
 
         simpleDb.deleteDomain(new DeleteDomainRequest(PARENT_DOMAIN));
         simpleDb.deleteDomain(new DeleteDomainRequest(CHILD_DOMAIN));
@@ -78,32 +91,36 @@ public class ToOneRelationTest extends BaseStoryRunner {
         simpleDb.createDomain(new CreateDomainRequest(PARENT_DOMAIN));
         simpleDb.createDomain(new CreateDomainRequest(CHILD_DOMAIN));
 
-        ReplaceableItem child = item("child1",
-                                     attr("name", "本", true)
-                                    ,attr("amount", SimpleDBUtils.encodeZeroPadding(100, 4), true));
-
         simpleDb.putAttributes(new PutAttributesRequest(
                 CHILD_DOMAIN,
                 "child1",
                 Arrays.asList(attr("name", "本", true),
-                              attr("amount", SimpleDBUtils.encodeZeroPadding(100, 4), true))));
+                              attr("amount", SimpleDBUtils.encodeZeroPadding(100, 4), true),
+                              attr("parentItemName", "parent", true))));
 
         simpleDb.putAttributes(new PutAttributesRequest(
                 PARENT_DOMAIN,
                 "parent",
-                Arrays.asList(attr("requestDate", SimpleDBUtils.encodeDate(new Date(2011, Calendar.AUGUST, 2)), true),
+                Arrays.asList(attr("requestDate", SimpleDBUtils.encodeDate(targetDate), true),
                               attr("detail", "child1", true))));
 
     }
 
-
-
+    private Detail detailObject;
+    
     @Given("an instance of a domain-object which have a relationship.")
-    public void createDomainObject() {
+    public void createDomainObject() throws SimpleQueryException, MultipleResultsExistException {
+        Client client = context.createNewClient();
+        detailObject = client.select().from(Detail.class).whereItemName(is("child1")).getSingleResult(true);
     }
 
     @Then("we can get another domain-object from the relationship.")
-    public void assertRelationship() {
+    public void assertRelationship() throws SimpleQueryException, MultipleResultsExistException {
+        assertThat(detailObject, Matchers.is(notNullValue()));
+        PurchaseRecord parent = detailObject.getParentRecordReference().get(true);
+        assertThat(parent, Matchers.is(notNullValue()));
+        assertThat(parent.getItemName(), Matchers.is("parent"));
+        assertThat(parent.getRequestDate(), Matchers.is(targetDate));
     }
 
 
@@ -145,10 +162,14 @@ public class ToOneRelationTest extends BaseStoryRunner {
         private Date requestDate;
         private final ReverseToManyDomainReference<Detail> detailReference;
 
+        public DefaultPurchaseRecord(Context context) {
+            this(context, null, null);
+        }
+        
         public DefaultPurchaseRecord(Context context, String itemName, Date requestDate) {
             super();
             this.itemName = itemName;
-            this.requestDate = new Date(requestDate.getTime());
+            this.requestDate = requestDate == null ? null : new Date(requestDate.getTime());
             DomainFactory factory = context.getDomainFactory();
             Domain<Detail> detailDomain = factory.createDomain(Detail.class);
             ConditionAttribute targetAttribute = attr("parentItemName");
@@ -187,6 +208,10 @@ public class ToOneRelationTest extends BaseStoryRunner {
         private int amount;
         private ToOneDomainReference<PurchaseRecord> parentReference;
 
+        public DefaultDetail(Context context) {
+            this(context, null, null, 0);
+        }
+        
         public DefaultDetail(Context context, String itemName, String name, int amount) {
             super();
             this.itemName = itemName;
@@ -234,6 +259,32 @@ public class ToOneRelationTest extends BaseStoryRunner {
         @Override
         public void setParentRecordReference(ToOneDomainReference<PurchaseRecord> reference) {
             this.parentReference = reference;
+        }
+    }
+    
+    public static class DetailInstanceFactory implements InstanceFactory<Detail> {
+        private Context context;
+
+        public DetailInstanceFactory(Context context) {
+            this.context = context;
+        }
+        
+        @Override
+        public Detail createInstance(Class<Detail> clazz) {
+            return new DefaultDetail(context);
+        }
+    }
+    
+    public static class ParentInstanceFactory implements InstanceFactory<PurchaseRecord> {
+        private Context context;
+
+        public ParentInstanceFactory(Context context) {
+            this.context = context;
+        }
+
+        @Override
+        public PurchaseRecord createInstance(Class<PurchaseRecord> clazz) {
+            return new DefaultPurchaseRecord(context);
         }
     }
 }

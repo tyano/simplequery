@@ -15,8 +15,6 @@
  */
 package com.shelfmap.simplequery.domain;
 
-import static com.shelfmap.simplequery.SimpleDbUtil.item;
-import static com.shelfmap.simplequery.SimpleDbUtil.attr;
 import com.amazonaws.services.simpledb.AmazonSimpleDB;
 import com.amazonaws.services.simpledb.model.CreateDomainRequest;
 import com.amazonaws.services.simpledb.model.DeleteDomainRequest;
@@ -26,17 +24,15 @@ import com.amazonaws.services.simpledb.util.SimpleDBUtils;
 import com.google.inject.Binder;
 import com.google.inject.Inject;
 import com.google.inject.Scopes;
-import com.shelfmap.simplequery.BaseStoryRunner;
-import com.shelfmap.simplequery.ClientFactory;
-import com.shelfmap.simplequery.Context;
-import com.shelfmap.simplequery.ContextHolder;
-import com.shelfmap.simplequery.StoryPath;
-import com.shelfmap.simplequery.TestContext;
+import static com.shelfmap.simplequery.SimpleDbUtil.attr;
+import static com.shelfmap.simplequery.SimpleDbUtil.item;
+import com.shelfmap.simplequery.*;
 import com.shelfmap.simplequery.annotation.Attribute;
 import com.shelfmap.simplequery.annotation.IntAttribute;
-import com.shelfmap.simplequery.annotation.SimpleDbDomain;
 import com.shelfmap.simplequery.annotation.ItemName;
+import com.shelfmap.simplequery.annotation.SimpleDbDomain;
 import com.shelfmap.simplequery.attribute.Attributes;
+import static com.shelfmap.simplequery.attribute.Attributes.attr;
 import com.shelfmap.simplequery.attribute.ConditionAttribute;
 import com.shelfmap.simplequery.domain.impl.DefaultToOneDomainReference;
 import com.shelfmap.simplequery.domain.impl.ReverseToManyDomainReference;
@@ -153,7 +149,7 @@ public class ToOneRelationTest extends BaseStoryRunner {
             this.requestDate = new Date(requestDate.getTime());
             DomainFactory factory = context.getDomainFactory();
             Domain<Detail> detailDomain = factory.createDomain(Detail.class);
-            ConditionAttribute targetAttribute = Attributes.attr("parentItemName");
+            ConditionAttribute targetAttribute = attr("parentItemName");
             this.detailReference = new ReverseToManyDomainReference<Detail>(context, itemName, detailDomain, targetAttribute);
         }
 

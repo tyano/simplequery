@@ -127,7 +127,9 @@ public class BeanDomainSnapshot implements DomainSnapshot {
         } else if (getter.isAnnotationPresent(LongAttribute.class) && (valueType.equals(Long.class) || valueType.equals(long.class))) {
             LongAttribute annotation = getter.getAnnotation(LongAttribute.class);
             result = (DomainAttribute<VT,CT>) processLongAttribute(annotation, propertyName, containerType, getter);
-
+        } else if (getter.isAnnotationPresent(ForwardDomainReference.class)) { 
+            ForwardDomainReference annotation = getter.getAnnotation(ForwardDomainReference.class);
+            result = processForwardDomainReference(annotation, propertyName, valueType, containerType, getter);
         } else if (getter.isAnnotationPresent(Attribute.class)) {
             Attribute annotation = getter.getAnnotation(Attribute.class);
             result = processAttribute(annotation, propertyName, valueType, containerType, getter);
@@ -195,7 +197,17 @@ public class BeanDomainSnapshot implements DomainSnapshot {
         AttributeConverterFactory factory = context.getAttributeConverterFactory();
         return factory.getAttributeConverter(attributeType);
     }
-
+    
+    @SuppressWarnings("unchecked")
+    private <VT,CT> DomainAttribute<VT,CT> processForwardDomainReference(ForwardDomainReference annotation, String propertyName, Class<VT> valueType, Class<CT> containerType, Method getter) {
+        String attributeName = annotation.attributeName().isEmpty()
+                ? propertyName
+                : annotation.attributeName();
+        Class<?> targetDomainClass = annotation.targetDomainClass();
+        AttributeConverter<?> converter = new DefaultToOneDomainReferenceAttributeConverter(context, targetDomainClass);
+        return new DefaultDomainAttribute<VT,CT>(getDomain(), attributeName, valueType, containerType, (AttributeConverter<VT>) converter, newAttributeAccessor(containerType, fullPropertyPath(propertyName)));
+    }
+    
     @SuppressWarnings("unchecked")
     private <VT,CT> DomainAttribute<VT,CT> processAttribute(Attribute annotation, String propertyName, Class<VT> valueType, Class<CT> containerType, Method getter) {
         try {

@@ -16,29 +16,26 @@
 
 package com.shelfmap.simplequery.expression.impl;
 
-import com.amazonaws.services.simpledb.AmazonSimpleDB;
 import com.amazonaws.services.simpledb.model.SelectResult;
+import com.shelfmap.simplequery.Context;
 import com.shelfmap.simplequery.expression.Expression;
 import com.shelfmap.simplequery.expression.ItemConverter;
 import com.shelfmap.simplequery.expression.QueryResults;
 import com.shelfmap.simplequery.expression.SimpleQueryException;
-import java.util.Collection;
 import java.util.Iterator;
-import java.util.List;
-import java.util.ListIterator;
 
 /**
  *
  * @author Tsutomu YANO
  */
 public class DefaultQueryResult<T> implements QueryResults<T> {
-    private final AmazonSimpleDB simpleDB;
+    private final Context context;
     private final Expression<T> expression;
     private final SelectResult result;
     private final ItemConverter<T> itemConveter;
 
-    public DefaultQueryResult(AmazonSimpleDB simpleDB, Expression<T> expression, SelectResult result, ItemConverter<T> itemConveter) {
-        this.simpleDB = simpleDB;
+    public DefaultQueryResult(Context context, Expression<T> expression, SelectResult result, ItemConverter<T> itemConveter) {
+        this.context = context;
         this.expression = expression;
         this.result = result;
         this.itemConveter = itemConveter;
@@ -46,7 +43,7 @@ public class DefaultQueryResult<T> implements QueryResults<T> {
 
     @Override
     public Iterator<T> iterator() {
-        return new SelectResultIterator<T>(simpleDB, expression, result, itemConveter);
+        return new SelectResultIterator<T>(getContext(), expression, result, itemConveter);
     }
 
     @Override
@@ -61,5 +58,10 @@ public class DefaultQueryResult<T> implements QueryResults<T> {
     @Override
     public boolean isEmpty() {
         return size() == 0;
+    }
+
+    @Override
+    public Context getContext() {
+        return this.context;
     }
 }

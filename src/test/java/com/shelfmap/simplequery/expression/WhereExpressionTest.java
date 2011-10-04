@@ -16,25 +16,25 @@
 
 package com.shelfmap.simplequery.expression;
 
-import static com.shelfmap.simplequery.attribute.Attributes.attr;
-import static com.shelfmap.simplequery.expression.matcher.MatcherFactory.greaterThan;
-import static org.junit.Assert.assertThat;
 import com.amazonaws.auth.PropertiesCredentials;
 import com.amazonaws.services.simpledb.AmazonSimpleDB;
 import com.amazonaws.services.simpledb.AmazonSimpleDBClient;
 import com.shelfmap.simplequery.BaseStoryRunner;
 import com.shelfmap.simplequery.Context;
 import com.shelfmap.simplequery.DefaultContext;
-import com.shelfmap.simplequery.annotation.SimpleDbDomain;
-import com.shelfmap.simplequery.annotation.IntAttribute;
 import com.shelfmap.simplequery.StoryPath;
+import com.shelfmap.simplequery.annotation.IntAttribute;
+import com.shelfmap.simplequery.annotation.SimpleDbDomain;
+import static com.shelfmap.simplequery.attribute.Attributes.attr;
 import com.shelfmap.simplequery.expression.impl.Select;
+import static com.shelfmap.simplequery.expression.matcher.MatcherFactory.greaterThan;
 import java.io.File;
 import java.io.IOException;
 import org.hamcrest.Matchers;
 import org.jbehave.core.annotations.Given;
 import org.jbehave.core.annotations.Then;
 import org.jbehave.core.annotations.When;
+import static org.junit.Assert.assertThat;
 
 /**
  *
@@ -61,7 +61,7 @@ public class WhereExpressionTest extends BaseStoryRunner {
 
     @When("TestDomain don't have any @Attribute annotation on it's properties,")
     public void createExpression() {
-        expression = new Select(context, simpleDB).from(DomainWithoutAttribute.class).where(attr("saving"), greaterThan(100000));
+        expression = new Select(context).from(DomainWithoutAttribute.class).where(attr("saving"), greaterThan(100000));
     }
 
     @Then("WhereExpression will generate a simple expression with no padding nor offset.")
@@ -71,7 +71,7 @@ public class WhereExpressionTest extends BaseStoryRunner {
 
     @When("TestDomain have a @Attribute on a property whose name is same with the attribute specified in a expression")
     public void createExpressionWithAnnotation() {
-        expression = new Select(context, simpleDB).from(DomainWithAttribute.class).where(attr("saving"), greaterThan(100000));
+        expression = new Select(context).from(DomainWithAttribute.class).where(attr("saving"), greaterThan(100000));
     }
 
     @Then("WhereExpression will use a padding and a offset on the annotation")
@@ -81,7 +81,7 @@ public class WhereExpressionTest extends BaseStoryRunner {
 
     @When("a property have a @Attribute annotation, but the annotation don't have attributeName,")
     public void createExpressionWithoutAttributeName() {
-        expression = new Select(context, simpleDB).from(DomainWithoutAttributeName.class).where(attr("saving"), greaterThan(500));
+        expression = new Select(context).from(DomainWithoutAttributeName.class).where(attr("saving"), greaterThan(500));
     }
 
     @Then("this library will find the annotation through the name of property instead of the attributeName, and uses values of the annotation.")

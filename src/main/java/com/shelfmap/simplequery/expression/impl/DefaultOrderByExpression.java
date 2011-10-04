@@ -17,18 +17,11 @@ package com.shelfmap.simplequery.expression.impl;
 
 
 import com.shelfmap.simplequery.Context;
-import com.shelfmap.simplequery.domain.Domain;
-import com.shelfmap.simplequery.attribute.SelectAttribute;
-import com.amazonaws.services.simpledb.AmazonSimpleDB;
-
 import com.shelfmap.simplequery.attribute.ConditionAttribute;
-import com.shelfmap.simplequery.expression.DomainExpression;
-import com.shelfmap.simplequery.expression.LimitExpression;
-import com.shelfmap.simplequery.expression.OrderByExpression;
-import com.shelfmap.simplequery.expression.SortOrder;
-import com.shelfmap.simplequery.expression.WhereExpression;
+import com.shelfmap.simplequery.attribute.SelectAttribute;
+import com.shelfmap.simplequery.domain.Domain;
+import com.shelfmap.simplequery.expression.*;
 import com.shelfmap.simplequery.util.Assertion;
-
 import static com.shelfmap.simplequery.util.Assertion.*;
 
 /**
@@ -41,16 +34,16 @@ public class DefaultOrderByExpression<T> extends BaseExpression<T> implements Or
     private final ConditionAttribute attribute;
     private final SortOrder sortOrder;
 
-    public DefaultOrderByExpression(Context context, AmazonSimpleDB simpleDB, DomainExpression<T> domainExpression, ConditionAttribute attribute, SortOrder sortOrder) {
-        this(context, simpleDB,
+    public DefaultOrderByExpression(Context context, DomainExpression<T> domainExpression, ConditionAttribute attribute, SortOrder sortOrder) {
+        this(context, 
              isNotNullAndReturn("domainExpression", domainExpression),
              null,
              attribute,
              sortOrder);
     }
 
-    public DefaultOrderByExpression(Context context, AmazonSimpleDB simpleDB, final WhereExpression<T> whereExpression, ConditionAttribute attribute, SortOrder sortOrder) {
-        this(context, simpleDB,
+    public DefaultOrderByExpression(Context context, final WhereExpression<T> whereExpression, ConditionAttribute attribute, SortOrder sortOrder) {
+        this(context,
             isNotNullAndGet("whereExpression", whereExpression,
                 new Assertion.Accessor<DomainExpression<T>>() {
                     @Override
@@ -63,8 +56,8 @@ public class DefaultOrderByExpression<T> extends BaseExpression<T> implements Or
             sortOrder);
     }
 
-    protected DefaultOrderByExpression(Context context, AmazonSimpleDB simpleDB, final DomainExpression<T> domainExpression, WhereExpression<T> whereExpression, ConditionAttribute attribute, SortOrder sortOrder) {
-        super(context, simpleDB,
+    protected DefaultOrderByExpression(Context context, final DomainExpression<T> domainExpression, WhereExpression<T> whereExpression, ConditionAttribute attribute, SortOrder sortOrder) {
+        super(context,
                 Assertion.isNotNullAndGet("domainExpression", domainExpression, new Assertion.Accessor<Domain<T>>() {
                     @Override
                     public Domain<T> get() {
@@ -114,19 +107,17 @@ public class DefaultOrderByExpression<T> extends BaseExpression<T> implements Or
 
     @Override
     public LimitExpression<T> limit(int limitCount) {
-        return new DefaultLimitExpression<T>(getContext(), getAmazonSimpleDB(), this, limitCount);
+        return new DefaultLimitExpression<T>(getContext(), this, limitCount);
     }
 
     @Override
     public OrderByExpression<T> rebuildWith(SelectAttribute... attributes) {
         return (getWhereExpression() != null)
                 ? new DefaultOrderByExpression<T>(getContext(),
-                                                  getAmazonSimpleDB(),
                                                   getWhereExpression().rebuildWith(attributes),
                                                   attribute,
                                                   sortOrder)
                 : new DefaultOrderByExpression<T>(getContext(),
-                                                  getAmazonSimpleDB(),
                                                   getDomainExpression().rebuildWith(attributes),
                                                   attribute,
                                                   sortOrder);

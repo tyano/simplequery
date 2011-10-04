@@ -15,14 +15,6 @@
  */
 package com.shelfmap.simplequery.expression;
 
-import java.util.Arrays;
-import java.util.List;
-
-import org.hamcrest.Matchers;
-import org.jbehave.core.annotations.Given;
-import org.jbehave.core.annotations.Then;
-import org.jbehave.core.annotations.When;
-
 import com.amazonaws.services.simpledb.AmazonSimpleDB;
 import com.amazonaws.services.simpledb.model.BatchPutAttributesRequest;
 import com.amazonaws.services.simpledb.model.CreateDomainRequest;
@@ -31,27 +23,26 @@ import com.amazonaws.services.simpledb.model.ReplaceableItem;
 import com.google.inject.Binder;
 import com.google.inject.Inject;
 import com.google.inject.Scopes;
-
-import com.shelfmap.simplequery.BaseStoryRunner;
-import com.shelfmap.simplequery.ClientFactory;
-import com.shelfmap.simplequery.ContextHolder;
-import com.shelfmap.simplequery.StoryPath;
-import com.shelfmap.simplequery.TestContext;
+import static com.shelfmap.simplequery.SimpleDbUtil.attr;
+import static com.shelfmap.simplequery.SimpleDbUtil.item;
+import com.shelfmap.simplequery.*;
 import com.shelfmap.simplequery.annotation.Attribute;
-import com.shelfmap.simplequery.annotation.SimpleDbDomain;
 import com.shelfmap.simplequery.annotation.ItemName;
+import com.shelfmap.simplequery.annotation.SimpleDbDomain;
 import com.shelfmap.simplequery.attribute.impl.AllAttribute;
 import com.shelfmap.simplequery.expression.impl.Select;
 import com.shelfmap.simplequery.expression.matcher.MatcherFactory;
-
+import static com.shelfmap.simplequery.expression.matcher.MatcherFactory.is;
+import java.util.Arrays;
 import static java.util.Arrays.asList;
-
+import java.util.List;
+import org.hamcrest.Matchers;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
+import org.jbehave.core.annotations.Given;
+import org.jbehave.core.annotations.Then;
+import org.jbehave.core.annotations.When;
 import static org.junit.Assert.assertThat;
-
-import static com.shelfmap.simplequery.SimpleDbUtil.*;
-import static com.shelfmap.simplequery.expression.matcher.MatcherFactory.is;
 
 /**
  *
@@ -116,7 +107,7 @@ public class ItemQueryTest extends BaseStoryRunner {
 
     @When("the expression is created with 'is' matcher")
     public void createItemQueryWithIs() {
-        exp = new Select(ctx.getContext(), ctx.getSimpleDb(), AllAttribute.INSTANCE).from(ItemTestDomain.class).whereItemName(is("firstItem"));
+        exp = new Select(ctx.getContext(), AllAttribute.INSTANCE).from(ItemTestDomain.class).whereItemName(is("firstItem"));
     }
 
     @Then("the result string must be -> $resultExp")
@@ -126,7 +117,7 @@ public class ItemQueryTest extends BaseStoryRunner {
 
     @When("the expression is created with 'in' matcher")
     public void createItemQueryWithIn() {
-        exp = new Select(ctx.getContext(), ctx.getSimpleDb(), AllAttribute.INSTANCE).from(ItemTestDomain.class).whereItemName(MatcherFactory.in("firstItem", "secondItem"));
+        exp = new Select(ctx.getContext(), AllAttribute.INSTANCE).from(ItemTestDomain.class).whereItemName(MatcherFactory.in("firstItem", "secondItem"));
     }
 
     @SimpleDbDomain(DOMAIN_NAME)

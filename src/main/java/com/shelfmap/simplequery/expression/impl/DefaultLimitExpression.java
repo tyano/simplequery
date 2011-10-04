@@ -15,8 +15,6 @@
  */
 package com.shelfmap.simplequery.expression.impl;
 
-import static com.shelfmap.simplequery.util.Assertion.*;
-import com.amazonaws.services.simpledb.AmazonSimpleDB;
 import com.shelfmap.simplequery.Context;
 import com.shelfmap.simplequery.attribute.SelectAttribute;
 import com.shelfmap.simplequery.domain.Domain;
@@ -25,6 +23,8 @@ import com.shelfmap.simplequery.expression.LimitExpression;
 import com.shelfmap.simplequery.expression.OrderByExpression;
 import com.shelfmap.simplequery.expression.WhereExpression;
 import com.shelfmap.simplequery.util.Assertion;
+import static com.shelfmap.simplequery.util.Assertion.isNotNullAndGet;
+import static com.shelfmap.simplequery.util.Assertion.isNotNullAndReturn;
 
 /**
  *
@@ -37,8 +37,8 @@ public class DefaultLimitExpression<T> extends BaseExpression<T> implements Limi
     private WhereExpression<T> whereExpression;
     private OrderByExpression<T> orderByExpression;
 
-    protected DefaultLimitExpression(Context context, AmazonSimpleDB simpleDB, final DomainExpression<T> domainExpression, WhereExpression<T> whereExpression, OrderByExpression<T> orderByExpression, int limitCount) {
-        super(context, simpleDB,
+    protected DefaultLimitExpression(Context context, final DomainExpression<T> domainExpression, WhereExpression<T> whereExpression, OrderByExpression<T> orderByExpression, int limitCount) {
+        super(context,
               Assertion.isNotNullAndGet("domainExpression", domainExpression, new Assertion.Accessor<Domain<T>>() {
                 @Override
                 public Domain<T> get() {
@@ -52,16 +52,16 @@ public class DefaultLimitExpression<T> extends BaseExpression<T> implements Limi
         this.orderByExpression = orderByExpression;
     }
 
-    public DefaultLimitExpression(Context context, AmazonSimpleDB simpleDB, DomainExpression<T> domainExpression, int limitCount) {
-        this(context, simpleDB,
+    public DefaultLimitExpression(Context context, DomainExpression<T> domainExpression, int limitCount) {
+        this(context,
                 isNotNullAndReturn("domainExpression", domainExpression),
                 null,
                 null,
                 limitCount);
     }
 
-    public DefaultLimitExpression(Context context, AmazonSimpleDB simpleDB, final WhereExpression<T> whereExpression, int limitCount) {
-        this(context, simpleDB,
+    public DefaultLimitExpression(Context context, final WhereExpression<T> whereExpression, int limitCount) {
+        this(context,
              isNotNullAndGet("whereExpression", whereExpression,
                  new Assertion.Accessor<DomainExpression<T>>() {
                      @Override
@@ -74,8 +74,8 @@ public class DefaultLimitExpression<T> extends BaseExpression<T> implements Limi
              limitCount);
     }
 
-    public DefaultLimitExpression(Context context, AmazonSimpleDB simpleDB, final OrderByExpression<T> orderByExpression, int limitCount) {
-        this(context, simpleDB,
+    public DefaultLimitExpression(Context context, final OrderByExpression<T> orderByExpression, int limitCount) {
+        this(context,
              isNotNullAndGet("orderByExpression", orderByExpression,
                  new Assertion.Accessor<DomainExpression<T>>() {
                      @Override
@@ -119,9 +119,9 @@ public class DefaultLimitExpression<T> extends BaseExpression<T> implements Limi
     @Override
     public LimitExpression<T> rebuildWith(SelectAttribute... attributes) {
         return (orderByExpression != null)
-                ? new DefaultLimitExpression<T>(getContext(), getAmazonSimpleDB(), orderByExpression.rebuildWith(attributes), limitCount)
+                ? new DefaultLimitExpression<T>(getContext(), orderByExpression.rebuildWith(attributes), limitCount)
                 : (whereExpression != null)
-                    ? new DefaultLimitExpression<T>(getContext(), getAmazonSimpleDB(), whereExpression.rebuildWith(attributes), limitCount)
-                    : new DefaultLimitExpression<T>(getContext(), getAmazonSimpleDB(), domainExpression.rebuildWith(attributes), limitCount);
+                    ? new DefaultLimitExpression<T>(getContext(), whereExpression.rebuildWith(attributes), limitCount)
+                    : new DefaultLimitExpression<T>(getContext(), domainExpression.rebuildWith(attributes), limitCount);
     }
 }

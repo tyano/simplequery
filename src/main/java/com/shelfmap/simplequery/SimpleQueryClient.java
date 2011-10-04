@@ -51,12 +51,12 @@ public class SimpleQueryClient implements Client {
     }
 
     @Override
-    public SelectQuery select(SelectAttribute... attribute) {
-        return newSelectQuery(attribute);
+    public SelectQuery select(SelectAttribute... attributes) {
+        return newSelectQuery(attributes);
     }
 
-    protected SelectQuery newSelectQuery(SelectAttribute... attribute) {
-        return new Select(context, simpleDB, attribute);
+    protected SelectQuery newSelectQuery(SelectAttribute... attributes) {
+        return new Select(context, attributes);
     }
 
     @Override

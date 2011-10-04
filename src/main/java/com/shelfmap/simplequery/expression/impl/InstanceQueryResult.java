@@ -15,6 +15,7 @@
  */
 package com.shelfmap.simplequery.expression.impl;
 
+import com.shelfmap.simplequery.Context;
 import com.shelfmap.simplequery.expression.QueryResults;
 import java.util.Collection;
 import java.util.Collections;
@@ -27,8 +28,10 @@ import java.util.Iterator;
 public class InstanceQueryResult<T> implements QueryResults<T> {
 
     private final Collection<? extends T> values;
+    private final Context context;
 
-    public InstanceQueryResult(Collection<? extends T> values) {
+    public InstanceQueryResult(Context context, Collection<? extends T> values) {
+        this.context = context;
         this.values = values;
     }
 
@@ -50,6 +53,11 @@ public class InstanceQueryResult<T> implements QueryResults<T> {
     @SuppressWarnings("unchecked")
     public Iterator<T> iterator() {
         return (Iterator<T>) values.iterator();
+    }
+
+    @Override
+    public Context getContext() {
+        return context;
     }
 
 }

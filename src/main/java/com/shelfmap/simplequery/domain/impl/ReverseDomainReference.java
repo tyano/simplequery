@@ -15,18 +15,14 @@
  */
 package com.shelfmap.simplequery.domain.impl;
 
-import static com.shelfmap.simplequery.expression.matcher.MatcherFactory.is;
 import com.shelfmap.simplequery.Context;
 import com.shelfmap.simplequery.attribute.ConditionAttribute;
-import com.shelfmap.simplequery.domain.Domain;
-import com.shelfmap.simplequery.domain.DomainAttribute;
-import com.shelfmap.simplequery.domain.DomainAttributes;
-import com.shelfmap.simplequery.domain.DomainReference;
-import com.shelfmap.simplequery.domain.ReverseReference;
+import com.shelfmap.simplequery.domain.*;
 import com.shelfmap.simplequery.expression.Expression;
 import com.shelfmap.simplequery.expression.MultipleResultsExistException;
 import com.shelfmap.simplequery.expression.QueryResults;
 import com.shelfmap.simplequery.expression.SimpleQueryException;
+import static com.shelfmap.simplequery.expression.matcher.MatcherFactory.is;
 
 /**
  *
@@ -69,6 +65,7 @@ public abstract class ReverseDomainReference<T> implements DomainReference<T>, R
         return targetAttribute;
     }
 
+    @Override
     public Context getContext() {
         return context;
     }

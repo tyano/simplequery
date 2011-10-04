@@ -16,6 +16,7 @@
 
 package com.shelfmap.simplequery.expression;
 
+import com.shelfmap.simplequery.Context;
 import com.shelfmap.simplequery.attribute.SelectAttribute;
 
 /**
@@ -50,4 +51,5 @@ public interface Expression<T> extends Describable {
     
     int count() throws SimpleQueryException;
     Expression<T> rebuildWith(SelectAttribute... attributes);
+    Context getContext();
 }

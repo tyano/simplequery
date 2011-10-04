@@ -16,11 +16,14 @@
 
 package com.shelfmap.simplequery.expression;
 
+import com.shelfmap.simplequery.Context;
+
 /**
  *
  * @author Tsutomu YANO
  */
 public interface QueryResults<T> extends Iterable<T> {
+    Context getContext();
     int size();
     boolean isEmpty();
 }

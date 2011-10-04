@@ -15,24 +15,20 @@
  */
 package com.shelfmap.simplequery.expression;
 
-import static com.shelfmap.simplequery.attribute.Attributes.attr;
-import static org.junit.Assert.assertThat;
-import static com.shelfmap.simplequery.expression.matcher.MatcherFactory.*;
 import com.google.inject.Binder;
 import com.google.inject.Inject;
 import com.google.inject.Scopes;
-import com.shelfmap.simplequery.BaseStoryRunner;
-import com.shelfmap.simplequery.ClientFactory;
-import com.shelfmap.simplequery.ContextHolder;
-import com.shelfmap.simplequery.StoryPath;
-import com.shelfmap.simplequery.TestContext;
+import com.shelfmap.simplequery.*;
+import static com.shelfmap.simplequery.attribute.Attributes.attr;
 import com.shelfmap.simplequery.attribute.impl.AllAttribute;
 import com.shelfmap.simplequery.expression.impl.Select;
+import static com.shelfmap.simplequery.expression.matcher.MatcherFactory.like;
 import java.util.Arrays;
 import java.util.List;
 import org.hamcrest.Matchers;
 import org.jbehave.core.annotations.Then;
 import org.jbehave.core.annotations.When;
+import static org.junit.Assert.assertThat;
 
 /**
  *
@@ -59,7 +55,7 @@ public class LimitExpressionTest extends BaseStoryRunner {
 
     @When("calling limit(10) for OrderByExpression")
     public void callLimitAgainstOrderByExp() {
-        exp = new Select(ctx.getContext(), ctx.getSimpleDb(), AllAttribute.INSTANCE).from(TestDomain.class).where(attr("name"), like("yano%")).orderBy(attr("name"), SortOrder.Asc).limit(10);
+        exp = new Select(ctx.getContext(), AllAttribute.INSTANCE).from(TestDomain.class).where(attr("name"), like("yano%")).orderBy(attr("name"), SortOrder.Asc).limit(10);
     }
 
     @Then("it should generate 'limit 10'")
@@ -69,7 +65,7 @@ public class LimitExpressionTest extends BaseStoryRunner {
 
     @When("limit(10) for WhereExpression")
     public void callLimitAgainstWhereExp() {
-        exp = new Select(ctx.getContext(), ctx.getSimpleDb(), AllAttribute.INSTANCE).from(TestDomain.class).where(attr("name"), like("yano%")).limit(10);
+        exp = new Select(ctx.getContext(), AllAttribute.INSTANCE).from(TestDomain.class).where(attr("name"), like("yano%")).limit(10);
     }
 
     @Then("it should generate 'limit 10' after where expression")
@@ -79,7 +75,7 @@ public class LimitExpressionTest extends BaseStoryRunner {
 
     @When("limit(10) for DomainExpression")
     public void callLimitAgainstDomainExp() {
-        exp = new Select(ctx.getContext(), ctx.getSimpleDb(), AllAttribute.INSTANCE).from(TestDomain.class).limit(10);
+        exp = new Select(ctx.getContext(), AllAttribute.INSTANCE).from(TestDomain.class).limit(10);
     }
 
     @Then("it should generate 'limit 10' after domain expression")

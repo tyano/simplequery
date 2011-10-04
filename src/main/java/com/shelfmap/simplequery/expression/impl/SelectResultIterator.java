@@ -16,10 +16,10 @@
 
 package com.shelfmap.simplequery.expression.impl;
 
-import com.amazonaws.services.simpledb.AmazonSimpleDB;
 import com.amazonaws.services.simpledb.model.Item;
 import com.amazonaws.services.simpledb.model.SelectRequest;
 import com.amazonaws.services.simpledb.model.SelectResult;
+import com.shelfmap.simplequery.Context;
 import com.shelfmap.simplequery.expression.CanNotConvertItemException;
 import com.shelfmap.simplequery.expression.Expression;
 import com.shelfmap.simplequery.expression.ItemConverter;
@@ -31,7 +31,7 @@ import java.util.List;
  * @author Tsutomu YANO
  */
 public class SelectResultIterator<T> implements Iterator<T> {
-    private AmazonSimpleDB simpleDB;
+    private Context context;
     private Expression<?> expression;
     private SelectResult currentResult;
     private ItemConverter<T> itemConverter;
@@ -40,8 +40,8 @@ public class SelectResultIterator<T> implements Iterator<T> {
     private int currentIndex;
     
 
-    public SelectResultIterator(AmazonSimpleDB simpleDB, Expression<?> expression, SelectResult result, ItemConverter<T> itemConveter) {
-        this.simpleDB = simpleDB;
+    public SelectResultIterator(Context context, Expression<?> expression, SelectResult result, ItemConverter<T> itemConveter) {
+        this.context = context;
         this.expression = expression;
         this.currentResult = result;
         this.currentItemList = result.getItems();
@@ -86,7 +86,7 @@ public class SelectResultIterator<T> implements Iterator<T> {
         final String nextToken = currentResult.getNextToken();
         if(nextToken != null) {
             SelectRequest request = new SelectRequest(expression.describe()).withNextToken(nextToken);
-            SelectResult result = simpleDB.select(request);
+            SelectResult result = context.createNewClient().getSimpleDB().select(request);
             currentResult = result;
             currentItemList = currentResult.getItems();
             currentListSize = currentItemList.size();
@@ -114,7 +114,7 @@ public class SelectResultIterator<T> implements Iterator<T> {
         return expression;
     }
 
-    public AmazonSimpleDB getSimpleDB() {
-        return simpleDB;
+    public Context getContext() {
+        return context;
     }
 }

@@ -16,6 +16,7 @@
 
 package com.shelfmap.simplequery.expression;
 
+import com.shelfmap.simplequery.Context;
 import com.shelfmap.simplequery.attribute.SelectAttribute;
 import java.util.Collection;
 
@@ -41,4 +42,5 @@ public interface SelectQuery extends Describable {
      * @return An expression object which will retrieve all records of the domain specified by the {@code target} parameter.
      */
     <T> DomainExpression<T> from(Class<T> target);
+    Context getContext();
 }

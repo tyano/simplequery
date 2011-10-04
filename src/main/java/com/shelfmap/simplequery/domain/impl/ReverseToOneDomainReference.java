@@ -44,7 +44,7 @@ public class ReverseToOneDomainReference<T> extends ReverseDomainReference<T> im
             element.add(t);
             break;
         }
-        return new InstanceQueryResult<T>(element);
+        return new InstanceQueryResult<T>(getContext(), element);
     }
 
     @Override

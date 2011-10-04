@@ -15,17 +15,13 @@
  */
 package com.shelfmap.simplequery.domain.impl;
 
-import static com.shelfmap.simplequery.expression.matcher.MatcherFactory.is;
 import com.shelfmap.simplequery.Context;
-import com.shelfmap.simplequery.domain.Domain;
-import com.shelfmap.simplequery.domain.DomainAttribute;
-import com.shelfmap.simplequery.domain.DomainAttributes;
-import com.shelfmap.simplequery.domain.ForwardReference;
-import com.shelfmap.simplequery.domain.ToOneDomainReference;
+import com.shelfmap.simplequery.domain.*;
 import com.shelfmap.simplequery.expression.Expression;
 import com.shelfmap.simplequery.expression.MultipleResultsExistException;
 import com.shelfmap.simplequery.expression.QueryResults;
 import com.shelfmap.simplequery.expression.SimpleQueryException;
+import static com.shelfmap.simplequery.expression.matcher.MatcherFactory.is;
 
 /**
  *
@@ -64,6 +60,7 @@ public class DefaultToOneDomainReference<T> implements ToOneDomainReference<T>, 
         return context.createNewClient().select().from(getTargetDomain().getDomainClass()).whereItemName(is(getTargetItemName()));
     }
 
+    @Override
     public Context getContext() {
         return context;
     }
@@ -81,7 +78,7 @@ public class DefaultToOneDomainReference<T> implements ToOneDomainReference<T>, 
     }
 
     private DomainAttribute<String,String> findItemNameAttribute() {
-        DomainAttributes attributes = getContext().getDomainAttributes(getTargetDomain());
-        return attributes.getItemNameAttribute();
+        DomainSnapshot snapshot = getContext().createDomainSnapshot(getTargetDomain());
+        return snapshot.getItemNameAttribute();
     }
 }

@@ -16,25 +16,9 @@
 package com.shelfmap.simplequery.domain.impl;
 
 import com.shelfmap.simplequery.Context;
-import com.shelfmap.simplequery.domain.AttributeStore;
+import com.shelfmap.simplequery.annotation.*;
+import com.shelfmap.simplequery.domain.*;
 import static com.shelfmap.simplequery.util.Assertion.isNotNull;
-import com.shelfmap.simplequery.annotation.FlatAttribute;
-import com.shelfmap.simplequery.annotation.FloatAttribute;
-import com.shelfmap.simplequery.annotation.IntAttribute;
-import com.shelfmap.simplequery.annotation.LongAttribute;
-import com.shelfmap.simplequery.annotation.Attribute;
-import com.shelfmap.simplequery.annotation.Container;
-import com.shelfmap.simplequery.annotation.ItemName;
-import com.shelfmap.simplequery.domain.AttributeAccessor;
-import com.shelfmap.simplequery.domain.AttributeConverter;
-import com.shelfmap.simplequery.domain.AttributeConverterFactory;
-import com.shelfmap.simplequery.domain.AttributeKey;
-import com.shelfmap.simplequery.domain.CanNotWriteAttributeException;
-import com.shelfmap.simplequery.domain.Domain;
-import com.shelfmap.simplequery.domain.DomainAttributes;
-import com.shelfmap.simplequery.domain.DomainAttribute;
-import com.shelfmap.simplequery.domain.DomainFactory;
-import com.shelfmap.simplequery.domain.ReverseReference;
 import java.beans.BeanInfo;
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
@@ -47,18 +31,18 @@ import java.util.Iterator;
  *
  * @author Tsutomu YANO
  */
-public class BeanDomainAttributes implements DomainAttributes {
+public class BeanDomainSnapshot implements DomainSnapshot {
     private final AttributeStore attributeStore = new DefaultAttributeStore();
     private final Domain<?> domain;
     private final String parentPropertyPath;
     private final Context context;
     private String itemNameProperty;
 
-    public BeanDomainAttributes(Context context, Domain<?> domain) {
+    public BeanDomainSnapshot(Context context, Domain<?> domain) {
         this(context, domain, null);
     }
 
-    public BeanDomainAttributes(Context context, Domain<?> domain, String parentPropertyPath) {
+    public BeanDomainSnapshot(Context context, Domain<?> domain, String parentPropertyPath) {
         isNotNull("domain", domain);
         isNotNull("context", context);
 
@@ -245,12 +229,12 @@ public class BeanDomainAttributes implements DomainAttributes {
     private void buildFlatAttribute(Class<?> propertyType, String propertyName) {
         DomainFactory domainFactory = getContext().getDomainFactory();
         Domain<?> childDomain = domainFactory.createDomain(propertyType);
-        BeanDomainAttributes attributes = new BeanDomainAttributes(getContext(), childDomain, fullPropertyPath(propertyName));
+        BeanDomainSnapshot attributes = new BeanDomainSnapshot(getContext(), childDomain, fullPropertyPath(propertyName));
         copy(this, attributes);
     }
 
     @SuppressWarnings("AccessingNonPublicFieldOfAnotherObject")
-    private void copy(BeanDomainAttributes dest, BeanDomainAttributes source) {
+    private void copy(BeanDomainSnapshot dest, BeanDomainSnapshot source) {
         for (AttributeKey key : source.attributeStore.keySet()) {
             if(dest.attributeStore.isAttributeDefined(key.getAttributeName())) {
                 throw new IllegalArgumentException("The name of the attribute '" + key.getAttributeName() + "' of " + source.getDomain().getDomainClass().getName() + " is duplicated with the parent domainClass '" + dest.getDomain().getDomainClass().getName() + "'.");
@@ -260,7 +244,7 @@ public class BeanDomainAttributes implements DomainAttributes {
     }
 
     @SuppressWarnings("AccessingNonPublicFieldOfAnotherObject")
-    private <VT,CT> void copyAttribute(BeanDomainAttributes dest, BeanDomainAttributes source, Class<VT> valueType, Class<CT> containerType, String attributeName) {
+    private <VT,CT> void copyAttribute(BeanDomainSnapshot dest, BeanDomainSnapshot source, Class<VT> valueType, Class<CT> containerType, String attributeName) {
         dest.attributeStore.putAttribute(attributeName, valueType, containerType, source.getAttribute(attributeName, valueType, containerType));
     }
 

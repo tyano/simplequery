@@ -23,7 +23,7 @@ import com.shelfmap.simplequery.attribute.SelectAttribute;
 import com.shelfmap.simplequery.domain.AttributeConverter;
 import com.shelfmap.simplequery.domain.Domain;
 import com.shelfmap.simplequery.domain.DomainAttribute;
-import com.shelfmap.simplequery.domain.DomainAttributes;
+import com.shelfmap.simplequery.domain.DomainSnapshot;
 import com.shelfmap.simplequery.expression.*;
 import com.shelfmap.simplequery.expression.matcher.Matcher;
 import com.shelfmap.simplequery.util.Assertion;
@@ -61,11 +61,11 @@ public class DefaultWhereExpression<T> extends BaseExpression<T> implements Wher
     @SuppressWarnings("unchecked")
     public String describe() {
         StringBuilder sb = new StringBuilder();
-        DomainAttributes domainAttributes = getContext().getDomainAttributes(getDomain());
+        DomainSnapshot snapshot = getContext().createDomainSnapshot(getDomain());
 
         Condition<?> current = condition;
         while (current.getParent() != null) {
-            configureMatcher(domainAttributes, current);
+            configureMatcher(snapshot, current);
             current = current.getParent();
         }
 
@@ -75,14 +75,14 @@ public class DefaultWhereExpression<T> extends BaseExpression<T> implements Wher
         return sb.toString();
     }
 
-    private <AT> void configureMatcher(DomainAttributes domainAttributes, Condition<AT> current) {
+    private <AT> void configureMatcher(DomainSnapshot snapshot, Condition<AT> current) {
         String attributeName = current.getAttribute().getAttributeName();
         Matcher<AT> matcher = current.getMatcher();
         if (matcher != null) {
 
             //TODO DomainAttributes#getAttribute might return an DomainAttribute whose type parameter don't match with the Condition 'current'.
             @SuppressWarnings("unchecked")
-            DomainAttribute<AT,?> attribute = (DomainAttribute<AT,?>) domainAttributes.getAttribute(attributeName);
+            DomainAttribute<AT,?> attribute = (DomainAttribute<AT,?>) snapshot.getAttribute(attributeName);
             if(attribute != null) {
                 matcher.setAttributeConverter(attribute.getAttributeConverter());
             }

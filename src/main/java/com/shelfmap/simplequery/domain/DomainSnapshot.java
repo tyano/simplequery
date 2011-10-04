@@ -22,7 +22,7 @@ import com.shelfmap.simplequery.Context;
  *
  * @author Tsutomu YANO
  */
-public interface DomainAttributes extends Iterable<DomainAttribute<?,?>> {
+public interface DomainSnapshot extends Iterable<DomainAttribute<?,?>> {
     Context getContext();
     DomainAttribute<String,String> getItemNameAttribute();
     boolean isAttributeDefined(String attributeName);

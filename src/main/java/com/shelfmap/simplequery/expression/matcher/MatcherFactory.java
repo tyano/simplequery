@@ -72,4 +72,8 @@ public final class MatcherFactory {
     public static IsNotNullMatcher isNotNull() {
         return new IsNotNullMatcher();
     }
+    
+    public static ReferToMatcher referTo(String... itemNames) {
+        return new ReferToMatcher(itemNames);
+    }
 }

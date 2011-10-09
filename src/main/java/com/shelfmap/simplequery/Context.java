@@ -18,8 +18,8 @@ package com.shelfmap.simplequery;
 import com.amazonaws.auth.AWSCredentials;
 import com.shelfmap.simplequery.domain.AttributeConverterFactory;
 import com.shelfmap.simplequery.domain.Domain;
+import com.shelfmap.simplequery.domain.DomainDescriptor;
 import com.shelfmap.simplequery.domain.DomainFactory;
-import com.shelfmap.simplequery.domain.DomainSnapshot;
 import com.shelfmap.simplequery.expression.ItemConverter;
 import java.io.Serializable;
 
@@ -32,7 +32,7 @@ public interface Context extends Serializable {
      <T> ItemConverter<T> getItemConverter(Domain<T> domain);
      <T> InstanceFactory<T> getInstanceFactory(Domain<T> domain);
     DomainFactory getDomainFactory();
-    DomainSnapshot createDomainSnapshot(Domain<?> domain);
+    DomainDescriptor createDomainDescriptor(Domain<?> domain);
     AttributeConverterFactory getAttributeConverterFactory();
     AWSCredentials getCredentials();
 }

@@ -75,7 +75,7 @@ public abstract class AbstractReverseDomainReference<T> implements DomainReferen
     }
 
     protected <T> DomainAttribute<String,String> getTargetDomainAttribute(Domain<T> targetDomain, ConditionAttribute attribute) {
-        DomainSnapshot snapshot = getContext().createDomainSnapshot(targetDomain);
-        return snapshot.getAttribute(attribute.getAttributeName(), String.class, String.class);
+        DomainDescriptor descriptor = getContext().createDomainDescriptor(targetDomain);
+        return descriptor.getAttribute(attribute.getAttributeName(), String.class, String.class);
     }
 }

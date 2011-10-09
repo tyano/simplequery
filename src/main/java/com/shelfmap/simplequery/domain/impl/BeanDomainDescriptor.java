@@ -31,18 +31,18 @@ import java.util.Iterator;
  *
  * @author Tsutomu YANO
  */
-public class BeanDomainSnapshot implements DomainSnapshot {
+public class BeanDomainDescriptor implements DomainDescriptor {
     private final AttributeStore attributeStore = new DefaultAttributeStore();
     private final Domain<?> domain;
     private final String parentPropertyPath;
     private final Context context;
     private String itemNameProperty;
 
-    public BeanDomainSnapshot(Context context, Domain<?> domain) {
+    public BeanDomainDescriptor(Context context, Domain<?> domain) {
         this(context, domain, null);
     }
 
-    public BeanDomainSnapshot(Context context, Domain<?> domain, String parentPropertyPath) {
+    public BeanDomainDescriptor(Context context, Domain<?> domain, String parentPropertyPath) {
         isNotNull("domain", domain);
         isNotNull("context", context);
 
@@ -241,12 +241,12 @@ public class BeanDomainSnapshot implements DomainSnapshot {
     private void buildFlatAttribute(Class<?> propertyType, String propertyName) {
         DomainFactory domainFactory = getContext().getDomainFactory();
         Domain<?> childDomain = domainFactory.createDomain(propertyType);
-        BeanDomainSnapshot attributes = new BeanDomainSnapshot(getContext(), childDomain, fullPropertyPath(propertyName));
+        BeanDomainDescriptor attributes = new BeanDomainDescriptor(getContext(), childDomain, fullPropertyPath(propertyName));
         copy(this, attributes);
     }
 
     @SuppressWarnings("AccessingNonPublicFieldOfAnotherObject")
-    private void copy(BeanDomainSnapshot dest, BeanDomainSnapshot source) {
+    private void copy(BeanDomainDescriptor dest, BeanDomainDescriptor source) {
         for (AttributeKey key : source.attributeStore.keySet()) {
             if(dest.attributeStore.isAttributeDefined(key.getAttributeName())) {
                 throw new IllegalArgumentException("The name of the attribute '" + key.getAttributeName() + "' of " + source.getDomain().getDomainClass().getName() + " is duplicated with the parent domainClass '" + dest.getDomain().getDomainClass().getName() + "'.");
@@ -256,7 +256,7 @@ public class BeanDomainSnapshot implements DomainSnapshot {
     }
 
     @SuppressWarnings("AccessingNonPublicFieldOfAnotherObject")
-    private <VT,CT> void copyAttribute(BeanDomainSnapshot dest, BeanDomainSnapshot source, Class<VT> valueType, Class<CT> containerType, String attributeName) {
+    private <VT,CT> void copyAttribute(BeanDomainDescriptor dest, BeanDomainDescriptor source, Class<VT> valueType, Class<CT> containerType, String attributeName) {
         dest.attributeStore.putAttribute(attributeName, valueType, containerType, source.getAttribute(attributeName, valueType, containerType));
     }
 

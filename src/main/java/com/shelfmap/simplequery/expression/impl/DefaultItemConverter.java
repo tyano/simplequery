@@ -23,7 +23,7 @@ import com.shelfmap.simplequery.InstanceFactory;
 import com.shelfmap.simplequery.domain.AttributeAccessor;
 import com.shelfmap.simplequery.domain.Domain;
 import com.shelfmap.simplequery.domain.DomainAttribute;
-import com.shelfmap.simplequery.domain.DomainSnapshot;
+import com.shelfmap.simplequery.domain.DomainDescriptor;
 import com.shelfmap.simplequery.expression.CanNotConvertItemException;
 import com.shelfmap.simplequery.expression.CanNotRestoreAttributeException;
 import com.shelfmap.simplequery.expression.ItemConverter;
@@ -44,7 +44,7 @@ public class DefaultItemConverter<T> implements ItemConverter<T> {
     private final Domain<T> domain;
     private final Context context;
     private final InstanceFactory<T> instanceFactory;
-    private DomainSnapshot snapshot;
+    private DomainDescriptor descriptor;
 
     public DefaultItemConverter(Context context, Domain<T> domain) {
         isNotNull("domain", domain);
@@ -56,8 +56,8 @@ public class DefaultItemConverter<T> implements ItemConverter<T> {
 
     @Override
     public T convert(Item item) throws CanNotConvertItemException {
-        if(snapshot == null) {
-            snapshot = getContext().createDomainSnapshot(getDomain());
+        if(descriptor == null) {
+            descriptor = getContext().createDomainDescriptor(getDomain());
         }
 
         T instance = instanceFactory.createInstance(getDomain().getDomainClass());
@@ -66,7 +66,7 @@ public class DefaultItemConverter<T> implements ItemConverter<T> {
             try {
                 String attributeName = attr.getName();
                 String attributeValue = attr.getValue();
-                domainAttribute = snapshot.getAttribute(attributeName);
+                domainAttribute = descriptor.getAttribute(attributeName);
                 writeValueToDomain(domainAttribute, instance, attributeValue);
             } catch (CanNotRestoreAttributeException ex) {
                 throw new CanNotConvertItemException("could not write a attribute: " + domainAttribute.getAttributeName() + " for the item: " + item.getName(), ex, item);
@@ -74,7 +74,7 @@ public class DefaultItemConverter<T> implements ItemConverter<T> {
         }
 
         //Fill all collection properties with empty collection
-        for (DomainAttribute<?,?> domainAttribute : snapshot) {
+        for (DomainAttribute<?,?> domainAttribute : descriptor) {
             if(domainAttribute.getContainerType().isArray() || Collection.class.isAssignableFrom(domainAttribute.getContainerType())) {
                 Object value = domainAttribute.getAttributeAccessor().read(instance);
                 if(value == null) {
@@ -87,7 +87,7 @@ public class DefaultItemConverter<T> implements ItemConverter<T> {
             }
         }
 
-        DomainAttribute<String,String> itemNameAttribute = snapshot.getItemNameAttribute();
+        DomainAttribute<String,String> itemNameAttribute = descriptor.getItemNameAttribute();
         String itemNameValue = item.getName();
         if(itemNameAttribute != null) {
            itemNameAttribute.getAttributeAccessor().write(instance, itemNameValue);

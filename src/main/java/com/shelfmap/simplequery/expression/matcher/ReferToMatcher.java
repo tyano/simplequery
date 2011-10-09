@@ -44,12 +44,13 @@ public class ReferToMatcher extends BaseMatcher<String> {
     @Override
     public String describe() {
         StringBuilder sb = new StringBuilder();
+        sb.append(expression());
         if(getValues().size() > 1) {
-            sb.append(expression()).append(" (");
+            sb.append(" (");
             sb.append(SimpleDBUtils.quoteValues(getValues()));
             sb.append(")");            
         } else {
-            sb.append(expression()).append(" ");
+            sb.append(" ");
             sb.append(SimpleDBUtils.quoteValue(values()[0]));
         }
         return sb.toString();

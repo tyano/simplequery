@@ -34,10 +34,10 @@ import com.shelfmap.simplequery.domain.impl.DefaultToOneDomainReference;
 import com.shelfmap.simplequery.expression.MultipleResultsExistException;
 import com.shelfmap.simplequery.expression.SimpleQueryException;
 import static com.shelfmap.simplequery.expression.matcher.MatcherFactory.is;
+import static com.shelfmap.simplequery.util.Dates.date;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.Calendar;
 import java.util.Date;
 import org.hamcrest.Matchers;
 import static org.hamcrest.Matchers.notNullValue;
@@ -56,7 +56,7 @@ public class ToOneRelationTest extends BaseStoryRunner {
     private static final String CHILD_DOMAIN = "ToOneRelationTest-child";
 
     private Context context;
-    private Date targetDate = new Date(2011, Calendar.AUGUST, 2);
+    private Date targetDate = date(2011, 10, 2);
 
     @Given("a test-specific context")
     public void createContext() throws IOException {
@@ -143,9 +143,11 @@ public class ToOneRelationTest extends BaseStoryRunner {
             switch(index) {
                 case 1: 
                     assertThat(detail.getItemName(), Matchers.is("child1"));
+                    assertThat(detail.getAmount(), Matchers.is(100));
                     break;
                 case 2: 
                     assertThat(detail.getItemName(), Matchers.is("child2"));
+                    assertThat(detail.getAmount(), Matchers.is(200));
                     break;
             }
         }

@@ -22,21 +22,22 @@ import com.shelfmap.simplequery.expression.Expression;
 import com.shelfmap.simplequery.expression.MultipleResultsExistException;
 import com.shelfmap.simplequery.expression.QueryResults;
 import com.shelfmap.simplequery.expression.SimpleQueryException;
-import static com.shelfmap.simplequery.expression.matcher.MatcherFactory.is;
+import com.shelfmap.simplequery.expression.matcher.MatcherFactory;
+import static com.shelfmap.simplequery.expression.matcher.MatcherFactory.referTo;
 
 /**
  *
  * @author Tsutomu YANO
  */
-public abstract class AbstractReverseDomainReference<T> implements DomainReference<T>, ReverseReference {
+public abstract class AbstractReverseDomainReference<M,T> implements DomainReference<T>, ReverseReference {
     private final Context context;
-    private final String masterItemName;
+    private final M masterObject;
     private final Domain<T> targetDomain;
     private final ConditionAttribute targetAttribute;
 
-    public AbstractReverseDomainReference(Context context, String masterItemName, Domain<T> targetDomain, ConditionAttribute targetAttribute) {
+    public AbstractReverseDomainReference(Context context, M masterObject, Domain<T> targetDomain, ConditionAttribute targetAttribute) {
         this.context = context;
-        this.masterItemName = masterItemName;
+        this.masterObject = masterObject;
         this.targetDomain = targetDomain;
         this.targetAttribute = targetAttribute;
     }
@@ -58,7 +59,7 @@ public abstract class AbstractReverseDomainReference<T> implements DomainReferen
     }
 
     private Expression<T> createExpression() {
-        return getContext().createNewClient().select().from(getTargetDomain().getDomainClass()).where(getTargetAttribute(), is(getMasterItemName()));
+        return getContext().createNewClient().select().from(getTargetDomain().getDomainClass()).where(getTargetAttribute(), referTo(getMasterItemName()));
     }
 
     public ConditionAttribute getTargetAttribute() {
@@ -71,7 +72,10 @@ public abstract class AbstractReverseDomainReference<T> implements DomainReferen
     }
 
     public String getMasterItemName() {
-        return masterItemName;
+        Class<?> clazz = masterObject.getClass();
+        Domain<?> domain = context.getDomainFactory().findDomain(clazz);
+        DomainDescriptor descriptor = context.createDomainDescriptor(domain);
+        return descriptor.getItemNameAttribute().getAttributeAccessor().read(masterObject);
     }
 
     protected <T> DomainAttribute<String,String> getTargetDomainAttribute(Domain<T> targetDomain, ConditionAttribute attribute) {

@@ -30,10 +30,10 @@ import java.util.List;
  *
  * @author Tsutomu YANO
  */
-public class DefaultReverseToOneDomainReference<T> extends AbstractReverseDomainReference<T> implements ReverseToOneDomainReference<T> {
+public class DefaultReverseToOneDomainReference<M,T> extends AbstractReverseDomainReference<M,T> implements ReverseToOneDomainReference<T> {
 
-    public DefaultReverseToOneDomainReference(Context context, String masterItemName, Domain<T> targetDomain, ConditionAttribute targetAttribute) {
-        super(context, masterItemName, targetDomain, targetAttribute);
+    public DefaultReverseToOneDomainReference(Context context, M masterObject, Domain<T> targetDomain, ConditionAttribute targetAttribute) {
+        super(context, masterObject, targetDomain, targetAttribute);
     }
 
     @Override

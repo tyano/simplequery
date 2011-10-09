@@ -25,9 +25,9 @@ import com.shelfmap.simplequery.domain.ReverseToManyDomainReference;
  *
  * @author Tsutomu YANO
  */
-public class DefaultReverseToManyDomainReference<T> extends AbstractReverseDomainReference<T> implements ReverseToManyDomainReference<T> {
-    public DefaultReverseToManyDomainReference(Context context, String masterItemName, Domain<T> targetDomain, ConditionAttribute targetAttribute) {
-        super(context, masterItemName, targetDomain, targetAttribute);
+public class DefaultReverseToManyDomainReference<M,T> extends AbstractReverseDomainReference<M,T> implements ReverseToManyDomainReference<T> {
+    public DefaultReverseToManyDomainReference(Context context, M masterObject, Domain<T> targetDomain, ConditionAttribute targetAttribute) {
+        super(context, masterObject, targetDomain, targetAttribute);
     }
 
     @Override

@@ -31,5 +31,4 @@ public interface DomainDescriptor extends Iterable<DomainAttribute<?,?>> {
     Class<?> getContainerType(String attributeName);
     DomainAttribute<?,?> getAttribute(String attributeName);
     Domain<?> getDomain();
-    <VT,CT> void writeAttribute(Object instance, String attributeName, Class<VT> valueType, Class<CT> containerType, CT value) throws CanNotWriteAttributeException;
 }

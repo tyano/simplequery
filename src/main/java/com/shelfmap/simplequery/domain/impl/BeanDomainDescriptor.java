@@ -275,6 +275,7 @@ public class BeanDomainDescriptor implements DomainDescriptor {
         return attributeStore.getAttribute(attributeName);
     }
 
+    @Override
     public Domain<?> getDomain() {
         return domain;
     }
@@ -282,12 +283,6 @@ public class BeanDomainDescriptor implements DomainDescriptor {
     @Override
     public Iterator<DomainAttribute<?,?>> iterator() {
         return attributeStore.values().iterator();
-    }
-
-    @Override
-    public <VT,CT> void writeAttribute(Object instance, String attributeName, Class<VT> valueType, Class<CT> containerType, CT value) throws CanNotWriteAttributeException {
-        DomainAttribute<VT,CT> attribute = attributeStore.getAttribute(attributeName, valueType, containerType);
-        attribute.getAttributeAccessor().write(instance, value);
     }
 
     @Override

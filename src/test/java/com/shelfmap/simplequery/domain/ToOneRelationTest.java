@@ -95,7 +95,14 @@ public class ToOneRelationTest extends BaseStoryRunner {
                 CHILD_DOMAIN,
                 "child1",
                 Arrays.asList(attr("name", "本", true),
-                              attr("amount", SimpleDBUtils.encodeZeroPadding(100, 4), true),
+                              attr("amount", SimpleDBUtils.encodeZeroPadding(100, 5), true),
+                              attr("parentItemName", "parent", true))));
+
+        simpleDb.putAttributes(new PutAttributesRequest(
+                CHILD_DOMAIN,
+                "child2",
+                Arrays.asList(attr("name", "本2", true),
+                              attr("amount", SimpleDBUtils.encodeZeroPadding(200, 5), true),
                               attr("parentItemName", "parent", true))));
 
         simpleDb.putAttributes(new PutAttributesRequest(
@@ -122,6 +129,29 @@ public class ToOneRelationTest extends BaseStoryRunner {
         assertThat(parent.getItemName(), Matchers.is("parent"));
         assertThat(parent.getRequestDate(), Matchers.is(targetDate));
     }
+    
+    @Then("we can get all children from parent's reverse-reference.")
+    public void assertReverseReference() throws Exception {
+        Client client = context.createNewClient();
+        PurchaseRecord parent = client.select().from(PurchaseRecord.class).whereItemName(is("parent")).getSingleResult(true);
+        assertThat(parent, Matchers.is(notNullValue()));
+        Iterable<Detail> children = parent.getDetailReference().getResults(true);
+        assertThat(children, Matchers.is(notNullValue()));
+        int index = 0;
+        for (Detail detail : children) {
+            index++;
+            switch(index) {
+                case 1: 
+                    assertThat(detail.getItemName(), Matchers.is("child1"));
+                    break;
+                case 2: 
+                    assertThat(detail.getItemName(), Matchers.is("child2"));
+                    break;
+            }
+        }
+        assertThat(index, Matchers.is(2));
+    }
+    
 
 
     @SimpleDbDomain(PARENT_DOMAIN)
@@ -173,7 +203,7 @@ public class ToOneRelationTest extends BaseStoryRunner {
             DomainFactory factory = context.getDomainFactory();
             Domain<Detail> detailDomain = factory.createDomain(Detail.class);
             ConditionAttribute targetAttribute = attr("parentItemName");
-            this.detailReference = new DefaultReverseToManyDomainReference<Detail>(context, itemName, detailDomain, targetAttribute);
+            this.detailReference = new DefaultReverseToManyDomainReference<PurchaseRecord,Detail>(context, this, detailDomain, targetAttribute);
         }
 
         @Override

@@ -36,7 +36,7 @@ public class SimpleNamedDomain<T> implements Domain<T> {
     }
     
     public static SimpleNamedDomain<?> find(final Class<?> domainClass) {
-        Collection<Class<?>> linearized = Objects.linearlize(domainClass);
+        Collection<Class<?>> linearized = Objects.linearize(domainClass);
         for (Class<?> clazz : linearized) {
             if(clazz.isAnnotationPresent(SimpleDbDomain.class)) {
                 return newDomain(clazz);

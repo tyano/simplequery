@@ -15,6 +15,11 @@
  */
 package com.shelfmap.simplequery.util;
 
+import java.beans.IntrospectionException;
+import java.beans.Introspector;
+import java.beans.PropertyDescriptor;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import static java.util.Arrays.asList;
 import java.util.Collection;
@@ -28,21 +33,53 @@ public final class Objects {
 
     private Objects() {
     }
-    
-    public static Collection<Class<?>> linearlize(Class<?> parentClass) {
+
+    public static Collection<Class<?>> linearize(Class<?> parentClass) {
         List<Class<?>> resultList = new ArrayList<Class<?>>();
         appendAllInterfaces(parentClass, resultList);
-        
+
         Class<?> superClass = parentClass.getSuperclass();
-        while(superClass != null && superClass != Object.class) {
+        while (superClass != null && superClass != Object.class) {
             appendAllInterfaces(superClass, resultList);
             superClass = superClass.getSuperclass();
         }
         return resultList;
     }
-    
+
     private static void appendAllInterfaces(Class<?> clazz, List<Class<?>> list) {
         list.add(clazz);
         list.addAll(asList(clazz.getInterfaces()));
+    }
+
+    public static <A extends Object & Annotation> A findAnnotation(Class<?> targetClass, Class<A> findingAnnotation) {
+        for (Class<?> clazz : linearize(targetClass)) {
+            if (clazz.isAnnotationPresent(findingAnnotation)) {
+                return clazz.getAnnotation(findingAnnotation);
+            }
+        }
+        return null;
+    }
+
+    public static <A extends Object & Annotation> A findAnnotationOnProperty(Class<?> targetClass, String propertyName, Class<A> findingAnnotation) throws IntrospectionException {
+        CLASS_LOOP:
+        for (Class<?> clazz : linearize(targetClass)) {
+            PropertyDescriptor[] descriptors = Introspector.getBeanInfo(clazz).getPropertyDescriptors();
+            for (PropertyDescriptor descriptor : descriptors) {
+                if (descriptor.getName().equals(propertyName)) {
+                    Method readMethod = descriptor.getReadMethod();
+                    A annotation = readMethod.getAnnotation(findingAnnotation);
+                    if (annotation != null) {
+                        return annotation;
+                    } else {
+                        continue CLASS_LOOP;
+                    }
+                }
+            }
+        }
+        return null;
+    }
+    
+    public static <A extends Object & Annotation> boolean isAnnotationPresentOnProperty(Class<?> targetClass, String propertyName, Class<A> findingAnnotation) throws IntrospectionException {
+        return findAnnotationOnProperty(targetClass, propertyName, findingAnnotation) != null;
     }
 }

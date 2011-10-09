@@ -22,6 +22,7 @@ import static com.shelfmap.simplequery.util.Assertion.*;
 import com.shelfmap.simplequery.domain.AttributeAccessor;
 import com.shelfmap.simplequery.domain.Domain;
 import com.shelfmap.simplequery.domain.DomainFactory;
+import com.shelfmap.simplequery.util.Objects;
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
@@ -90,7 +91,7 @@ public class PropertyAttributeAccessor<T> implements AttributeAccessor<T> {
     private Object generateNewPropertyValueForNullProperty(PropertyDescriptor descriptor, Object current) throws InvocationTargetException, IllegalArgumentException, IllegalAccessException {
         Object target;
         Class<?> propertyType = descriptor.getPropertyType();
-        SimpleDbDomain annotation = propertyType.getAnnotation(SimpleDbDomain.class);
+        SimpleDbDomain annotation = Objects.findAnnotation(propertyType, SimpleDbDomain.class);
 
         Object newInstance = annotation != null
                 ? newDomainInstance(propertyType)

@@ -15,9 +15,11 @@
  */
 package com.shelfmap.simplequery.domain.impl;
 
-import com.shelfmap.simplequery.domain.Domain;
 import com.shelfmap.simplequery.annotation.SimpleDbDomain;
+import com.shelfmap.simplequery.domain.Domain;
 import static com.shelfmap.simplequery.util.Assertion.isNotNull;
+import com.shelfmap.simplequery.util.Objects;
+import java.util.Collection;
 
 /**
  *
@@ -31,6 +33,20 @@ public class SimpleNamedDomain<T> implements Domain<T> {
 
     public static <X> SimpleNamedDomain<X> of(final Class<X> domainClass) {
         return new SimpleNamedDomain<X>(domainClass);
+    }
+    
+    public static SimpleNamedDomain<?> find(final Class<?> domainClass) {
+        Collection<Class<?>> linearized = Objects.linearlize(domainClass);
+        for (Class<?> clazz : linearized) {
+            if(clazz.isAnnotationPresent(SimpleDbDomain.class)) {
+                return newDomain(clazz);
+            }
+        }
+        throw new IllegalArgumentException("domainClass must have a @SimpleDbDomain annotation.");
+    }
+    
+    private static <C> SimpleNamedDomain<C> newDomain(Class<C> clazz) {
+        return new SimpleNamedDomain<C>(clazz);
     }
 
     public SimpleNamedDomain(final Class<T> domainClass) {

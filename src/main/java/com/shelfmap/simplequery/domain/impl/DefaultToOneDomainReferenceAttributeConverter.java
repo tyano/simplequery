@@ -43,7 +43,7 @@ public class DefaultToOneDomainReferenceAttributeConverter implements AttributeC
     @Override
     public DefaultToOneDomainReference<?> restoreValue(String targetValue) throws CanNotRestoreAttributeException {
         DomainFactory factory = context.getDomainFactory();
-        Domain<?> targetDomain = factory.createDomain(targetClass);
+        Domain<?> targetDomain = factory.findDomain(targetClass);
         DefaultToOneDomainReference<?> reference = createDefaultToOneDomainReference(context, targetDomain);
         reference.setTargetItemName(targetValue);
         return reference;

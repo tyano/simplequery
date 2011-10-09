@@ -21,4 +21,5 @@ package com.shelfmap.simplequery.domain;
  */
 public interface DomainFactory {
     <T> Domain<T> createDomain(Class<T> domainClass);
+    Domain<?> findDomain(Class<?> domainClass);
 }

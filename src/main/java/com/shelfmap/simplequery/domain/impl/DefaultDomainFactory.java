@@ -27,4 +27,9 @@ public class DefaultDomainFactory implements DomainFactory {
     public <T> Domain<T> createDomain(Class<T> domainClass) {
         return SimpleNamedDomain.of(domainClass);
     }
+
+    @Override
+    public Domain<?> findDomain(Class<?> domainClass) {
+        return SimpleNamedDomain.find(domainClass);
+    }
 }

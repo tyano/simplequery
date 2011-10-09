@@ -22,7 +22,7 @@ import java.util.Collection;
  *
  * @author Tsutomu YANO
  */
-public class Assertion {
+public final class Assertion {
     private Assertion() {
         super();
     }

@@ -24,7 +24,7 @@ import java.util.Date;
  *
  * @author Tsutomu YANO
  */
-public class Dates {
+public final class Dates {
 
     private Dates() {
         super();

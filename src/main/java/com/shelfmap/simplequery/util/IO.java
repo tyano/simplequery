@@ -26,7 +26,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author Tsutomu YANO
  */
-public class IO {
+public final class IO {
 
     public static void close(Closeable target, Object owner) {
         assert owner != null;

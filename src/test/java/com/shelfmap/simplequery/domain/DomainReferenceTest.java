@@ -30,6 +30,7 @@ import com.shelfmap.simplequery.annotation.SimpleDbDomain;
 import static com.shelfmap.simplequery.attribute.Attributes.attr;
 import com.shelfmap.simplequery.attribute.ConditionAttribute;
 import com.shelfmap.simplequery.domain.impl.DefaultReverseToManyDomainReference;
+import com.shelfmap.simplequery.domain.impl.DefaultReverseToOneDomainReference;
 import com.shelfmap.simplequery.domain.impl.DefaultToOneDomainReference;
 import com.shelfmap.simplequery.expression.MultipleResultsExistException;
 import com.shelfmap.simplequery.expression.SimpleQueryException;
@@ -49,8 +50,8 @@ import static org.junit.Assert.assertThat;
  *
  * @author Tsutomu YANO
  */
-@StoryPath("stories/ToOneRelation.story")
-public class ToOneRelationTest extends BaseStoryRunner {
+@StoryPath("stories/ReferenceToOtherDomain.story")
+public class DomainReferenceTest extends BaseStoryRunner {
 
     private static final String PARENT_DOMAIN = "ToOneRelationTest-parent";
     private static final String CHILD_DOMAIN = "ToOneRelationTest-child";
@@ -67,21 +68,24 @@ public class ToOneRelationTest extends BaseStoryRunner {
             @SuppressWarnings("unchecked")
             public <T> InstanceFactory<T> getInstanceFactory(Domain<T> domain) {
                 Class<T> domainClass = domain.getDomainClass();
-                
+
                 if(Detail.class.isAssignableFrom(domainClass)) {
                     return (InstanceFactory<T>) new DetailInstanceFactory(this);
                 }
-                
+
                 if(PurchaseRecord.class.isAssignableFrom(domainClass)) {
                     return (InstanceFactory<T>) new ParentInstanceFactory(this);
                 }
+                if(PurchaseRecord2.class.isAssignableFrom(domainClass)) {
+                    return (InstanceFactory<T>) new ToOneParentInstanceFactory(this);
+                }
                 return super.getInstanceFactory(domain);
             }
-            
+
         };
     }
-    
-    @Given("domains where one-side have a relationship to another one.")
+
+    @Given("domains which refer each other")
     public void setupDomains() {
         AmazonSimpleDB simpleDb = context.createNewClient().getSimpleDB();
 
@@ -114,14 +118,14 @@ public class ToOneRelationTest extends BaseStoryRunner {
     }
 
     private Detail detailObject;
-    
+
     @Given("an instance of a domain-object which have a relationship.")
     public void createDomainObject() throws SimpleQueryException, MultipleResultsExistException {
         Client client = context.createNewClient();
         detailObject = client.select().from(Detail.class).whereItemName(is("child1")).getSingleResult(true);
     }
 
-    @Then("we can get another domain-object from the relationship.")
+    @Then("we can get a domain-object of parent from the reference of a child object.")
     public void assertRelationship() throws SimpleQueryException, MultipleResultsExistException {
         assertThat(detailObject, Matchers.is(notNullValue()));
         PurchaseRecord parent = detailObject.getParentRecordReference().get(true);
@@ -129,7 +133,7 @@ public class ToOneRelationTest extends BaseStoryRunner {
         assertThat(parent.getItemName(), Matchers.is("parent"));
         assertThat(parent.getRequestDate(), Matchers.is(targetDate));
     }
-    
+
     @Then("we can get all children from parent's reverse-reference.")
     public void assertReverseReference() throws Exception {
         Client client = context.createNewClient();
@@ -141,11 +145,11 @@ public class ToOneRelationTest extends BaseStoryRunner {
         for (Detail detail : children) {
             index++;
             switch(index) {
-                case 1: 
+                case 1:
                     assertThat(detail.getItemName(), Matchers.is("child1"));
                     assertThat(detail.getAmount(), Matchers.is(100));
                     break;
-                case 2: 
+                case 2:
                     assertThat(detail.getItemName(), Matchers.is("child2"));
                     assertThat(detail.getAmount(), Matchers.is(200));
                     break;
@@ -153,8 +157,26 @@ public class ToOneRelationTest extends BaseStoryRunner {
         }
         assertThat(index, Matchers.is(2));
     }
-    
 
+
+    PurchaseRecord2 master;
+
+    @Given("an instance of master-object which have multiple children but handle them with ReverseToOneDomainReference")
+    public void createInstanceWithReverseToOneReference() throws SimpleQueryException, MultipleResultsExistException {
+        Client client = context.createNewClient();
+        master = client.select().from(PurchaseRecord2.class).whereItemName(is("parent")).getSingleResult(true);
+    }
+
+    @Then("the master object can get only 1 child from the reference.")
+    public void assertReverseToOne() throws SimpleQueryException {
+        assertThat(master, Matchers.is(notNullValue()));
+        Iterable<Detail> details = master.getDetailReference().getResults(true);
+        int index = 0;
+        for (Detail detail : details) {
+            index++;
+        }
+        assertThat(index, Matchers.is(1));
+    }
 
     @SimpleDbDomain(PARENT_DOMAIN)
     public interface PurchaseRecord {
@@ -166,6 +188,18 @@ public class ToOneRelationTest extends BaseStoryRunner {
         void setRequestDate(Date requestDate);
 
         ReverseToManyDomainReference<Detail> getDetailReference();
+    }
+
+    @SimpleDbDomain(PARENT_DOMAIN)
+    public interface PurchaseRecord2 {
+        @ItemName
+        String getItemName();
+        void setItemName(String itemName);
+
+        Date getRequestDate();
+        void setRequestDate(Date requestDate);
+
+        ReverseToOneDomainReference<Detail> getDetailReference();
     }
 
     @SimpleDbDomain(CHILD_DOMAIN)
@@ -184,21 +218,20 @@ public class ToOneRelationTest extends BaseStoryRunner {
         @ForwardDomainReference(attributeName = "parentItemName", targetDomainClass=PurchaseRecord.class)
         ToOneDomainReference<PurchaseRecord> getParentRecordReference();
         void setParentRecordReference(ToOneDomainReference<PurchaseRecord> reference);
-        
+
     }
 
-
-    public static class DefaultPurchaseRecord implements PurchaseRecord {
+    public static class ToManyPurchaseRecord implements PurchaseRecord {
 
         private String itemName;
         private Date requestDate;
         private final ReverseToManyDomainReference<Detail> detailReference;
 
-        public DefaultPurchaseRecord(Context context) {
+        public ToManyPurchaseRecord(Context context) {
             this(context, null, null);
         }
-        
-        public DefaultPurchaseRecord(Context context, String itemName, Date requestDate) {
+
+        public ToManyPurchaseRecord(Context context, String itemName, Date requestDate) {
             super();
             this.itemName = itemName;
             this.requestDate = requestDate == null ? null : new Date(requestDate.getTime());
@@ -234,6 +267,52 @@ public class ToOneRelationTest extends BaseStoryRunner {
         }
     }
 
+    public static class ToOnePurchaseRecord implements PurchaseRecord2 {
+
+        private String itemName;
+        private Date requestDate;
+        private final ReverseToOneDomainReference<Detail> detailReference;
+
+        public ToOnePurchaseRecord(Context context) {
+            this(context, null, null);
+        }
+
+        public ToOnePurchaseRecord(Context context, String itemName, Date requestDate) {
+            super();
+            this.itemName = itemName;
+            this.requestDate = requestDate == null ? null : new Date(requestDate.getTime());
+            DomainFactory factory = context.getDomainFactory();
+            Domain<Detail> detailDomain = factory.createDomain(Detail.class);
+            ConditionAttribute targetAttribute = attr("parentItemName");
+            this.detailReference = new DefaultReverseToOneDomainReference<PurchaseRecord2,Detail>(context, this, detailDomain, targetAttribute);
+        }
+
+        @Override
+        public String getItemName() {
+            return this.itemName;
+        }
+
+        @Override
+        public void setItemName(String itemName) {
+            this.itemName = itemName;
+        }
+
+        @Override
+        public Date getRequestDate() {
+            return new Date(this.requestDate.getTime());
+        }
+
+        @Override
+        public void setRequestDate(Date requestDate) {
+            this.requestDate = new Date(requestDate.getTime());
+        }
+
+        @Override
+        public ReverseToOneDomainReference<Detail> getDetailReference() {
+            return this.detailReference;
+        }
+    }
+
     public static class DefaultDetail implements Detail {
         private String itemName;
         private String name;
@@ -243,7 +322,7 @@ public class ToOneRelationTest extends BaseStoryRunner {
         public DefaultDetail(Context context) {
             this(context, null, null, 0);
         }
-        
+
         public DefaultDetail(Context context, String itemName, String name, int amount) {
             super();
             this.itemName = itemName;
@@ -293,20 +372,20 @@ public class ToOneRelationTest extends BaseStoryRunner {
             this.parentReference = reference;
         }
     }
-    
+
     public static class DetailInstanceFactory implements InstanceFactory<Detail> {
         private Context context;
 
         public DetailInstanceFactory(Context context) {
             this.context = context;
         }
-        
+
         @Override
         public Detail createInstance(Class<Detail> clazz) {
             return new DefaultDetail(context);
         }
     }
-    
+
     public static class ParentInstanceFactory implements InstanceFactory<PurchaseRecord> {
         private Context context;
 
@@ -316,7 +395,20 @@ public class ToOneRelationTest extends BaseStoryRunner {
 
         @Override
         public PurchaseRecord createInstance(Class<PurchaseRecord> clazz) {
-            return new DefaultPurchaseRecord(context);
+            return new ToManyPurchaseRecord(context);
+        }
+    }
+
+    public static class ToOneParentInstanceFactory implements InstanceFactory<PurchaseRecord2> {
+        private Context context;
+
+        public ToOneParentInstanceFactory(Context context) {
+            this.context = context;
+        }
+
+        @Override
+        public PurchaseRecord2 createInstance(Class<PurchaseRecord2> clazz) {
+            return new ToOnePurchaseRecord(context);
         }
     }
 }

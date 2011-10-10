@@ -17,6 +17,7 @@ package com.shelfmap.simplequery.attribute;
 
 import com.shelfmap.simplequery.attribute.impl.DefaultAttribute;
 import com.shelfmap.simplequery.attribute.impl.EveryAttribute;
+import com.shelfmap.simplequery.attribute.impl.ItemNameAttribute;
 
 /**
  * Utility class for creating instance of QueryAttribute.
@@ -44,5 +45,9 @@ public class Attributes {
      */
     public static EveryAttribute every(String name) {
         return new EveryAttribute(name);
+    }
+
+    public static ItemNameAttribute itemName() {
+        return ItemNameAttribute.INSTANCE;
     }
 }

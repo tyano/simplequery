@@ -13,16 +13,32 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package com.shelfmap.simplequery.factory;
+package com.shelfmap.simplequery.factory.impl;
 
 import com.shelfmap.simplequery.Client;
 import com.shelfmap.simplequery.Context;
+import com.shelfmap.simplequery.SimpleQueryClient;
+import com.shelfmap.simplequery.factory.ClientConfigurationException;
+import com.shelfmap.simplequery.factory.ClientFactory;
 
 /**
  *
  * @author Tsutomu YANO
  */
-public interface ClientFactory {
-    Context getContext();
-    Client create() throws ClientConfigurationException;
+public class DefaultClientFactory implements ClientFactory {
+    private Context context;
+
+    public DefaultClientFactory(Context context) {
+        this.context = context;
+    }
+
+    @Override
+    public Client create() throws ClientConfigurationException {
+        return new SimpleQueryClient(getContext());
+    }
+
+    @Override
+    public Context getContext() {
+        return this.context;
+    }
 }

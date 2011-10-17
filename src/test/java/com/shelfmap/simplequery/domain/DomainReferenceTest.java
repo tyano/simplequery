@@ -15,6 +15,12 @@
  */
 package com.shelfmap.simplequery.domain;
 
+import com.shelfmap.simplequery.domain.testdomain.PurchaseRecord;
+import com.shelfmap.simplequery.domain.testdomain.Detail;
+import com.shelfmap.simplequery.domain.testdomain.ToManyPurchaseRecord;
+import com.shelfmap.simplequery.domain.testdomain.PurchaseRecord2;
+import com.shelfmap.simplequery.domain.testdomain.ToOnePurchaseRecord;
+import com.shelfmap.simplequery.domain.testdomain.DefaultDetail;
 import com.amazonaws.auth.PropertiesCredentials;
 import com.amazonaws.services.simpledb.AmazonSimpleDB;
 import com.amazonaws.services.simpledb.model.CreateDomainRequest;
@@ -23,15 +29,6 @@ import com.amazonaws.services.simpledb.model.PutAttributesRequest;
 import com.amazonaws.services.simpledb.util.SimpleDBUtils;
 import static com.shelfmap.simplequery.SimpleDbUtil.attr;
 import com.shelfmap.simplequery.*;
-import com.shelfmap.simplequery.annotation.ForwardDomainReference;
-import com.shelfmap.simplequery.annotation.IntAttribute;
-import com.shelfmap.simplequery.annotation.ItemName;
-import com.shelfmap.simplequery.annotation.SimpleDbDomain;
-import static com.shelfmap.simplequery.attribute.Attributes.attr;
-import com.shelfmap.simplequery.attribute.ConditionAttribute;
-import com.shelfmap.simplequery.domain.impl.DefaultReverseToManyDomainReference;
-import com.shelfmap.simplequery.domain.impl.DefaultReverseToOneDomainReference;
-import com.shelfmap.simplequery.domain.impl.DefaultToOneDomainReference;
 import com.shelfmap.simplequery.expression.MultipleResultsExistException;
 import com.shelfmap.simplequery.expression.SimpleQueryException;
 import static com.shelfmap.simplequery.expression.matcher.MatcherFactory.is;
@@ -53,8 +50,8 @@ import static org.junit.Assert.assertThat;
 @StoryPath("stories/ReferenceToOtherDomain.story")
 public class DomainReferenceTest extends BaseStoryRunner {
 
-    private static final String PARENT_DOMAIN = "ToOneRelationTest-parent";
-    private static final String CHILD_DOMAIN = "ToOneRelationTest-child";
+    public static final String PARENT_DOMAIN = "ToOneRelationTest-parent";
+    public static final String CHILD_DOMAIN = "ToOneRelationTest-child";
 
     private Context context;
     private Date targetDate = date(2011, 10, 2);
@@ -178,202 +175,7 @@ public class DomainReferenceTest extends BaseStoryRunner {
         assertThat(index, Matchers.is(1));
     }
 
-    @SimpleDbDomain(PARENT_DOMAIN)
-    public interface PurchaseRecord {
-        @ItemName
-        String getItemName();
-        void setItemName(String itemName);
-
-        Date getRequestDate();
-        void setRequestDate(Date requestDate);
-
-        ReverseToManyDomainReference<Detail> getDetailReference();
-    }
-
-    @SimpleDbDomain(PARENT_DOMAIN)
-    public interface PurchaseRecord2 {
-        @ItemName
-        String getItemName();
-        void setItemName(String itemName);
-
-        Date getRequestDate();
-        void setRequestDate(Date requestDate);
-
-        ReverseToOneDomainReference<Detail> getDetailReference();
-    }
-
-    @SimpleDbDomain(CHILD_DOMAIN)
-    public interface Detail {
-        @ItemName
-        String getItemName();
-        void setItemName(String itemName);
-
-        String getName();
-        void setName(String name);
-
-        @IntAttribute(padding=5)
-        int getAmount();
-        void setAmount(int amount);
-
-        @ForwardDomainReference(attributeName = "parentItemName", targetDomainClass=PurchaseRecord.class)
-        ToOneDomainReference<PurchaseRecord> getParentRecordReference();
-        void setParentRecordReference(ToOneDomainReference<PurchaseRecord> reference);
-
-    }
-
-    public static class ToManyPurchaseRecord implements PurchaseRecord {
-
-        private String itemName;
-        private Date requestDate;
-        private final ReverseToManyDomainReference<Detail> detailReference;
-
-        public ToManyPurchaseRecord(Context context) {
-            this(context, null, null);
-        }
-
-        public ToManyPurchaseRecord(Context context, String itemName, Date requestDate) {
-            super();
-            this.itemName = itemName;
-            this.requestDate = requestDate == null ? null : new Date(requestDate.getTime());
-            DomainFactory factory = context.getDomainFactory();
-            Domain<Detail> detailDomain = factory.createDomain(Detail.class);
-            ConditionAttribute targetAttribute = attr("parentItemName");
-            this.detailReference = new DefaultReverseToManyDomainReference<PurchaseRecord,Detail>(context, this, detailDomain, targetAttribute);
-        }
-
-        @Override
-        public String getItemName() {
-            return this.itemName;
-        }
-
-        @Override
-        public void setItemName(String itemName) {
-            this.itemName = itemName;
-        }
-
-        @Override
-        public Date getRequestDate() {
-            return new Date(this.requestDate.getTime());
-        }
-
-        @Override
-        public void setRequestDate(Date requestDate) {
-            this.requestDate = new Date(requestDate.getTime());
-        }
-
-        @Override
-        public ReverseToManyDomainReference<Detail> getDetailReference() {
-            return this.detailReference;
-        }
-    }
-
-    public static class ToOnePurchaseRecord implements PurchaseRecord2 {
-
-        private String itemName;
-        private Date requestDate;
-        private final ReverseToOneDomainReference<Detail> detailReference;
-
-        public ToOnePurchaseRecord(Context context) {
-            this(context, null, null);
-        }
-
-        public ToOnePurchaseRecord(Context context, String itemName, Date requestDate) {
-            super();
-            this.itemName = itemName;
-            this.requestDate = requestDate == null ? null : new Date(requestDate.getTime());
-            DomainFactory factory = context.getDomainFactory();
-            Domain<Detail> detailDomain = factory.createDomain(Detail.class);
-            ConditionAttribute targetAttribute = attr("parentItemName");
-            this.detailReference = new DefaultReverseToOneDomainReference<PurchaseRecord2,Detail>(context, this, detailDomain, targetAttribute);
-        }
-
-        @Override
-        public String getItemName() {
-            return this.itemName;
-        }
-
-        @Override
-        public void setItemName(String itemName) {
-            this.itemName = itemName;
-        }
-
-        @Override
-        public Date getRequestDate() {
-            return new Date(this.requestDate.getTime());
-        }
-
-        @Override
-        public void setRequestDate(Date requestDate) {
-            this.requestDate = new Date(requestDate.getTime());
-        }
-
-        @Override
-        public ReverseToOneDomainReference<Detail> getDetailReference() {
-            return this.detailReference;
-        }
-    }
-
-    public static class DefaultDetail implements Detail {
-        private String itemName;
-        private String name;
-        private int amount;
-        private ToOneDomainReference<PurchaseRecord> parentReference;
-
-        public DefaultDetail(Context context) {
-            this(context, null, null, 0);
-        }
-
-        public DefaultDetail(Context context, String itemName, String name, int amount) {
-            super();
-            this.itemName = itemName;
-            this.name = name;
-            this.amount = amount;
-            Domain<PurchaseRecord> domain = context.getDomainFactory().createDomain(PurchaseRecord.class);
-            this.parentReference = new DefaultToOneDomainReference<PurchaseRecord>(context, domain);
-        }
-
-        @Override
-        public String getItemName() {
-            return this.itemName;
-        }
-
-        @Override
-        public void setItemName(String itemName) {
-            this.itemName = itemName;
-        }
-
-        @Override
-        public String getName() {
-            return this.name;
-        }
-
-        @Override
-        public void setName(String name) {
-            this.name = name;
-        }
-
-        @Override
-        public int getAmount() {
-            return this.amount;
-        }
-
-        @Override
-        public void setAmount(int amount) {
-            this.amount = amount;
-        }
-
-        @Override
-        public ToOneDomainReference<PurchaseRecord> getParentRecordReference() {
-            return this.parentReference;
-        }
-
-        @Override
-        public void setParentRecordReference(ToOneDomainReference<PurchaseRecord> reference) {
-            this.parentReference = reference;
-        }
-    }
-
-    public static class DetailInstanceFactory implements InstanceFactory<Detail> {
+    private static class DetailInstanceFactory implements InstanceFactory<Detail> {
         private Context context;
 
         public DetailInstanceFactory(Context context) {
@@ -386,7 +188,7 @@ public class DomainReferenceTest extends BaseStoryRunner {
         }
     }
 
-    public static class ParentInstanceFactory implements InstanceFactory<PurchaseRecord> {
+    private static class ParentInstanceFactory implements InstanceFactory<PurchaseRecord> {
         private Context context;
 
         public ParentInstanceFactory(Context context) {
@@ -399,7 +201,7 @@ public class DomainReferenceTest extends BaseStoryRunner {
         }
     }
 
-    public static class ToOneParentInstanceFactory implements InstanceFactory<PurchaseRecord2> {
+    private static class ToOneParentInstanceFactory implements InstanceFactory<PurchaseRecord2> {
         private Context context;
 
         public ToOneParentInstanceFactory(Context context) {

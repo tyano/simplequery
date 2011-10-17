@@ -42,7 +42,7 @@ public abstract class BaseExpression<T> implements Expression<T> {
         isNotNull("domain", domain);
         this.context = context;
         this.domain = domain;
-        
+
         this.simpleDB = context.createNewClient().getSimpleDB();
     }
 
@@ -57,7 +57,7 @@ public abstract class BaseExpression<T> implements Expression<T> {
 
         Item first = items.get(0);
         try {
-            return getContext().getItemConverter(getDomain()).convert(first);
+            return getContext().getItemConverterFactory().create(getDomain()).convert(first);
         } catch (CanNotConvertItemException ex) {
             throw new SimpleQueryException("Can not convert an item", ex);
         }
@@ -67,7 +67,7 @@ public abstract class BaseExpression<T> implements Expression<T> {
     public QueryResults<T> getResults(boolean consistent) throws SimpleQueryException {
         SelectRequest selectReq = new SelectRequest(describe(), consistent);
         SelectResult result = simpleDB.select(selectReq);
-        return new DefaultQueryResult<T>(getContext(), this, result, getContext().getItemConverter(getDomain()));
+        return new DefaultQueryResult<T>(getContext(), this, result, getContext().getItemConverterFactory().create(getDomain()));
     }
 
     @Override

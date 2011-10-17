@@ -20,7 +20,7 @@ import com.shelfmap.simplequery.domain.AttributeConverterFactory;
 import com.shelfmap.simplequery.domain.Domain;
 import com.shelfmap.simplequery.domain.DomainDescriptor;
 import com.shelfmap.simplequery.domain.DomainFactory;
-import com.shelfmap.simplequery.expression.ItemConverter;
+import com.shelfmap.simplequery.factory.ItemConverterFactory;
 import java.io.Serializable;
 
 /**
@@ -29,7 +29,7 @@ import java.io.Serializable;
  */
 public interface Context extends Serializable {
     Client createNewClient();
-    <T> ItemConverter<T> getItemConverter(Domain<T> domain);
+    ItemConverterFactory getItemConverterFactory();
     <T> DomainInstanceFactory<T> getDomainInstanceFactory(Domain<T> domain);
     DomainFactory getDomainFactory();
     DomainDescriptor createDomainDescriptor(Domain<?> domain);

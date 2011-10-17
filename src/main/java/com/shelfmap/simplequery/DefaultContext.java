@@ -19,8 +19,8 @@ import com.amazonaws.auth.AWSCredentials;
 import com.shelfmap.simplequery.domain.*;
 import com.shelfmap.simplequery.domain.impl.BeanDomainDescriptor;
 import com.shelfmap.simplequery.domain.impl.DefaultDomainFactory;
-import com.shelfmap.simplequery.expression.ItemConverter;
-import com.shelfmap.simplequery.expression.impl.DefaultItemConverter;
+import com.shelfmap.simplequery.factory.ItemConverterFactory;
+import com.shelfmap.simplequery.factory.impl.DefaultItemConverterFactory;
 
 /**
  *
@@ -41,8 +41,8 @@ public class DefaultContext implements Context {
     }
 
     @Override
-    public <T> ItemConverter<T> getItemConverter(Domain<T> domain) {
-        return new DefaultItemConverter<T>(this, domain);
+    public ItemConverterFactory getItemConverterFactory() {
+        return new DefaultItemConverterFactory(this);
     }
 
     @Override

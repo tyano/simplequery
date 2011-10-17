@@ -63,20 +63,20 @@ public class DomainReferenceTest extends BaseStoryRunner {
 
             @Override
             @SuppressWarnings("unchecked")
-            public <T> InstanceFactory<T> getInstanceFactory(Domain<T> domain) {
+            public <T> DomainInstanceFactory<T> getDomainInstanceFactory(Domain<T> domain) {
                 Class<T> domainClass = domain.getDomainClass();
 
                 if(Detail.class.isAssignableFrom(domainClass)) {
-                    return (InstanceFactory<T>) new DetailInstanceFactory(this);
+                    return (DomainInstanceFactory<T>) new DetailInstanceFactory(this);
                 }
 
                 if(PurchaseRecord.class.isAssignableFrom(domainClass)) {
-                    return (InstanceFactory<T>) new ParentInstanceFactory(this);
+                    return (DomainInstanceFactory<T>) new ParentInstanceFactory(this);
                 }
                 if(PurchaseRecord2.class.isAssignableFrom(domainClass)) {
-                    return (InstanceFactory<T>) new ToOneParentInstanceFactory(this);
+                    return (DomainInstanceFactory<T>) new ToOneParentInstanceFactory(this);
                 }
-                return super.getInstanceFactory(domain);
+                return super.getDomainInstanceFactory(domain);
             }
 
         };
@@ -175,7 +175,7 @@ public class DomainReferenceTest extends BaseStoryRunner {
         assertThat(index, Matchers.is(1));
     }
 
-    private static class DetailInstanceFactory implements InstanceFactory<Detail> {
+    private static class DetailInstanceFactory implements DomainInstanceFactory<Detail> {
         private Context context;
 
         public DetailInstanceFactory(Context context) {
@@ -183,12 +183,12 @@ public class DomainReferenceTest extends BaseStoryRunner {
         }
 
         @Override
-        public Detail createInstance(Class<Detail> clazz) {
+        public Detail create(Domain<Detail> domain) {
             return new DefaultDetail(context);
         }
     }
 
-    private static class ParentInstanceFactory implements InstanceFactory<PurchaseRecord> {
+    private static class ParentInstanceFactory implements DomainInstanceFactory<PurchaseRecord> {
         private Context context;
 
         public ParentInstanceFactory(Context context) {
@@ -196,12 +196,12 @@ public class DomainReferenceTest extends BaseStoryRunner {
         }
 
         @Override
-        public PurchaseRecord createInstance(Class<PurchaseRecord> clazz) {
+        public PurchaseRecord create(Domain<PurchaseRecord> domain) {
             return new ToManyPurchaseRecord(context);
         }
     }
 
-    private static class ToOneParentInstanceFactory implements InstanceFactory<PurchaseRecord2> {
+    private static class ToOneParentInstanceFactory implements DomainInstanceFactory<PurchaseRecord2> {
         private Context context;
 
         public ToOneParentInstanceFactory(Context context) {
@@ -209,7 +209,7 @@ public class DomainReferenceTest extends BaseStoryRunner {
         }
 
         @Override
-        public PurchaseRecord2 createInstance(Class<PurchaseRecord2> clazz) {
+        public PurchaseRecord2 create(Domain<PurchaseRecord2> domain) {
             return new ToOnePurchaseRecord(context);
         }
     }

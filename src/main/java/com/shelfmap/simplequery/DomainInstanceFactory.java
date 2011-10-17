@@ -16,10 +16,12 @@
 
 package com.shelfmap.simplequery;
 
+import com.shelfmap.simplequery.domain.Domain;
+
 /**
  *
  * @author Tsutomu YANO
  */
-public interface InstanceFactory<T> {
-    T createInstance(Class<T> clazz);
+public interface DomainInstanceFactory<T> {
+    T create(Domain<T> clazz);
 }

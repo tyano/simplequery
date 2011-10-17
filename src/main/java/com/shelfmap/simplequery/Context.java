@@ -29,8 +29,8 @@ import java.io.Serializable;
  */
 public interface Context extends Serializable {
     Client createNewClient();
-     <T> ItemConverter<T> getItemConverter(Domain<T> domain);
-     <T> InstanceFactory<T> getInstanceFactory(Domain<T> domain);
+    <T> ItemConverter<T> getItemConverter(Domain<T> domain);
+    <T> DomainInstanceFactory<T> getDomainInstanceFactory(Domain<T> domain);
     DomainFactory getDomainFactory();
     DomainDescriptor createDomainDescriptor(Domain<?> domain);
     AttributeConverterFactory getAttributeConverterFactory();

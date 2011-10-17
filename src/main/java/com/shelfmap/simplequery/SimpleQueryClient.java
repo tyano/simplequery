@@ -16,6 +16,7 @@
 
 package com.shelfmap.simplequery;
 
+import com.shelfmap.simplequery.factory.ClientConfigurationException;
 import com.amazonaws.ClientConfiguration;
 import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.services.s3.AmazonS3;

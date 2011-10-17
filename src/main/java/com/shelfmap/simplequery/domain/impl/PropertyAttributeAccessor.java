@@ -17,7 +17,7 @@ package com.shelfmap.simplequery.domain.impl;
 
 import com.shelfmap.simplequery.Context;
 import com.shelfmap.simplequery.annotation.SimpleDbDomain;
-import com.shelfmap.simplequery.InstanceFactory;
+import com.shelfmap.simplequery.DomainInstanceFactory;
 import static com.shelfmap.simplequery.util.Assertion.*;
 import com.shelfmap.simplequery.domain.AttributeAccessor;
 import com.shelfmap.simplequery.domain.Domain;
@@ -105,8 +105,8 @@ public class PropertyAttributeAccessor<T> implements AttributeAccessor<T> {
     private <T> T newDomainInstance(Class<T> propertyType) {
         DomainFactory factory = getContext().getDomainFactory();
         Domain<T> domain = factory.createDomain(propertyType);
-        InstanceFactory<T> instanceFactory = getContext().getInstanceFactory(domain);
-        return instanceFactory.createInstance(domain.getDomainClass());
+        DomainInstanceFactory<T> instanceFactory = getContext().getDomainInstanceFactory(domain);
+        return instanceFactory.create(domain);
     }
 
     private <T> T newObjectInstance(Class<T> clazz) {

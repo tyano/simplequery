@@ -19,7 +19,7 @@ package com.shelfmap.simplequery.expression.impl;
 import com.amazonaws.services.simpledb.model.Attribute;
 import com.amazonaws.services.simpledb.model.Item;
 import com.shelfmap.simplequery.Context;
-import com.shelfmap.simplequery.InstanceFactory;
+import com.shelfmap.simplequery.DomainInstanceFactory;
 import com.shelfmap.simplequery.domain.AttributeAccessor;
 import com.shelfmap.simplequery.domain.Domain;
 import com.shelfmap.simplequery.domain.DomainAttribute;
@@ -43,7 +43,7 @@ public class DefaultItemConverter<T> implements ItemConverter<T> {
 
     private final Domain<T> domain;
     private final Context context;
-    private final InstanceFactory<T> instanceFactory;
+    private final DomainInstanceFactory<T> instanceFactory;
     private DomainDescriptor descriptor;
 
     public DefaultItemConverter(Context context, Domain<T> domain) {
@@ -51,7 +51,7 @@ public class DefaultItemConverter<T> implements ItemConverter<T> {
         isNotNull("context", context);
         this.domain = domain;
         this.context = context;
-        this.instanceFactory = context.getInstanceFactory(domain);
+        this.instanceFactory = context.getDomainInstanceFactory(domain);
     }
 
     @Override
@@ -60,7 +60,7 @@ public class DefaultItemConverter<T> implements ItemConverter<T> {
             descriptor = getContext().createDomainDescriptor(getDomain());
         }
 
-        T instance = instanceFactory.createInstance(getDomain().getDomainClass());
+        T instance = instanceFactory.create(getDomain());
         for (Attribute attr : item.getAttributes()) {
             DomainAttribute<?,?> domainAttribute = null;
             try {

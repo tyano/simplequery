@@ -15,21 +15,23 @@
  */
 package com.shelfmap.simplequery;
 
+import com.shelfmap.simplequery.domain.Domain;
+
 /**
  *
  * @author Tsutomu YANO
  */
-public class DefaultInstanceFactory<T> implements InstanceFactory<T> {
+public class DefaultInstanceFactory<T> implements DomainInstanceFactory<T> {
 
     @Override
-    public T createInstance(Class<T> clazz) {
+    public T create(Domain<T> domain) {
         try {
-            return clazz.newInstance();
+            return domain.getDomainClass().newInstance();
         } catch (InstantiationException ex) {
-            throw new IllegalStateException("Could not instanciate the class: " + clazz, ex);
+            throw new IllegalStateException("Could not instanciate the class: " + domain, ex);
         } catch (IllegalAccessException ex) {
-            throw new IllegalStateException("Could not access to the default constructor of: " + clazz, ex);
+            throw new IllegalStateException("Could not access to the default constructor of: " + domain, ex);
         }
     }
-    
+
 }

@@ -16,7 +16,10 @@
 package com.shelfmap.simplequery;
 
 import com.amazonaws.auth.AWSCredentials;
-import com.shelfmap.simplequery.domain.*;
+import com.shelfmap.simplequery.domain.AttributeConverterFactory;
+import com.shelfmap.simplequery.domain.DefaultAttributeConverterFactory;
+import com.shelfmap.simplequery.domain.Domain;
+import com.shelfmap.simplequery.domain.DomainFactory;
 import com.shelfmap.simplequery.domain.impl.DefaultDomainFactory;
 import com.shelfmap.simplequery.factory.DomainDescriptorFactory;
 import com.shelfmap.simplequery.factory.ItemConverterFactory;
@@ -38,7 +41,7 @@ public class DefaultContext implements Context {
 
     @Override
     public Client createNewClient() {
-        return new SimpleQueryClient(this, credentials);
+        return new SimpleQueryClient(this);
     }
 
     @Override

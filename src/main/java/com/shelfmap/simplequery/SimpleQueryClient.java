@@ -16,7 +16,6 @@
 
 package com.shelfmap.simplequery;
 
-import com.shelfmap.simplequery.factory.ClientConfigurationException;
 import com.amazonaws.ClientConfiguration;
 import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.services.s3.AmazonS3;
@@ -26,6 +25,7 @@ import com.amazonaws.services.simpledb.AmazonSimpleDBClient;
 import com.shelfmap.simplequery.attribute.SelectAttribute;
 import com.shelfmap.simplequery.expression.SelectQuery;
 import com.shelfmap.simplequery.expression.impl.Select;
+import com.shelfmap.simplequery.factory.ClientConfigurationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,9 +40,9 @@ public class SimpleQueryClient implements Client {
     private final AmazonS3 s3;
 
     @SuppressWarnings("OverridableMethodCallInConstructor")
-    public SimpleQueryClient(Context context, AWSCredentials securityCredencial) throws ClientConfigurationException {
-        this.simpleDB = createSimpleDb(securityCredencial);
-        this.s3 = createS3(securityCredencial);
+    public SimpleQueryClient(Context context) throws ClientConfigurationException {
+        this.simpleDB = createSimpleDb(context.getCredentials());
+        this.s3 = createS3(context.getCredentials());
         this.context = context;
     }
 

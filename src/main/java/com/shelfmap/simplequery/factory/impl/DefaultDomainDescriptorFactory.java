@@ -13,17 +13,32 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package com.shelfmap.simplequery.factory;
+package com.shelfmap.simplequery.factory.impl;
 
 import com.shelfmap.simplequery.Context;
 import com.shelfmap.simplequery.domain.Domain;
 import com.shelfmap.simplequery.domain.DomainDescriptor;
+import com.shelfmap.simplequery.domain.impl.BeanDomainDescriptor;
+import com.shelfmap.simplequery.factory.DomainDescriptorFactory;
 
 /**
  *
  * @author Tsutomu YANO
  */
-public interface DomainDescriptorFactory {
-    DomainDescriptor create(Domain<?> domain);
-    Context getContext();
+public class DefaultDomainDescriptorFactory implements DomainDescriptorFactory {
+    private Context context;
+
+    public DefaultDomainDescriptorFactory(Context context) {
+        this.context = context;
+    }
+
+    @Override
+    public DomainDescriptor create(Domain<?> domain) {
+        return new BeanDomainDescriptor(getContext(), domain);
+    }
+
+    @Override
+    public Context getContext() {
+        return this.context;
+    }
 }

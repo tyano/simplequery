@@ -17,9 +17,10 @@ package com.shelfmap.simplequery;
 
 import com.amazonaws.auth.AWSCredentials;
 import com.shelfmap.simplequery.domain.*;
-import com.shelfmap.simplequery.domain.impl.BeanDomainDescriptor;
 import com.shelfmap.simplequery.domain.impl.DefaultDomainFactory;
+import com.shelfmap.simplequery.factory.DomainDescriptorFactory;
 import com.shelfmap.simplequery.factory.ItemConverterFactory;
+import com.shelfmap.simplequery.factory.impl.DefaultDomainDescriptorFactory;
 import com.shelfmap.simplequery.factory.impl.DefaultItemConverterFactory;
 
 /**
@@ -51,8 +52,8 @@ public class DefaultContext implements Context {
     }
 
     @Override
-    public DomainDescriptor createDomainDescriptor(Domain<?> domain) {
-        return new BeanDomainDescriptor(this, domain);
+    public DomainDescriptorFactory getDomainDescriptorFactory() {
+        return new DefaultDomainDescriptorFactory(this);
     }
 
     @Override

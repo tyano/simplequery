@@ -16,10 +16,7 @@
 package com.shelfmap.simplequery.domain.impl;
 
 import com.shelfmap.simplequery.Context;
-import com.shelfmap.simplequery.attribute.Attributes;
-import static com.shelfmap.simplequery.attribute.Attributes.itemName;
 import com.shelfmap.simplequery.attribute.ConditionAttribute;
-import com.shelfmap.simplequery.attribute.impl.ItemNameAttribute;
 import com.shelfmap.simplequery.domain.*;
 import com.shelfmap.simplequery.expression.Expression;
 import com.shelfmap.simplequery.expression.MultipleResultsExistException;
@@ -77,12 +74,12 @@ public abstract class AbstractReverseDomainReference<M,T> implements DomainRefer
     public String getMasterItemName() {
         Class<?> clazz = masterObject.getClass();
         Domain<?> domain = context.getDomainFactory().findDomain(clazz);
-        DomainDescriptor descriptor = context.createDomainDescriptor(domain);
+        DomainDescriptor descriptor = context.getDomainDescriptorFactory().create(domain);
         return descriptor.getItemNameAttribute().getAttributeAccessor().read(masterObject);
     }
 
     protected <T> DomainAttribute<String,String> getTargetDomainAttribute(Domain<T> targetDomain, ConditionAttribute attribute) {
-        DomainDescriptor descriptor = getContext().createDomainDescriptor(targetDomain);
+        DomainDescriptor descriptor = getContext().getDomainDescriptorFactory().create(targetDomain);
         return descriptor.getAttribute(attribute.getAttributeName(), String.class, String.class);
     }
 }

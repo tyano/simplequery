@@ -82,7 +82,7 @@ public class DefaultToOneDomainReference<T> implements ToOneDomainReference<T>, 
     }
 
     private DomainAttribute<String,String> findItemNameAttribute() {
-        DomainDescriptor descriptor = getContext().createDomainDescriptor(getTargetDomain());
+        DomainDescriptor descriptor = getContext().getDomainDescriptorFactory().create(getTargetDomain());
         return descriptor.getItemNameAttribute();
     }
 }

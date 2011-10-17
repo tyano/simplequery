@@ -61,7 +61,7 @@ public class DefaultWhereExpression<T> extends BaseExpression<T> implements Wher
     @SuppressWarnings("unchecked")
     public String describe() {
         StringBuilder sb = new StringBuilder();
-        DomainDescriptor descriptor = getContext().createDomainDescriptor(getDomain());
+        DomainDescriptor descriptor = getContext().getDomainDescriptorFactory().create(getDomain());
 
         Condition<?> current = condition;
         while (current.getParent() != null) {

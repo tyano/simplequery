@@ -57,7 +57,7 @@ public class DefaultItemConverter<T> implements ItemConverter<T> {
     @Override
     public T convert(Item item) throws CanNotConvertItemException {
         if(descriptor == null) {
-            descriptor = getContext().createDomainDescriptor(getDomain());
+            descriptor = getContext().getDomainDescriptorFactory().create(getDomain());
         }
 
         T instance = instanceFactory.create(getDomain());

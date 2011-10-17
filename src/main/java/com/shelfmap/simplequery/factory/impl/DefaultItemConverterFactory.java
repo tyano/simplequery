@@ -13,17 +13,32 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package com.shelfmap.simplequery.factory;
+package com.shelfmap.simplequery.factory.impl;
 
 import com.shelfmap.simplequery.Context;
 import com.shelfmap.simplequery.domain.Domain;
 import com.shelfmap.simplequery.expression.ItemConverter;
+import com.shelfmap.simplequery.expression.impl.DefaultItemConverter;
+import com.shelfmap.simplequery.factory.ItemConverterFactory;
 
 /**
  *
  * @author Tsutomu YANO
  */
-public interface ItemConverterFactory {
-    <T> ItemConverter<T> create(Domain<T> domain);
-    Context getContext();
+public class DefaultItemConverterFactory implements ItemConverterFactory {
+    private Context context;
+
+    public DefaultItemConverterFactory(Context context) {
+        this.context = context;
+    }
+
+    @Override
+    public <T> ItemConverter<T> create(Domain<T> domain) {
+        return new DefaultItemConverter<T>(getContext(), domain);
+    }
+
+    @Override
+    public Context getContext() {
+        return this.context;
+    }
 }

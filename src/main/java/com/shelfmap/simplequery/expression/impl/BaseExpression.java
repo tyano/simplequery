@@ -67,7 +67,7 @@ public abstract class BaseExpression<T> implements Expression<T> {
     public QueryResults<T> getResults(boolean consistent) throws SimpleQueryException {
         SelectRequest selectReq = new SelectRequest(describe(), consistent);
         SelectResult result = simpleDB.select(selectReq);
-        return new DefaultQueryResult<T>(getContext(), this, result, getContext().getItemConverterFactory().create(getDomain()));
+        return new DefaultQueryResult<T>(getContext(), getDomain(), this, result);
     }
 
     @Override

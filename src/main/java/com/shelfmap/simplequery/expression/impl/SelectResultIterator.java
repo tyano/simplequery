@@ -20,6 +20,7 @@ import com.amazonaws.services.simpledb.model.Item;
 import com.amazonaws.services.simpledb.model.SelectRequest;
 import com.amazonaws.services.simpledb.model.SelectResult;
 import com.shelfmap.simplequery.Context;
+import com.shelfmap.simplequery.domain.Domain;
 import com.shelfmap.simplequery.expression.CanNotConvertItemException;
 import com.shelfmap.simplequery.expression.Expression;
 import com.shelfmap.simplequery.expression.ItemConverter;
@@ -32,22 +33,22 @@ import java.util.List;
  */
 public class SelectResultIterator<T> implements Iterator<T> {
     private Context context;
-    private Expression<?> expression;
+    private Expression<T> expression;
     private SelectResult currentResult;
-    private ItemConverter<T> itemConverter;
     private List<Item> currentItemList;
     private int currentListSize;
     private int currentIndex;
-    
+    private ItemConverter<T> itemConverter;
 
-    public SelectResultIterator(Context context, Expression<?> expression, SelectResult result, ItemConverter<T> itemConveter) {
+
+    public SelectResultIterator(Context context, Domain<T> domain, Expression<T> expression, SelectResult result) {
         this.context = context;
         this.expression = expression;
         this.currentResult = result;
         this.currentItemList = result.getItems();
         this.currentIndex = 0;
         this.currentListSize = this.currentItemList.size();
-        this.itemConverter = itemConveter;
+        this.itemConverter = context.getItemConverterFactory().create(domain);
     }
 
     @Override
@@ -58,7 +59,7 @@ public class SelectResultIterator<T> implements Iterator<T> {
     @Override
     public T next() {
         Item item = null;
-        
+
         if(currentIndex >= currentListSize && currentResult.getNextToken() != null) {
             retrieveNextItems();
         }
@@ -66,14 +67,14 @@ public class SelectResultIterator<T> implements Iterator<T> {
             item = currentItemList.get(currentIndex);
             currentIndex++;
         }
-        
+
         T instance = null;
         try {
             instance = itemConverter.convert(item);
         } catch (CanNotConvertItemException ex) {
             throw new IllegalStateException("Could not convert an item to a domain object.", ex);
         }
-        
+
         return instance;
     }
 
@@ -81,7 +82,7 @@ public class SelectResultIterator<T> implements Iterator<T> {
     public void remove() {
         throw new UnsupportedOperationException("Not supported");
     }
-    
+
     protected void retrieveNextItems() {
         final String nextToken = currentResult.getNextToken();
         if(nextToken != null) {

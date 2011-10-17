@@ -18,8 +18,8 @@ package com.shelfmap.simplequery.expression.impl;
 
 import com.amazonaws.services.simpledb.model.SelectResult;
 import com.shelfmap.simplequery.Context;
+import com.shelfmap.simplequery.domain.Domain;
 import com.shelfmap.simplequery.expression.Expression;
-import com.shelfmap.simplequery.expression.ItemConverter;
 import com.shelfmap.simplequery.expression.QueryResults;
 import com.shelfmap.simplequery.expression.SimpleQueryException;
 import java.util.Iterator;
@@ -32,18 +32,18 @@ public class DefaultQueryResult<T> implements QueryResults<T> {
     private final Context context;
     private final Expression<T> expression;
     private final SelectResult result;
-    private final ItemConverter<T> itemConveter;
+    private final Domain<T> domain;
 
-    public DefaultQueryResult(Context context, Expression<T> expression, SelectResult result, ItemConverter<T> itemConveter) {
+    public DefaultQueryResult(Context context, Domain<T> domain, Expression<T> expression, SelectResult result) {
         this.context = context;
+        this.domain = domain;
         this.expression = expression;
         this.result = result;
-        this.itemConveter = itemConveter;
     }
 
     @Override
     public Iterator<T> iterator() {
-        return new SelectResultIterator<T>(getContext(), expression, result, itemConveter);
+        return new SelectResultIterator<T>(getContext(), domain, expression, result);
     }
 
     @Override

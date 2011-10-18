@@ -135,7 +135,8 @@ public class DefaultBlobReference<T> implements BlobReference<T> {
 
         try {
             PutObjectRequest request = new PutObjectRequest(bucket, key, uploadSource, metadata);
-            TransferManager transfer = new TransferManager(getContext().getCredentials());
+            AmazonS3 s3 = getContext().getClientFactory().create().getS3();
+            TransferManager transfer = new TransferManager(s3);
             this.lastUpload = transfer.upload(request);
             return this.lastUpload;
         } catch (AmazonServiceException ex) {

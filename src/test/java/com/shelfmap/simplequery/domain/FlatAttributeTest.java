@@ -93,7 +93,7 @@ public class FlatAttributeTest extends BaseStoryRunner {
 
     @When("select an item whose name is 'test-1'")
     public void selectingTest1() throws Exception {
-        Expression<User> exp = ctx.getContext().createNewClient().select().from(User.class).where(Attributes.attr("name"), is("test-1"));
+        Expression<User> exp = ctx.getContext().getClientFactory().create().select().from(User.class).where(Attributes.attr("name"), is("test-1"));
         user = exp.getSingleResult(true);
     }
 
@@ -108,7 +108,7 @@ public class FlatAttributeTest extends BaseStoryRunner {
 
     @When("selecting an item whose address1 of the address property is 'test2-Address1'")
     public void selectingTest2() throws Exception {
-        Expression<User> exp = ctx.getContext().createNewClient().select().from(User.class).where(Attributes.attr("address1"), is("test2-Address1"));
+        Expression<User> exp = ctx.getContext().getClientFactory().create().select().from(User.class).where(Attributes.attr("address1"), is("test2-Address1"));
         user = exp.getSingleResult(true);
     }
 
@@ -120,7 +120,7 @@ public class FlatAttributeTest extends BaseStoryRunner {
 
     @When("selecting an item which have a FlatAttribute")
     public void selectingTest3() throws Exception {
-        Expression<User> exp = ctx.getContext().createNewClient().select().from(User.class).where(Attributes.attr("name"), is("test-3"));
+        Expression<User> exp = ctx.getContext().getClientFactory().create().select().from(User.class).where(Attributes.attr("name"), is("test-3"));
         user = exp.getSingleResult(true);
     }
 
@@ -134,7 +134,7 @@ public class FlatAttributeTest extends BaseStoryRunner {
 
     @When("selecting an item with Address class as the domain class")
     public void selectingTest4() throws Exception {
-        Expression<Address> exp = ctx.getContext().createNewClient().select().from(Address.class).where(Attributes.attr("address1"), is("test4-Address1"));
+        Expression<Address> exp = ctx.getContext().getClientFactory().create().select().from(Address.class).where(Attributes.attr("address1"), is("test4-Address1"));
         address = exp.getSingleResult(true);
     }
 

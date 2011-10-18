@@ -84,7 +84,7 @@ public class DomainReferenceTest extends BaseStoryRunner {
 
     @Given("domains which refer each other")
     public void setupDomains() {
-        AmazonSimpleDB simpleDb = context.createNewClient().getSimpleDB();
+        AmazonSimpleDB simpleDb = context.getClientFactory().create().getSimpleDB();
 
         simpleDb.deleteDomain(new DeleteDomainRequest(PARENT_DOMAIN));
         simpleDb.deleteDomain(new DeleteDomainRequest(CHILD_DOMAIN));
@@ -118,7 +118,7 @@ public class DomainReferenceTest extends BaseStoryRunner {
 
     @Given("an instance of a domain-object which have a relationship.")
     public void createDomainObject() throws SimpleQueryException, MultipleResultsExistException {
-        Client client = context.createNewClient();
+        Client client = context.getClientFactory().create();
         detailObject = client.select().from(Detail.class).whereItemName(is("child1")).getSingleResult(true);
     }
 
@@ -133,7 +133,7 @@ public class DomainReferenceTest extends BaseStoryRunner {
 
     @Then("we can get all children from parent's reverse-reference.")
     public void assertReverseReference() throws Exception {
-        Client client = context.createNewClient();
+        Client client = context.getClientFactory().create();
         PurchaseRecord parent = client.select().from(PurchaseRecord.class).whereItemName(is("parent")).getSingleResult(true);
         assertThat(parent, Matchers.is(notNullValue()));
         Iterable<Detail> children = parent.getDetailReference().getResults(true);
@@ -160,7 +160,7 @@ public class DomainReferenceTest extends BaseStoryRunner {
 
     @Given("an instance of master-object which have multiple children but handle them with ReverseToOneDomainReference")
     public void createInstanceWithReverseToOneReference() throws SimpleQueryException, MultipleResultsExistException {
-        Client client = context.createNewClient();
+        Client client = context.getClientFactory().create();
         master = client.select().from(PurchaseRecord2.class).whereItemName(is("parent")).getSingleResult(true);
     }
 

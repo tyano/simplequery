@@ -59,7 +59,7 @@ public abstract class AbstractReverseDomainReference<M,T> implements DomainRefer
     }
 
     private Expression<T> createExpression() {
-        return getContext().createNewClient().select().from(getTargetDomain().getDomainClass()).where(getTargetAttribute(), referTo(getMasterItemName())).orderBy(getTargetAttribute(), SortOrder.Asc);
+        return getContext().getClientFactory().create().select().from(getTargetDomain().getDomainClass()).where(getTargetAttribute(), referTo(getMasterItemName())).orderBy(getTargetAttribute(), SortOrder.Asc);
     }
 
     public ConditionAttribute getTargetAttribute() {

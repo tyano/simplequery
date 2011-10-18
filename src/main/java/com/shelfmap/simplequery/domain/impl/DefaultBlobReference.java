@@ -86,7 +86,7 @@ public class DefaultBlobReference<T> implements BlobReference<T> {
     private S3Object getS3ObjectRemote() {
         String bucket = resourceInfo.getBucketName();
         String key = resourceInfo.getKey();
-        AmazonS3 s3 = getContext().createNewClient().getS3();
+        AmazonS3 s3 = getContext().getClientFactory().create().getS3();
 
         GetObjectRequest request = new GetObjectRequest(bucket, key);
         return s3.getObject(request);

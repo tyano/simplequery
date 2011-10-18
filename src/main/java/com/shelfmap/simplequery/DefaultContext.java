@@ -21,8 +21,10 @@ import com.shelfmap.simplequery.domain.DefaultAttributeConverterFactory;
 import com.shelfmap.simplequery.domain.Domain;
 import com.shelfmap.simplequery.domain.DomainFactory;
 import com.shelfmap.simplequery.domain.impl.DefaultDomainFactory;
+import com.shelfmap.simplequery.factory.ClientFactory;
 import com.shelfmap.simplequery.factory.DomainDescriptorFactory;
 import com.shelfmap.simplequery.factory.ItemConverterFactory;
+import com.shelfmap.simplequery.factory.impl.DefaultClientFactory;
 import com.shelfmap.simplequery.factory.impl.DefaultDomainDescriptorFactory;
 import com.shelfmap.simplequery.factory.impl.DefaultItemConverterFactory;
 
@@ -40,8 +42,8 @@ public class DefaultContext implements Context {
     }
 
     @Override
-    public Client createNewClient() {
-        return new SimpleQueryClient(this);
+    public ClientFactory getClientFactory() {
+        return new DefaultClientFactory(this);
     }
 
     @Override

@@ -83,7 +83,7 @@ public class ItemQueryTest extends BaseStoryRunner {
 
     @When("querying with the item name from a test domain")
     public void selectByItemName() throws SimpleQueryException, MultipleResultsExistException {
-        result = ctx.getContext().createNewClient().select().from(ItemTestDomain.class).whereItemName(is("firstItem")).getSingleResult(true);
+        result = ctx.getContext().getClientFactory().create().select().from(ItemTestDomain.class).whereItemName(is("firstItem")).getSingleResult(true);
     }
 
     @Then("we can get the only one record from the test domain")
@@ -95,7 +95,7 @@ public class ItemQueryTest extends BaseStoryRunner {
 
     @When("there is no record matching the specified item's name")
     public void selectNonExistingItem() throws SimpleQueryException, MultipleResultsExistException {
-        result = ctx.getContext().createNewClient().select().from(ItemTestDomain.class).whereItemName(is("secondItem")).getSingleResult(true);
+        result = ctx.getContext().getClientFactory().create().select().from(ItemTestDomain.class).whereItemName(is("secondItem")).getSingleResult(true);
     }
 
     @Then("the return value must be a null")

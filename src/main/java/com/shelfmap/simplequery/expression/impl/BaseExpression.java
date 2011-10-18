@@ -43,7 +43,7 @@ public abstract class BaseExpression<T> implements Expression<T> {
         this.context = context;
         this.domain = domain;
 
-        this.simpleDB = context.createNewClient().getSimpleDB();
+        this.simpleDB = context.getClientFactory().create().getSimpleDB();
     }
 
     @Override

@@ -76,7 +76,7 @@ public class BlobReferenceStreamTest extends BaseStoryRunner {
 
     @Given("a S3 resource")
     public void createTestS3Resource() throws IOException {
-        AmazonS3 s3 = ctx.getContext().createNewClient().getS3();
+        AmazonS3 s3 = ctx.getContext().getClientFactory().create().getS3();
 
         boolean found = false;
         ObjectListing listing = s3.listObjects(BUCKET_NAME);
@@ -137,7 +137,7 @@ public class BlobReferenceStreamTest extends BaseStoryRunner {
         Upload upload = blob.getLastUpload();
         upload.waitForCompletion();
 
-        Client client = ctx.getContext().createNewClient();
+        Client client = ctx.getContext().getClientFactory().create();
         AmazonS3 s3 = client.getS3();
 
         GetObjectRequest request = new GetObjectRequest(BUCKET_NAME, PUT_KEY_NAME);

@@ -83,7 +83,7 @@ public class BlobReferenceTest extends BaseStoryRunner {
 
     @Given("a S3 resource")
     public void createTestS3Resource() throws IOException {
-        AmazonS3 s3 = ctx.getContext().createNewClient().getS3();
+        AmazonS3 s3 = ctx.getContext().getClientFactory().create().getS3();
 
         boolean found = false;
         ObjectListing listing = s3.listObjects(BUCKET_NAME);
@@ -211,7 +211,7 @@ public class BlobReferenceTest extends BaseStoryRunner {
     }
 
     private void deleteTestKey() {
-        AmazonS3 s3 = ctx.getContext().createNewClient().getS3();
+        AmazonS3 s3 = ctx.getContext().getClientFactory().create().getS3();
         s3.setEndpoint("s3-ap-northeast-1.amazonaws.com");
 
         if (s3.doesBucketExist(BUCKET_NAME)) {
@@ -229,7 +229,7 @@ public class BlobReferenceTest extends BaseStoryRunner {
 
     @Given("a S3 bucket")
     public void initS3Bucket() {
-        AmazonS3 s3 = ctx.getContext().createNewClient().getS3();
+        AmazonS3 s3 = ctx.getContext().getClientFactory().create().getS3();
         s3.setEndpoint("s3-ap-northeast-1.amazonaws.com");
 
         if (!s3.doesBucketExist(BUCKET_NAME)) {

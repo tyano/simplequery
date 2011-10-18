@@ -100,7 +100,7 @@ public class ListPropertyTest extends BaseStoryRunner {
 
     @When("selecting an item from the domain which have a multi-value column")
     public void selectItemsWithMultiValues() throws SimpleQueryException, MultipleResultsExistException {
-        result = ctx.getContext().createNewClient().select().from(ListPropertyDomain.class).whereItemName(is("first")).getSingleResult(true);
+        result = ctx.getContext().getClientFactory().create().select().from(ListPropertyDomain.class).whereItemName(is("first")).getSingleResult(true);
     }
 
     @Then("we can get the values through a property whose type is a kind of Collection")
@@ -122,7 +122,7 @@ public class ListPropertyTest extends BaseStoryRunner {
 
     @When("selecting an item from the same domain, but the properties type is not a kind of Collection")
     public void selectItemBySingleObjectProperty() throws SimpleQueryException, MultipleResultsExistException {
-        noListResult = ctx.getContext().createNewClient().select().from(DomainWithoutList.class).whereItemName(is("first")).getSingleResult(true);
+        noListResult = ctx.getContext().getClientFactory().create().select().from(DomainWithoutList.class).whereItemName(is("first")).getSingleResult(true);
     }
 
     @Then("we should get a random value from values of the multi-value column")
@@ -136,7 +136,7 @@ public class ListPropertyTest extends BaseStoryRunner {
 
     @When("the value of a multi-value column is null and the type of the property associated with the column is a kind of Collection")
     public void selectEmptyMultiValueColumnByList() throws SimpleQueryException, MultipleResultsExistException {
-        result = ctx.getContext().createNewClient().select().from(ListPropertyDomain.class).whereItemName(is("empty")).getSingleResult(true);
+        result = ctx.getContext().getClientFactory().create().select().from(ListPropertyDomain.class).whereItemName(is("empty")).getSingleResult(true);
     }
 
     @Then("the return value must be an empty collection")
@@ -148,7 +148,7 @@ public class ListPropertyTest extends BaseStoryRunner {
 
     @When("the value of a multi-value column is null and the type of the property associated with the column is not a Collection")
     public void selectEmptyMultiValueColumnBySingleObjectProperty() throws SimpleQueryException, MultipleResultsExistException {
-        noListResult = ctx.getContext().createNewClient().select().from(DomainWithoutList.class).whereItemName(is("empty")).getSingleResult(true);
+        noListResult = ctx.getContext().getClientFactory().create().select().from(DomainWithoutList.class).whereItemName(is("empty")).getSingleResult(true);
     }
 
     @Then("the return value must be a null")
@@ -160,7 +160,7 @@ public class ListPropertyTest extends BaseStoryRunner {
 
     @When("selecting an item from the domain which have a multi-value column and receive the result with an Array property")
     public void selectWithArray() throws SimpleQueryException, MultipleResultsExistException {
-        arrayResult = ctx.getContext().createNewClient().select().from(ArrayDomain.class).whereItemName(is("first")).getSingleResult(true);
+        arrayResult = ctx.getContext().getClientFactory().create().select().from(ArrayDomain.class).whereItemName(is("first")).getSingleResult(true);
     }
 
     @Then("we can get the values through a property whose type is an Array")
@@ -178,7 +178,7 @@ public class ListPropertyTest extends BaseStoryRunner {
 
     @When("the value of a multi-value column is null and the type of the property associated with the column is an array")
     public void selectEmptyValueByArray() throws SimpleQueryException, MultipleResultsExistException {
-        arrayResult = ctx.getContext().createNewClient().select().from(ArrayDomain.class).whereItemName(is("empty")).getSingleResult(true);
+        arrayResult = ctx.getContext().getClientFactory().create().select().from(ArrayDomain.class).whereItemName(is("empty")).getSingleResult(true);
     }
 
     @Then("the return value must be an array which size is zero")

@@ -21,10 +21,7 @@ import com.shelfmap.simplequery.domain.BlobOutputException;
 import com.shelfmap.simplequery.domain.BlobRestoreException;
 import com.shelfmap.simplequery.util.IO;
 import java.awt.image.BufferedImage;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
+import java.io.*;
 import java.util.Map;
 import java.util.concurrent.Executors;
 import javax.imageio.ImageIO;
@@ -56,7 +53,7 @@ public class ImageContentConverter implements BlobContentConverter<BufferedImage
     @Override
     public BufferedImage restoreObject(ObjectMetadata metadata, InputStream stream) throws BlobRestoreException {
         try {
-            return ImageIO.read(stream);
+            return ImageIO.read(new BufferedInputStream(stream));
         } catch (IOException ex) {
             throw new BlobRestoreException("Could not read image data from stream.", ex);
         }

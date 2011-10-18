@@ -17,35 +17,18 @@ package com.shelfmap.simplequery.domain;
 
 import com.amazonaws.AmazonClientException;
 import com.amazonaws.AmazonServiceException;
-import com.shelfmap.simplequery.domain.impl.DefaultBlobReference;
-import com.shelfmap.simplequery.domain.impl.ImageContentConverter;
-import static org.junit.Assert.assertThat;
-import static org.hamcrest.Matchers.is;
 import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.model.CreateBucketRequest;
-import com.amazonaws.services.s3.model.DeleteObjectRequest;
-import com.amazonaws.services.s3.model.ObjectListing;
-import com.amazonaws.services.s3.model.ObjectMetadata;
-import com.amazonaws.services.s3.model.PutObjectRequest;
-import com.amazonaws.services.s3.model.S3ObjectSummary;
+import com.amazonaws.services.s3.model.*;
 import com.google.inject.Binder;
 import com.google.inject.Inject;
 import com.google.inject.Scopes;
-import com.shelfmap.simplequery.BaseStoryRunner;
-import com.shelfmap.simplequery.ClientFactory;
-import com.shelfmap.simplequery.ContextHolder;
-import com.shelfmap.simplequery.StoryPath;
-import com.shelfmap.simplequery.TestContext;
+import com.shelfmap.simplequery.*;
+import com.shelfmap.simplequery.domain.impl.DefaultBlobReference;
+import com.shelfmap.simplequery.domain.impl.ImageContentConverter;
 import com.shelfmap.simplequery.domain.impl.StringContentConverter;
 import com.shelfmap.simplequery.util.IO;
 import java.awt.image.BufferedImage;
-import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
+import java.io.*;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -53,9 +36,14 @@ import java.util.Map;
 import javax.imageio.ImageIO;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.RandomStringUtils;
+import static org.hamcrest.Matchers.is;
 import org.jbehave.core.annotations.Given;
+import org.jbehave.core.annotations.Pending;
 import org.jbehave.core.annotations.Then;
 import org.jbehave.core.annotations.When;
+import static org.junit.Assert.assertThat;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -63,7 +51,8 @@ import org.jbehave.core.annotations.When;
  */
 @StoryPath("stories/BlobReferenceSpec.story")
 public class BlobReferenceTest extends BaseStoryRunner {
-
+    private static final Logger LOGGER = LoggerFactory.getLogger(BlobReferenceTest.class);
+    
     @Override
     protected void configureTestContext(Binder binder) {
         binder.bind(ContextHolder.class).to(TestContext.class).in(Scopes.SINGLETON);
@@ -73,7 +62,7 @@ public class BlobReferenceTest extends BaseStoryRunner {
     @Override
     @SuppressWarnings("unchecked")
     protected List<? extends Class<?>> getStepsClasses() {
-        return Arrays.asList(ClientFactory.class);
+        return Arrays.asList(TestClientFactory.class);
     }
     @Inject
     TestContext ctx;
@@ -98,7 +87,7 @@ public class BlobReferenceTest extends BaseStoryRunner {
         try {
             testImage = ImageIO.read(is);
         } finally {
-            IOUtils.closeQuietly(is);
+            IO.close(is, this);
         }
 
         InputStream uploadSource = null;
@@ -107,11 +96,12 @@ public class BlobReferenceTest extends BaseStoryRunner {
                 uploadSource = getClass().getResourceAsStream("/images/testimage.jpg");
                 ObjectMetadata metadata = new ObjectMetadata();
                 metadata.addUserMetadata("format", "jpeg");
+                metadata.setContentType("image/jpeg");
                 PutObjectRequest request = new PutObjectRequest(BUCKET_NAME, KEY_NAME, uploadSource, metadata);
                 s3.putObject(request);
             }
         } finally {
-            IOUtils.closeQuietly(uploadSource);
+            IO.close(uploadSource, this);
         }
 
     }
@@ -153,7 +143,6 @@ public class BlobReferenceTest extends BaseStoryRunner {
         ByteArrayInputStream byteInput = null;
         InputStream source = null;
         try {
-            //Created an image for assertion.
             //First, we must write testImage to byteArray with ImageIO.
             //Then we must create an image for assertion from the byteArray.
             //Because the data from getResourceStream() and the data create ImageIO.write() are not same binary data.
@@ -170,6 +159,7 @@ public class BlobReferenceTest extends BaseStoryRunner {
             Map<String, Object> conversionInfo = createConversionInfo();
             ObjectMetadata metadata = new ObjectMetadata();
             metadata.addUserMetadata("format", "jpeg");
+            metadata.setContentType("image/jpeg");
 
             BlobReference<BufferedImage> imageReference = new DefaultBlobReference<BufferedImage>(ctx.getContext(), new S3Resource(BUCKET_NAME, testKeyName), BufferedImage.class, new ImageContentConverter(conversionInfo));
 
@@ -178,19 +168,25 @@ public class BlobReferenceTest extends BaseStoryRunner {
             //so the data is same with the source binary data of sourceImage.
             imageReference.setContent(testImage, metadata);
         } finally {
-            IOUtils.closeQuietly(source);
-            IOUtils.closeQuietly(byteInput);
-            IOUtils.closeQuietly(byteOutput);
+            IO.close(source, this);
+            IO.close(byteInput, this);
+            IO.close(byteOutput, this);
         }
     }
 
     @Then("the put object must immediately be uploaded to S3 storage")
-    public void assertTheUploadResult() throws Exception {
+    public void assertTheUploadResult() throws IOException, BlobRestoreException {
         try {
             Map<String, Object> conversionInfo = createConversionInfo();
             BlobReference<BufferedImage> imageRestoreReference = new DefaultBlobReference<BufferedImage>(ctx.getContext(), new S3Resource(BUCKET_NAME, testKeyName), BufferedImage.class, new ImageContentConverter(conversionInfo));
 
-            BufferedImage image = imageRestoreReference.getContent();
+            BufferedImage image = null;
+            try {
+                image = imageRestoreReference.getContent();
+            } catch (BlobRestoreException ex) {
+                LOGGER.error("could not restore.", ex);
+                throw ex;
+            }
 
             ByteArrayOutputStream source = new ByteArrayOutputStream();
             ByteArrayOutputStream target = new ByteArrayOutputStream();
@@ -198,8 +194,8 @@ public class BlobReferenceTest extends BaseStoryRunner {
                 ImageIO.write(sourceImage, "jpeg", source);
                 ImageIO.write(image, "jpeg", target);
             } finally {
-                IOUtils.closeQuietly(source);
-                IOUtils.closeQuietly(target);
+                IO.close(source, this);
+                IO.close(target, this);
             }
 
             byte[] sourceBytes = source.toByteArray();
@@ -212,8 +208,6 @@ public class BlobReferenceTest extends BaseStoryRunner {
 
     private void deleteTestKey() {
         AmazonS3 s3 = ctx.getContext().getClientFactory().create().getS3();
-        s3.setEndpoint("s3-ap-northeast-1.amazonaws.com");
-
         if (s3.doesBucketExist(BUCKET_NAME)) {
             DeleteObjectRequest request = new DeleteObjectRequest(BUCKET_NAME, testKeyName);
             s3.deleteObject(request);
@@ -230,8 +224,6 @@ public class BlobReferenceTest extends BaseStoryRunner {
     @Given("a S3 bucket")
     public void initS3Bucket() {
         AmazonS3 s3 = ctx.getContext().getClientFactory().create().getS3();
-        s3.setEndpoint("s3-ap-northeast-1.amazonaws.com");
-
         if (!s3.doesBucketExist(BUCKET_NAME)) {
             CreateBucketRequest request = new CreateBucketRequest(BUCKET_NAME);
             request.setRegion("ap-northeast-1");
@@ -273,7 +265,9 @@ public class BlobReferenceTest extends BaseStoryRunner {
     @When("putting a string object through BlobReference")
     public void writeStringToS3() throws BlobOutputException, AmazonClientException, AmazonServiceException, InterruptedException {
         BlobReference<String> stringBlob = new DefaultBlobReference<String>(ctx.getContext(), new S3Resource(BUCKET_NAME, TEXT_KEY), String.class, new StringContentConverter(createStringConversionInfo()));
-        stringBlob.setContent(TEST_STRING, new ObjectMetadata());
+        ObjectMetadata metadata = new ObjectMetadata();
+        metadata.setContentType("text/plain");
+        stringBlob.setContent(TEST_STRING, metadata);
     }
 
     @Then("it must be regeneratable by the other BlobReference of same key and bucket.")

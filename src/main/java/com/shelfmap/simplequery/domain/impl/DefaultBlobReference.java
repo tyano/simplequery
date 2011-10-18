@@ -57,13 +57,31 @@ public class DefaultBlobReference<T> implements BlobReference<T> {
 
     @Override
     public T getContent() throws BlobRestoreException {
+        
+        //TODO for avoiding a strange behavior of Amazon S3, I download all data from a bucket into a file and create a InputStream.
+        //If I process something directly on the stream which have gotten by s3.getObject().getObjectContent(), 
+        //the remote socket of the s3 object suddenly be closed while the processing.
+        //Same problems are foundable in google search, but no appropriate answer.
+        File temp = null;
         InputStream resourceStream = null;
         try {
-            resourceStream = getInputStream();
+            String bucket = resourceInfo.getBucketName();
+            String key = resourceInfo.getKey();
+            String version = resourceInfo.getVersionId();
+            AmazonS3 s3 = getContext().getClientFactory().create().getS3();
+
+            GetObjectRequest request = version.isEmpty() ? new GetObjectRequest(bucket, key) : new GetObjectRequest(bucket, key, version);
+            temp = File.createTempFile("simplequery-", ".tmp");
+            s3.getObject(request, temp);
+            
+            resourceStream = new FileInputStream(temp);
             T content = getContentConverter().restoreObject(getObjectMetadata(), resourceStream);
             return content;
+        } catch(IOException ex) {
+            throw new BlobRestoreException(ex);
         } finally {
             IO.close(resourceStream, this);
+            if(temp != null) temp.delete();
         }
     }
 

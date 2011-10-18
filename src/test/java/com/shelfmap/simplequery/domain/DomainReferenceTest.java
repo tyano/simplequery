@@ -58,7 +58,7 @@ public class DomainReferenceTest extends BaseStoryRunner {
 
     @Given("a test-specific context")
     public void createContext() throws IOException {
-        context = new DefaultContext(new PropertiesCredentials(new File(ClientFactory.CREDENTIAL_PATH))) {
+        context = new DefaultContext(new PropertiesCredentials(new File(TestClientFactory.CREDENTIAL_PATH))) {
             private static final long serialVersionUID = 1L;
 
             @Override

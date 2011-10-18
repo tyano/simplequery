@@ -15,15 +15,6 @@
  */
 package com.shelfmap.simplequery.domain;
 
-import com.shelfmap.simplequery.attribute.Attributes;
-import java.util.Arrays;
-import java.util.List;
-
-import org.hamcrest.Matchers;
-import org.jbehave.core.annotations.Given;
-import org.jbehave.core.annotations.Then;
-import org.jbehave.core.annotations.When;
-
 import com.amazonaws.services.simpledb.model.BatchPutAttributesRequest;
 import com.amazonaws.services.simpledb.model.CreateDomainRequest;
 import com.amazonaws.services.simpledb.model.DeleteDomainRequest;
@@ -31,23 +22,21 @@ import com.amazonaws.services.simpledb.model.ReplaceableItem;
 import com.google.inject.Binder;
 import com.google.inject.Inject;
 import com.google.inject.Scopes;
-
-import com.shelfmap.simplequery.BaseStoryRunner;
-import com.shelfmap.simplequery.ClientFactory;
-import com.shelfmap.simplequery.ContextHolder;
-import com.shelfmap.simplequery.StoryPath;
-import com.shelfmap.simplequery.TestContext;
+import static com.shelfmap.simplequery.SimpleDbUtil.attr;
+import static com.shelfmap.simplequery.SimpleDbUtil.item;
+import com.shelfmap.simplequery.*;
+import com.shelfmap.simplequery.attribute.Attributes;
 import com.shelfmap.simplequery.expression.Expression;
-
+import static com.shelfmap.simplequery.expression.matcher.MatcherFactory.is;
+import java.util.Arrays;
 import static java.util.Arrays.asList;
-
-import static org.hamcrest.Matchers.not;
-import static org.hamcrest.Matchers.notNullValue;
-import static org.hamcrest.Matchers.nullValue;
-import static org.junit.Assert.*;
-
-import static com.shelfmap.simplequery.SimpleDbUtil.*;
-import static com.shelfmap.simplequery.expression.matcher.MatcherFactory.*;
+import java.util.List;
+import org.hamcrest.Matchers;
+import static org.hamcrest.Matchers.*;
+import org.jbehave.core.annotations.Given;
+import org.jbehave.core.annotations.Then;
+import org.jbehave.core.annotations.When;
+import static org.junit.Assert.assertThat;
 
 /**
  *
@@ -65,7 +54,7 @@ public class FlatAttributeTest extends BaseStoryRunner {
     @Override
     @SuppressWarnings("unchecked")
     protected List<? extends Class<?>> getStepsClasses() {
-        return Arrays.asList(ClientFactory.class);
+        return Arrays.asList(TestClientFactory.class);
     }
 
     private static final String DOMAIN_NAME = "flatattribute-test";

@@ -28,8 +28,8 @@ import org.slf4j.LoggerFactory;
  *
  * @author Tsutomu YANO
  */
-public class ClientFactory {
-    private static final Logger LOGGER = LoggerFactory.getLogger(ClientFactory.class);
+public class TestClientFactory {
+    private static final Logger LOGGER = LoggerFactory.getLogger(TestClientFactory.class);
 
     public static final String CREDENTIAL_PATH = "/Users/t_yano/aws.credential.properties";
 
@@ -43,14 +43,16 @@ public class ClientFactory {
         File securityFile = new File(getSecurityCredentialPath());
         AWSCredentials credentials = new PropertiesCredentials(securityFile);
 
-        Context context = new DefaultContext(credentials);
+        Context context = new DefaultContext(credentials) {
+            private static final long serialVersionUID = 1L;
+            @Override
+            public com.shelfmap.simplequery.factory.ClientFactory getClientFactory() {
+                return new TokyoClientFactory(this);
+            }
+        };
 
-        Client client = new SimpleQueryClient(context);
-        holder.setSimpleDb(client.getSimpleDB());
+        holder.setSimpleDb(context.getClientFactory().create().getSimpleDB());
         holder.setContext(context);
-
-//        holder.getClient().getS3().setEndpoint("s3-ap-northeast-1.amazonaws.com");
-//        holder.getSimpleDb().setEndpoint("sdb.ap-northeast-1.amazonaws.com");
     }
 
     public String getSecurityCredentialPath() {

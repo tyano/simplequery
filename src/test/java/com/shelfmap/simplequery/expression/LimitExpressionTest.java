@@ -45,7 +45,7 @@ public class LimitExpressionTest extends BaseStoryRunner {
     @Override
     @SuppressWarnings("unchecked")
     protected List<? extends Class<?>> getStepsClasses() {
-        return Arrays.asList(ClientFactory.class);
+        return Arrays.asList(TestClientFactory.class);
     }
 
     @Inject

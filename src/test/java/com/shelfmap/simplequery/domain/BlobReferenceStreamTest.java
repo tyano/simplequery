@@ -15,26 +15,14 @@
  */
 package com.shelfmap.simplequery.domain;
 
-import com.shelfmap.simplequery.domain.impl.DefaultBlobReference;
-import static org.junit.Assert.assertThat;
-import static org.hamcrest.Matchers.is;
 import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.model.GetObjectRequest;
-import com.amazonaws.services.s3.model.ObjectListing;
-import com.amazonaws.services.s3.model.ObjectMetadata;
-import com.amazonaws.services.s3.model.PutObjectRequest;
-import com.amazonaws.services.s3.model.S3Object;
-import com.amazonaws.services.s3.model.S3ObjectSummary;
+import com.amazonaws.services.s3.model.*;
 import com.amazonaws.services.s3.transfer.Upload;
 import com.google.inject.Binder;
 import com.google.inject.Inject;
 import com.google.inject.Scopes;
-import com.shelfmap.simplequery.BaseStoryRunner;
-import com.shelfmap.simplequery.Client;
-import com.shelfmap.simplequery.ClientFactory;
-import com.shelfmap.simplequery.ContextHolder;
-import com.shelfmap.simplequery.StoryPath;
-import com.shelfmap.simplequery.TestContext;
+import com.shelfmap.simplequery.*;
+import com.shelfmap.simplequery.domain.impl.DefaultBlobReference;
 import com.shelfmap.simplequery.domain.impl.ImageContentConverter;
 import com.shelfmap.simplequery.util.IO;
 import java.awt.image.BufferedImage;
@@ -45,9 +33,11 @@ import java.io.OutputStream;
 import java.util.Arrays;
 import java.util.List;
 import org.apache.commons.io.IOUtils;
+import static org.hamcrest.Matchers.is;
 import org.jbehave.core.annotations.Given;
 import org.jbehave.core.annotations.Then;
 import org.jbehave.core.annotations.When;
+import static org.junit.Assert.assertThat;
 
 /**
  *
@@ -65,7 +55,7 @@ public class BlobReferenceStreamTest extends BaseStoryRunner {
     @Override
     @SuppressWarnings("unchecked")
     protected List<? extends Class<?>> getStepsClasses() {
-        return Arrays.asList(ClientFactory.class);
+        return Arrays.asList(TestClientFactory.class);
     }
     @Inject
     TestContext ctx;

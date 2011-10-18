@@ -69,7 +69,7 @@ public class ListPropertyTest extends BaseStoryRunner {
     @Override
     @SuppressWarnings("unchecked")
     protected List<? extends Class<?>> getStepsClasses() {
-        return asList(ClientFactory.class);
+        return asList(TestClientFactory.class);
     }
 
     @Given("a initialized domain which have a multi-value column")

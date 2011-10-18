@@ -43,13 +43,7 @@ public class TestClientFactory {
         File securityFile = new File(getSecurityCredentialPath());
         AWSCredentials credentials = new PropertiesCredentials(securityFile);
 
-        Context context = new DefaultContext(credentials) {
-            private static final long serialVersionUID = 1L;
-            @Override
-            public com.shelfmap.simplequery.factory.ClientFactory getClientFactory() {
-                return new TokyoClientFactory(this);
-            }
-        };
+        Context context = new TokyoContext(credentials);
 
         holder.setSimpleDb(context.getClientFactory().create().getSimpleDB());
         holder.setContext(context);

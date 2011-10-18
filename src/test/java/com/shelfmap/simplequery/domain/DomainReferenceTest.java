@@ -15,12 +15,6 @@
  */
 package com.shelfmap.simplequery.domain;
 
-import com.shelfmap.simplequery.domain.testdomain.PurchaseRecord;
-import com.shelfmap.simplequery.domain.testdomain.Detail;
-import com.shelfmap.simplequery.domain.testdomain.ToManyPurchaseRecord;
-import com.shelfmap.simplequery.domain.testdomain.PurchaseRecord2;
-import com.shelfmap.simplequery.domain.testdomain.ToOnePurchaseRecord;
-import com.shelfmap.simplequery.domain.testdomain.DefaultDetail;
 import com.amazonaws.auth.PropertiesCredentials;
 import com.amazonaws.services.simpledb.AmazonSimpleDB;
 import com.amazonaws.services.simpledb.model.CreateDomainRequest;
@@ -29,6 +23,7 @@ import com.amazonaws.services.simpledb.model.PutAttributesRequest;
 import com.amazonaws.services.simpledb.util.SimpleDBUtils;
 import static com.shelfmap.simplequery.SimpleDbUtil.attr;
 import com.shelfmap.simplequery.*;
+import com.shelfmap.simplequery.domain.testdomain.*;
 import com.shelfmap.simplequery.expression.MultipleResultsExistException;
 import com.shelfmap.simplequery.expression.SimpleQueryException;
 import static com.shelfmap.simplequery.expression.matcher.MatcherFactory.is;
@@ -58,7 +53,7 @@ public class DomainReferenceTest extends BaseStoryRunner {
 
     @Given("a test-specific context")
     public void createContext() throws IOException {
-        context = new DefaultContext(new PropertiesCredentials(new File(TestClientFactory.CREDENTIAL_PATH))) {
+        context = new TokyoContext(new PropertiesCredentials(new File(TestClientFactory.CREDENTIAL_PATH))) {
             private static final long serialVersionUID = 1L;
 
             @Override

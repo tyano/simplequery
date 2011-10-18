@@ -24,4 +24,5 @@ import java.io.Serializable;
 public interface S3ResourceInfo extends Serializable{
     String getBucketName();
     String getKey();
+    String getVersionId();
 }

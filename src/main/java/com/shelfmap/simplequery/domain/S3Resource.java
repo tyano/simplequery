@@ -24,10 +24,16 @@ public class S3Resource implements S3ResourceInfo {
 
     private final String bucketName;
     private final String key;
+    private final String version;
 
-    public S3Resource(String bucketName, String key) {
+    public S3Resource(String bucketName, String key, String version) {
         this.bucketName = bucketName;
         this.key = key;
+        this.version = version;
+    }
+
+    public S3Resource(String bucketName, String key) {
+        this(bucketName, key, "");
     }
 
     @Override
@@ -38,5 +44,10 @@ public class S3Resource implements S3ResourceInfo {
     @Override
     public String getKey() {
         return key;
+    }
+
+    @Override
+    public String getVersionId() {
+        return version;
     }
 }

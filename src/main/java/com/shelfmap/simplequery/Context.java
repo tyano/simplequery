@@ -15,6 +15,8 @@
  */
 package com.shelfmap.simplequery;
 
+import com.amazonaws.AmazonClientException;
+import com.amazonaws.AmazonServiceException;
 import com.amazonaws.auth.AWSCredentials;
 import com.shelfmap.simplequery.domain.AttributeConverterFactory;
 import com.shelfmap.simplequery.domain.Domain;
@@ -36,4 +38,13 @@ public interface Context extends Serializable {
     DomainDescriptorFactory getDomainDescriptorFactory();
     AttributeConverterFactory getAttributeConverterFactory();
     AWSCredentials getCredentials();
+
+    void putObject(Object domainObject);
+    void putObjectImmediately(Object domainObject) throws AmazonServiceException, AmazonClientException;
+
+    void deleteObject(Object domainObject);
+    void deleteObjectImmediately(Object domainObject) throws AmazonServiceException, AmazonClientException;
+    void deleteItem(Domain<?> domain, String itemName) throws AmazonServiceException, AmazonClientException;
+
+    void save() throws AmazonServiceException, AmazonClientException;
 }

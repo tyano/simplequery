@@ -70,7 +70,7 @@ public class SelectResultIterator<T> implements Iterator<T> {
 
         T instance = null;
         try {
-            instance = itemConverter.convert(item);
+            instance = itemConverter.convertToInstance(item);
         } catch (CanNotConvertItemException ex) {
             throw new IllegalStateException("Could not convert an item to a domain object.", ex);
         }

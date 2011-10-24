@@ -57,7 +57,7 @@ public abstract class BaseExpression<T> implements Expression<T> {
 
         Item first = items.get(0);
         try {
-            return getContext().getItemConverterFactory().create(getDomain()).convert(first);
+            return getContext().getItemConverterFactory().create(getDomain()).convertToInstance(first);
         } catch (CanNotConvertItemException ex) {
             throw new SimpleQueryException("Can not convert an item", ex);
         }

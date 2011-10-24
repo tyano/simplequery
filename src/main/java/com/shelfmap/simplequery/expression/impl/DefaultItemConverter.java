@@ -18,18 +18,19 @@ package com.shelfmap.simplequery.expression.impl;
 
 import com.amazonaws.services.simpledb.model.Attribute;
 import com.amazonaws.services.simpledb.model.Item;
+import com.amazonaws.services.simpledb.model.ReplaceableAttribute;
+import com.amazonaws.services.simpledb.model.ReplaceableItem;
 import com.shelfmap.simplequery.Context;
 import com.shelfmap.simplequery.DomainInstanceFactory;
-import com.shelfmap.simplequery.domain.AttributeAccessor;
-import com.shelfmap.simplequery.domain.Domain;
-import com.shelfmap.simplequery.domain.DomainAttribute;
-import com.shelfmap.simplequery.domain.DomainDescriptor;
+import com.shelfmap.simplequery.domain.*;
 import com.shelfmap.simplequery.expression.CanNotConvertItemException;
 import com.shelfmap.simplequery.expression.CanNotRestoreAttributeException;
 import com.shelfmap.simplequery.expression.ItemConverter;
 import static com.shelfmap.simplequery.util.Assertion.isNotNull;
 import java.lang.reflect.Array;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,7 +56,7 @@ public class DefaultItemConverter<T> implements ItemConverter<T> {
     }
 
     @Override
-    public T convert(Item item) throws CanNotConvertItemException {
+    public T convertToInstance(Item item) throws CanNotConvertItemException {
         if(descriptor == null) {
             descriptor = getContext().getDomainDescriptorFactory().create(getDomain());
         }
@@ -147,6 +148,64 @@ public class DefaultItemConverter<T> implements ItemConverter<T> {
                 throw new IllegalStateException("The property's type with multiple value must be a subclass of Collection or an Array.");
             }
         }
+    }
+
+    @Override
+    public ReplaceableItem convertToItem(Object domainObject) {
+        if(descriptor == null) {
+            descriptor = getContext().getDomainDescriptorFactory().create(getDomain());
+        }
+
+        String itemName = descriptor.getItemNameAttribute().getAttributeAccessor().read(domainObject);
+        ReplaceableItem item = new ReplaceableItem(itemName);
+
+        List<ReplaceableAttribute> attributes = new ArrayList<ReplaceableAttribute>();
+        for (DomainAttribute<?,?> domainAttribute : descriptor) {
+            attributes.addAll(convertToReplaceableAttribute(domainAttribute, domainObject));
+        }
+
+        item.setAttributes(attributes);
+        return item;
+    }
+
+    private <VT,CT> Collection<ReplaceableAttribute> convertToReplaceableAttribute(DomainAttribute<VT,CT> domainAttribute, Object domainObject) {
+        Class<CT> containerType = domainAttribute.getContainerType();
+        Class<VT> valueType = domainAttribute.getValueType();
+
+        AttributeAccessor<CT> accessor = domainAttribute.getAttributeAccessor();
+        AttributeConverter<VT> converter = domainAttribute.getAttributeConverter();
+        String attributeName = domainAttribute.getAttributeName();
+
+        List<ReplaceableAttribute> sdbAttributes = new ArrayList<ReplaceableAttribute>();
+        if(valueType.equals(containerType)) {
+            VT attributeValue = valueType.cast(accessor.read(domainObject));
+            String convertedAttributeValue = converter.convertValue(attributeValue);
+            ReplaceableAttribute sdbAttribute = new ReplaceableAttribute(attributeName, convertedAttributeValue, true);
+            sdbAttributes.add(sdbAttribute);
+        } else if(containerType.isArray()) {
+            CT array = accessor.read(domainObject);
+            int length = Array.getLength(array);
+            boolean isFirst = true;
+            for(int i = 0; i < length; i++) {
+                @SuppressWarnings("unchecked")
+                VT attributeValue = (VT) Array.get(domainObject, i);
+                String convertedAttributeValue = converter.convertValue(attributeValue);
+                ReplaceableAttribute sdbAttribute = new ReplaceableAttribute(attributeName, convertedAttributeValue, isFirst);
+                sdbAttributes.add(sdbAttribute);
+                if(isFirst) isFirst = false;
+            }
+        } else if(Collection.class.isAssignableFrom(containerType)) {
+            @SuppressWarnings("unchecked")
+            Collection<? extends VT> collection = (Collection<? extends VT>) accessor.read(domainObject);
+            boolean isFirst = true;
+            for (VT attributeValue : collection) {
+                String convertedAttributeValue = converter.convertValue(attributeValue);
+                ReplaceableAttribute sdbAttribute = new ReplaceableAttribute(attributeName, convertedAttributeValue, isFirst);
+                sdbAttributes.add(sdbAttribute);
+                if(isFirst) isFirst = false;
+            }
+        }
+        return sdbAttributes;
     }
 
     @Override

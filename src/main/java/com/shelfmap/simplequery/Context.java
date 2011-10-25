@@ -25,6 +25,7 @@ import com.shelfmap.simplequery.factory.ClientFactory;
 import com.shelfmap.simplequery.factory.DomainDescriptorFactory;
 import com.shelfmap.simplequery.factory.ItemConverterFactory;
 import java.io.Serializable;
+import java.util.Set;
 
 /**
  *
@@ -39,12 +40,14 @@ public interface Context extends Serializable {
     AttributeConverterFactory getAttributeConverterFactory();
     AWSCredentials getCredentials();
 
-    void putObject(Object domainObject);
     void putObjectImmediately(Object domainObject) throws AmazonServiceException, AmazonClientException;
+    void putObjects(Object... domainObjects);
+    Set<Object> getPutObjects();
 
-    void deleteObject(Object domainObject);
     void deleteObjectImmediately(Object domainObject) throws AmazonServiceException, AmazonClientException;
     void deleteItem(Domain<?> domain, String itemName) throws AmazonServiceException, AmazonClientException;
+    void deleteObjects(Object... domainObjects);
+    Set<Object> getDeleteObjects();
 
     void save() throws AmazonServiceException, AmazonClientException;
 }

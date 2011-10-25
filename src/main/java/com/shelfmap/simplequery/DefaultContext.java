@@ -30,23 +30,32 @@ import com.shelfmap.simplequery.factory.ItemConverterFactory;
 import com.shelfmap.simplequery.factory.impl.DefaultClientFactory;
 import com.shelfmap.simplequery.factory.impl.DefaultDomainDescriptorFactory;
 import com.shelfmap.simplequery.factory.impl.DefaultItemConverterFactory;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
+import static java.util.Arrays.asList;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
+ *
+ * THIS CLASS IS THREAD SAFE
  *
  * @author Tsutomu YANO
  */
 public class DefaultContext implements Context {
     private static final long serialVersionUID = 1L;
 
-    private AWSCredentials credentials;
+    //TODO hey! AWSCredentials must be serializable! or must be transient!
+    private final AWSCredentials credentials;
     private final Set<Object> putObjects = new LinkedHashSet<Object>();;
     private final Set<Object> deleteObjects = new LinkedHashSet<Object>();
+
+    private final ReentrantReadWriteLock putObjectRwl = new ReentrantReadWriteLock();
+    private final Lock putObjectReadLock = putObjectRwl.readLock();
+    private final Lock putObjectWriteLock = putObjectRwl.writeLock();
+
+    private final ReentrantReadWriteLock deleteObjectRwl = new ReentrantReadWriteLock();
+    private final Lock deleteObjectReadLock = deleteObjectRwl.readLock();
+    private final Lock deleteObjectWriteLock = deleteObjectRwl.writeLock();
 
     public DefaultContext(AWSCredentials credentials) {
         this.credentials = credentials;
@@ -88,8 +97,23 @@ public class DefaultContext implements Context {
     }
 
     @Override
-    public void putObject(Object domainObject) {
-        putObjects.add(domainObject);
+    public void putObjects(Object... domainObjects) {
+        putObjectWriteLock.lock();
+        try {
+            putObjects.addAll(asList(domainObjects));
+        } finally {
+            putObjectWriteLock.unlock();
+        }
+    }
+
+    @Override
+    public Set<Object> getPutObjects() {
+        putObjectReadLock.lock();
+        try {
+            return new LinkedHashSet<Object>(this.putObjects);
+        } finally {
+            putObjectReadLock.unlock();
+        }
     }
 
     @Override
@@ -104,8 +128,23 @@ public class DefaultContext implements Context {
     }
 
     @Override
-    public void deleteObject(Object domainObject) {
-        deleteObjects.add(domainObject);
+    public void deleteObjects(Object... domainObjects) {
+        deleteObjectWriteLock.lock();
+        try {
+            deleteObjects.addAll(asList(domainObjects));
+        } finally {
+            deleteObjectWriteLock.unlock();
+        }
+    }
+
+    @Override
+    public Set<Object> getDeleteObjects() {
+        deleteObjectReadLock.lock();
+        try {
+            return new LinkedHashSet<Object>(this.deleteObjects);
+        } finally {
+            deleteObjectReadLock.unlock();
+        }
     }
 
     @Override
@@ -125,51 +164,66 @@ public class DefaultContext implements Context {
 
     @Override
     public void save() throws AmazonServiceException, AmazonClientException {
-        if(putObjects.isEmpty() && deleteObjects.isEmpty()) return;
+        //we must reading and writing putObjects and deleteObjects as atomic processing
+        //from reading putObjects and deleteObjects until clear the two collections,
+        //because if other thread writing data into the to collections and then we
+        //got writeLock and clear the collections, the wrote data written by other thread lost.
+        //So we must get WRITE locks at first.
 
-        Map<Domain<?>, List<DeletableItem>> deleteItems = new HashMap<Domain<?>, List<DeletableItem>>();
-        Map<Domain<?>, List<ReplaceableItem>> putItems = new HashMap<Domain<?>, List<ReplaceableItem>>();
+        //TODO I believe we can change this implementation more efficient. ex) putting and deleting data wtih some threads, and wait until all threads end.
+        putObjectWriteLock.lock();
+        deleteObjectWriteLock.lock();
+        try {
+            if(putObjects.isEmpty() && deleteObjects.isEmpty()) return;
 
-        for (Object object : deleteObjects) {
-            Domain<?> domain = getDomainFactory().findDomain(object.getClass());
-            DomainDescriptor descriptor = getDomainDescriptorFactory().create(domain);
-            String itemName = descriptor.getItemNameAttribute().getAttributeAccessor().read(object);
-            DeletableItem item = new DeletableItem().withName(itemName);
+            Map<Domain<?>, List<DeletableItem>> deleteItems = new HashMap<Domain<?>, List<DeletableItem>>();
+            Map<Domain<?>, List<ReplaceableItem>> putItems = new HashMap<Domain<?>, List<ReplaceableItem>>();
 
-            List<DeletableItem> list = deleteItems.get(domain);
-            if(list == null) {
-                list = new ArrayList<DeletableItem>();
-                deleteItems.put(domain, list);
+            for (Object object : deleteObjects) {
+                Domain<?> domain = getDomainFactory().findDomain(object.getClass());
+                DomainDescriptor descriptor = getDomainDescriptorFactory().create(domain);
+                String itemName = descriptor.getItemNameAttribute().getAttributeAccessor().read(object);
+                DeletableItem item = new DeletableItem().withName(itemName);
+
+                List<DeletableItem> list = deleteItems.get(domain);
+                if(list == null) {
+                    list = new ArrayList<DeletableItem>();
+                    deleteItems.put(domain, list);
+                }
+                list.add(item);
             }
-            list.add(item);
-        }
-        deleteObjects.clear();
 
-        for (Object object : putObjects) {
-            Domain<?> domain = getDomainFactory().findDomain(object.getClass());
-            ItemConverter<?> itemConverter = getItemConverterFactory().create(domain);
-            ReplaceableItem item = itemConverter.convertToItem(object);
-            List<ReplaceableItem> list = putItems.get(domain);
-            if(list == null) {
-                list = new ArrayList<ReplaceableItem>();
-                putItems.put(domain, list);
+            for (Object object : putObjects) {
+                Domain<?> domain = getDomainFactory().findDomain(object.getClass());
+                ItemConverter<?> itemConverter = getItemConverterFactory().create(domain);
+                ReplaceableItem item = itemConverter.convertToItem(object);
+                List<ReplaceableItem> list = putItems.get(domain);
+                if(list == null) {
+                    list = new ArrayList<ReplaceableItem>();
+                    putItems.put(domain, list);
+                }
+                list.add(item);
             }
-            list.add(item);
-        }
-        putObjects.clear();
 
+            AmazonSimpleDB simpleDB = getClientFactory().create().getSimpleDB();
+            for (Domain<?> domain : deleteItems.keySet()) {
+                List<DeletableItem> items = deleteItems.get(domain);
+                BatchDeleteAttributesRequest request = new BatchDeleteAttributesRequest(domain.getDomainName(), items);
+                simpleDB.batchDeleteAttributes(request);
+            }
 
-        AmazonSimpleDB simpleDB = getClientFactory().create().getSimpleDB();
-        for (Domain<?> domain : deleteItems.keySet()) {
-            List<DeletableItem> items = deleteItems.get(domain);
-            BatchDeleteAttributesRequest request = new BatchDeleteAttributesRequest(domain.getDomainName(), items);
-            simpleDB.batchDeleteAttributes(request);
-        }
+            for (Domain<?> domain : putItems.keySet()) {
+                List<ReplaceableItem> items = putItems.get(domain);
+                BatchPutAttributesRequest request = new BatchPutAttributesRequest(domain.getDomainName(), items);
+                simpleDB.batchPutAttributes(request);
+            }
 
-        for (Domain<?> domain : putItems.keySet()) {
-            List<ReplaceableItem> items = putItems.get(domain);
-            BatchPutAttributesRequest request = new BatchPutAttributesRequest(domain.getDomainName(), items);
-            simpleDB.batchPutAttributes(request);
+            //all objects are processed successfully, then clear all objects from caches.
+            deleteObjects.clear();
+            putObjects.clear();
+        } finally {
+            putObjectWriteLock.unlock();
+            deleteObjectWriteLock.unlock();
         }
     }
 }

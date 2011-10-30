@@ -101,19 +101,17 @@ public class SavingDomainsTest extends BaseStoryRunner {
                 new BatchPutAttributesRequest(
                 MAIN_DOMAIN,
                 asList(
-                    item("0001",
-                        attr("name", "User 1", true),
-                        attr("age", "035", true),
-                        attr("province", "tokyo", true)),
-                    item("0002",
-                        attr("name", "User 2", true),
-                        attr("age", "022", true),
-                        attr("province", "chiba", true))));
+                item("0001",
+                attr("name", "User 1", true),
+                attr("age", "035", true),
+                attr("province", "tokyo", true)),
+                item("0002",
+                attr("name", "User 2", true),
+                attr("age", "022", true),
+                attr("province", "chiba", true))));
 
         simpleDb.batchPutAttributes(mainRequest);
     }
-
-
     Province tokyo;
     Province chiba;
     User user1;
@@ -176,18 +174,18 @@ public class SavingDomainsTest extends BaseStoryRunner {
             Client client = context.getClientFactory().create();
             QueryResults<Province> results = client.select().from(Province.class).whereItemName(MatcherFactory.in("tokyo", "chiba")).getResults(true);
             for (Province p : results) {
-                if(p.getItemName().equals("tokyo")) {
+                if (p.getItemName().equals("tokyo")) {
                     tokyo = p;
-                } else if(p.getItemName().equals("chiba")) {
+                } else if (p.getItemName().equals("chiba")) {
                     chiba = p;
                 }
             }
 
             QueryResults<User> users = client.select().from(User.class).whereItemName(MatcherFactory.in("0001", "0002")).getResults(true);
             for (User u : users) {
-                if(u.getItemName().equals("0001")) {
+                if (u.getItemName().equals("0001")) {
                     user1 = u;
-                } else if(u.getItemName().equals("0002")) {
+                } else if (u.getItemName().equals("0002")) {
                     user2 = u;
                 }
             }
@@ -224,18 +222,18 @@ public class SavingDomainsTest extends BaseStoryRunner {
             Client client = context.getClientFactory().create();
             QueryResults<Province> results = client.select().from(Province.class).whereItemName(MatcherFactory.in("tokyo", "chiba")).getResults(true);
             for (Province p : results) {
-                if(p.getItemName().equals("tokyo")) {
+                if (p.getItemName().equals("tokyo")) {
                     assertThat(p.getName(), is("TOKYO"));
-                } else if(p.getItemName().equals("chiba")) {
+                } else if (p.getItemName().equals("chiba")) {
                     assertThat(p.getName(), is("CHIBA"));
                 }
             }
 
             QueryResults<User> users = client.select().from(User.class).whereItemName(MatcherFactory.in("0001", "0002")).getResults(true);
             for (User u : users) {
-                if(u.getItemName().equals("0001")) {
+                if (u.getItemName().equals("0001")) {
                     assertThat(u.getName(), is("changed user 1"));
-                } else if(u.getItemName().equals("0002")) {
+                } else if (u.getItemName().equals("0002")) {
                     assertThat(u.getName(), is("changed user 2"));
                 }
             }
@@ -243,6 +241,20 @@ public class SavingDomainsTest extends BaseStoryRunner {
             LOGGER.error("exception occur", ex);
             fail();
         }
+    }
+
+    @When("we set null-value to an attribute of an instance")
+    public void changeAPropertyNull() {
+        user1.setName(null);
+        context.putObjectImmediately(user1);
+    }
+
+    @Then("the attribute will be deleted in SimpleDB")
+    public void assertTheAttributeDeletedInAWS() {
+    }
+
+    @Then("the property of the instance become null if the instance is refreshed")
+    public void assertThePropertyBecomeNull() {
     }
 
     /**

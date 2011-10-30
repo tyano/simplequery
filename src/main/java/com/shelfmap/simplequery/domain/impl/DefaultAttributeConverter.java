@@ -46,7 +46,7 @@ public class DefaultAttributeConverter<T> implements AttributeConverter<T> {
 
     @Override
     public String convertValue(T targetValue) {
-        isNotNull("targetValue", targetValue);
+        if(targetValue == null) return null;
         return targetValue.toString();
     }
 
@@ -62,6 +62,8 @@ public class DefaultAttributeConverter<T> implements AttributeConverter<T> {
      */
     @Override
     public T restoreValue(String targetValue) throws CanNotRestoreAttributeException {
+        if(targetValue == null) return null;
+
         if (clazz.isAssignableFrom(String.class)) {
             return clazz.cast(targetValue);
         }

@@ -29,14 +29,11 @@ import com.shelfmap.simplequery.annotation.SimpleDbDomain;
 import com.shelfmap.simplequery.domain.Domain;
 import com.shelfmap.simplequery.domain.ToOneDomainReference;
 import com.shelfmap.simplequery.domain.impl.DefaultToOneDomainReference;
-import com.shelfmap.simplequery.expression.MultipleResultsExistException;
 import com.shelfmap.simplequery.expression.QueryResults;
-import com.shelfmap.simplequery.expression.SimpleQueryException;
 import com.shelfmap.simplequery.expression.matcher.MatcherFactory;
 import java.io.File;
 import java.io.IOException;
 import static java.util.Arrays.asList;
-import java.util.logging.Level;
 import static org.hamcrest.Matchers.*;
 import org.jbehave.core.annotations.Given;
 import org.jbehave.core.annotations.Then;
@@ -59,6 +56,7 @@ public class SavingDomainsTest extends BaseStoryRunner {
     Context context;
 
     @Given("a test-specific context")
+    @edu.umd.cs.findbugs.annotations.SuppressWarnings("DMI_HARDCODED_ABSOLUTE_FILENAME")
     public void createContext() throws IOException {
         context = new TokyoContext(new PropertiesCredentials(new File(TestClientFactory.CREDENTIAL_PATH))) {
 
@@ -114,6 +112,8 @@ public class SavingDomainsTest extends BaseStoryRunner {
 
         simpleDb.batchPutAttributes(mainRequest);
     }
+
+
     Province tokyo;
     Province chiba;
     User user1;
@@ -203,14 +203,14 @@ public class SavingDomainsTest extends BaseStoryRunner {
             user1.setName("changed user 1");
             user2.setName("changed user 2");
 
-            Province tokyo = user1.getProvinceReference().get(true);
-            Province chiba = user2.getProvinceReference().get(true);
+            Province refTokyo = user1.getProvinceReference().get(true);
+            Province refChiba = user2.getProvinceReference().get(true);
 
-            tokyo.setName("TOKYO");
-            chiba.setName("CHIBA");
+            refTokyo.setName("TOKYO");
+            refChiba.setName("CHIBA");
 
             //save all changes
-            context.putObjects(user1, user2, tokyo, chiba);
+            context.putObjects(user1, user2, refTokyo, refChiba);
             context.save();
         } catch (Exception ex) {
             LOGGER.error("exception occur", ex);
@@ -218,7 +218,7 @@ public class SavingDomainsTest extends BaseStoryRunner {
         }
     }
 
-    @Then("we can save all changes with one method call, including the referenced instances")
+    @Then("we can save all instances, which put into Context, with one method call")
     public void assertChangesApplied() {
         try {
             Client client = context.getClientFactory().create();

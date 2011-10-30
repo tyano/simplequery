@@ -16,4 +16,4 @@ Given 2 test domains
 Given some instances of the test domain which have a reference to another domain
 
 When we change some properties of instances of test domains and the referenced instances
-Then we can save all changes with one method call, including the referenced instances
+Then we can save all instances, which put into Context, with one method call

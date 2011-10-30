@@ -47,7 +47,7 @@ public class DefaultAttributeConverter<T> implements AttributeConverter<T> {
     @Override
     public String convertValue(T targetValue) {
         isNotNull("targetValue", targetValue);
-        return SimpleDBUtils.quoteValue(targetValue.toString());
+        return targetValue.toString();
     }
 
     /**

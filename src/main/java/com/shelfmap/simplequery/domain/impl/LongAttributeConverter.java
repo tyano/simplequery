@@ -39,11 +39,11 @@ public class LongAttributeConverter implements AttributeConverter<Long> {
         isNotNull("targetValue", targetValue);
         String result = "";
         if (offset > 0) {
-            result = quoteValue(encodeRealNumberRange(targetValue, maxNumberOfDigits, offset));
+            result = encodeRealNumberRange(targetValue, maxNumberOfDigits, offset);
         } else if (maxNumberOfDigits > 0) {
-            result = quoteValue(encodeZeroPadding(targetValue, maxNumberOfDigits));
+            result = encodeZeroPadding(targetValue, maxNumberOfDigits);
         } else {
-            result = quoteValue(targetValue.toString());
+            result = targetValue.toString();
         }
         return result;
     }

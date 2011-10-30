@@ -41,11 +41,11 @@ public class FloatAttributeConverter implements AttributeConverter<Float> {
         isNotNull("targetValue", targetValue);
         String result = "";
         if (offset > 0) {
-            result = quoteValue(encodeRealNumberRange(targetValue.floatValue(), maxDigitLeft, maxDigitRight, offset));
+            result = encodeRealNumberRange(targetValue.floatValue(), maxDigitLeft, maxDigitRight, offset);
         } else if (maxDigitLeft > 0) {
-            result = quoteValue(encodeZeroPadding(targetValue.floatValue(), maxDigitLeft));
+            result = encodeZeroPadding(targetValue.floatValue(), maxDigitLeft);
         } else {
-            result = quoteValue(targetValue.toString());
+            result = targetValue.toString();
         }
         return result;
     }

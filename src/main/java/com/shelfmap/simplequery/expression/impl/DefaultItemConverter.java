@@ -16,12 +16,11 @@
 
 package com.shelfmap.simplequery.expression.impl;
 
-import com.amazonaws.services.simpledb.model.Attribute;
-import com.amazonaws.services.simpledb.model.Item;
-import com.amazonaws.services.simpledb.model.ReplaceableAttribute;
-import com.amazonaws.services.simpledb.model.ReplaceableItem;
+import com.amazonaws.services.simpledb.model.*;
 import com.shelfmap.simplequery.Context;
 import com.shelfmap.simplequery.DomainInstanceFactory;
+import com.shelfmap.simplequery.ItemState;
+import com.shelfmap.simplequery.SimpleItemState;
 import com.shelfmap.simplequery.domain.*;
 import com.shelfmap.simplequery.expression.CanNotConvertItemException;
 import com.shelfmap.simplequery.expression.CanNotRestoreAttributeException;
@@ -151,24 +150,32 @@ public class DefaultItemConverter<T> implements ItemConverter<T> {
     }
 
     @Override
-    public ReplaceableItem convertToItem(Object domainObject) {
+    public ItemState makeCurrentStateOf(Object domainObject) {
         if(descriptor == null) {
             descriptor = getContext().getDomainDescriptorFactory().create(getDomain());
         }
 
         String itemName = descriptor.getItemNameAttribute().getAttributeAccessor().read(domainObject);
-        ReplaceableItem item = new ReplaceableItem(itemName);
+        ItemState lastState = new SimpleItemState(itemName);
 
-        List<ReplaceableAttribute> attributes = new ArrayList<ReplaceableAttribute>();
         for (DomainAttribute<?,?> domainAttribute : descriptor) {
-            attributes.addAll(convertToReplaceableAttribute(domainAttribute, domainObject));
+            ItemState state = updateState(itemName, domainAttribute, domainObject);
+            Collection<ReplaceableAttribute> changed = state.getChangedItems();
+            Collection<Attribute> deleted = state.getDeletedItems();
+
+            if(!changed.isEmpty()) {
+                lastState.addChanged(changed.toArray(new ReplaceableAttribute[0]));
+            }
+
+            if(!deleted.isEmpty()) {
+                lastState.addDeleted(deleted.toArray(new Attribute[0]));
+            }
         }
 
-        item.setAttributes(attributes);
-        return item;
+        return lastState;
     }
 
-    private <VT,CT> Collection<ReplaceableAttribute> convertToReplaceableAttribute(DomainAttribute<VT,CT> domainAttribute, Object domainObject) {
+    private <VT,CT> ItemState updateState(String itemName, DomainAttribute<VT,CT> domainAttribute, Object domainObject) {
         Class<CT> containerType = domainAttribute.getContainerType();
         Class<VT> valueType = domainAttribute.getValueType();
 
@@ -176,12 +183,19 @@ public class DefaultItemConverter<T> implements ItemConverter<T> {
         AttributeConverter<VT> converter = domainAttribute.getAttributeConverter();
         String attributeName = domainAttribute.getAttributeName();
 
-        List<ReplaceableAttribute> sdbAttributes = new ArrayList<ReplaceableAttribute>();
+        List<ReplaceableAttribute> sdbChangedAttributes = new ArrayList<ReplaceableAttribute>();
+        List<Attribute> sdbDeletedAttributes = new ArrayList<Attribute>();
+
         if(valueType.equals(containerType)) {
             VT attributeValue = valueType.cast(accessor.read(domainObject));
-            String convertedAttributeValue = converter.convertValue(attributeValue);
-            ReplaceableAttribute sdbAttribute = new ReplaceableAttribute(attributeName, convertedAttributeValue, true);
-            sdbAttributes.add(sdbAttribute);
+            if(attributeValue != null) {
+                String convertedAttributeValue = converter.convertValue(attributeValue);
+                ReplaceableAttribute sdbAttribute = new ReplaceableAttribute(attributeName, convertedAttributeValue, true);
+                sdbChangedAttributes.add(sdbAttribute);
+            } else {
+                Attribute deleted = new Attribute().withName(attributeName);
+                sdbDeletedAttributes.add(deleted);
+            }
         } else if(containerType.isArray()) {
             CT array = accessor.read(domainObject);
             int length = Array.getLength(array);
@@ -189,9 +203,12 @@ public class DefaultItemConverter<T> implements ItemConverter<T> {
             for(int i = 0; i < length; i++) {
                 @SuppressWarnings("unchecked")
                 VT attributeValue = (VT) Array.get(domainObject, i);
-                String convertedAttributeValue = converter.convertValue(attributeValue);
-                ReplaceableAttribute sdbAttribute = new ReplaceableAttribute(attributeName, convertedAttributeValue, isFirst);
-                sdbAttributes.add(sdbAttribute);
+
+                if(attributeValue != null) {
+                    String convertedAttributeValue = converter.convertValue(attributeValue);
+                    ReplaceableAttribute sdbAttribute = new ReplaceableAttribute(attributeName, convertedAttributeValue, isFirst);
+                    sdbChangedAttributes.add(sdbAttribute);
+                }
                 if(isFirst) isFirst = false;
             }
         } else if(Collection.class.isAssignableFrom(containerType)) {
@@ -199,13 +216,25 @@ public class DefaultItemConverter<T> implements ItemConverter<T> {
             Collection<? extends VT> collection = (Collection<? extends VT>) accessor.read(domainObject);
             boolean isFirst = true;
             for (VT attributeValue : collection) {
-                String convertedAttributeValue = converter.convertValue(attributeValue);
-                ReplaceableAttribute sdbAttribute = new ReplaceableAttribute(attributeName, convertedAttributeValue, isFirst);
-                sdbAttributes.add(sdbAttribute);
+                if(attributeValue != null) {
+                    String convertedAttributeValue = converter.convertValue(attributeValue);
+                    ReplaceableAttribute sdbAttribute = new ReplaceableAttribute(attributeName, convertedAttributeValue, isFirst);
+                    sdbChangedAttributes.add(sdbAttribute);
+                }
                 if(isFirst) isFirst = false;
             }
         }
-        return sdbAttributes;
+
+        ItemState state = new SimpleItemState(itemName);
+        if(!sdbChangedAttributes.isEmpty()) {
+            state.addChanged(sdbChangedAttributes.toArray(new ReplaceableAttribute[0]));
+        }
+
+        if(!sdbDeletedAttributes.isEmpty()) {
+            state.addDeleted(sdbDeletedAttributes.toArray(new Attribute[0]));
+        }
+
+        return state;
     }
 
     @Override

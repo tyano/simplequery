@@ -185,11 +185,30 @@ public class DefaultContext implements Context {
     @Override
     public void putObjectImmediately(final Object domainObject) throws AmazonServiceException, AmazonClientException {
         Domain<?> domain = getDomainFactory().findDomain(domainObject.getClass());
-        ItemConverter<?> itemConverter = getItemConverterFactory().create(domain);
-        ReplaceableItem item = itemConverter.convertToItem(domainObject);
+        DomainDescriptor descriptor = getDomainDescriptorFactory().create(domain);
+        String itemName = descriptor.getItemNameAttribute().getAttributeAccessor().read(domainObject);
 
-        PutAttributesRequest request = new PutAttributesRequest(domain.getDomainName(), item.getName(), item.getAttributes());
-        getSimpleDB().putAttributes(request);
+        ItemConverter<?> itemConverter = getItemConverterFactory().create(domain);
+        ItemState itemState = itemConverter.makeCurrentStateOf(domainObject);
+
+        Collection<ReplaceableAttribute> changed = itemState.getChangedItems();
+        Collection<Attribute> deleted = itemState.getDeletedItems();
+
+        if(!changed.isEmpty()) {
+            PutAttributesRequest request = new PutAttributesRequest()
+                                                .withDomainName(domain.getDomainName())
+                                                .withItemName(itemName)
+                                                .withAttributes(changed);
+            getSimpleDB().putAttributes(request);
+        }
+
+        if(!deleted.isEmpty()) {
+            DeleteAttributesRequest request = new DeleteAttributesRequest()
+                                                .withDomainName(domain.getDomainName())
+                                                .withItemName(itemName)
+                                                .withAttributes(deleted);
+            getSimpleDB().deleteAttributes(request);
+        }
     }
 
     @Override
@@ -259,27 +278,46 @@ public class DefaultContext implements Context {
 
             for (Object object : putObjects) {
                 Domain<?> domain = getDomainFactory().findDomain(object.getClass());
+                DomainDescriptor descriptor = getDomainDescriptorFactory().create(domain);
+                String itemName = descriptor.getItemNameAttribute().getAttributeAccessor().read(object);
+
                 ItemConverter<?> itemConverter = getItemConverterFactory().create(domain);
-                ReplaceableItem item = itemConverter.convertToItem(object);
-                List<ReplaceableItem> list = putItems.get(domain);
-                if(list == null) {
-                    list = new ArrayList<ReplaceableItem>();
-                    putItems.put(domain, list);
+                ItemState itemState = itemConverter.makeCurrentStateOf(object);
+                Collection<ReplaceableAttribute> changed = itemState.getChangedItems();
+                Collection<Attribute> deleted = itemState.getDeletedItems();
+
+                if(!changed.isEmpty()) {
+                    List<ReplaceableItem> list = putItems.get(domain);
+                    if(list == null) {
+                        list = new ArrayList<ReplaceableItem>();
+                        putItems.put(domain, list);
+                    }
+                    list.add(new ReplaceableItem().withName(itemName).withAttributes(changed));
                 }
-                list.add(item);
+
+                if(!deleted.isEmpty()){
+                    List<DeletableItem> list = deleteItems.get(domain);
+                    if(list == null) {
+                        list = new ArrayList<DeletableItem>();
+                        deleteItems.put(domain, list);
+                    }
+                    list.add(new DeletableItem().withName(itemName).withAttributes(deleted));
+                }
             }
 
-            AmazonSimpleDB simpleDB = getSimpleDB();
-            for (Domain<?> domain : deleteItems.keySet()) {
-                List<DeletableItem> items = deleteItems.get(domain);
+            AmazonSimpleDB sdb = getSimpleDB();
+            for (Map.Entry<Domain<?>, List<DeletableItem>> entry : deleteItems.entrySet()) {
+                Domain<?> domain = entry.getKey();
+                List<DeletableItem> items = entry.getValue();
                 BatchDeleteAttributesRequest request = new BatchDeleteAttributesRequest(domain.getDomainName(), items);
-                simpleDB.batchDeleteAttributes(request);
+                sdb.batchDeleteAttributes(request);
             }
 
-            for (Domain<?> domain : putItems.keySet()) {
-                List<ReplaceableItem> items = putItems.get(domain);
+            for (Map.Entry<Domain<?>, List<ReplaceableItem>> entry : putItems.entrySet()) {
+                Domain<?> domain = entry.getKey();
+                List<ReplaceableItem> items = entry.getValue();
                 BatchPutAttributesRequest request = new BatchPutAttributesRequest(domain.getDomainName(), items);
-                simpleDB.batchPutAttributes(request);
+                sdb.batchPutAttributes(request);
             }
 
             //all objects are processed successfully, then clear all objects from caches.

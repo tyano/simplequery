@@ -67,6 +67,7 @@ public final class Objects {
             for (PropertyDescriptor descriptor : descriptors) {
                 if (descriptor.getName().equals(propertyName)) {
                     Method readMethod = descriptor.getReadMethod();
+                    if(readMethod == null) throw new IllegalStateException("the property '" + propertyName + "' does not have a getter method.");
                     A annotation = readMethod.getAnnotation(findingAnnotation);
                     if (annotation != null) {
                         return annotation;
@@ -78,7 +79,7 @@ public final class Objects {
         }
         return null;
     }
-    
+
     public static <A extends Object & Annotation> boolean isAnnotationPresentOnProperty(Class<?> targetClass, String propertyName, Class<A> findingAnnotation) throws IntrospectionException {
         return findAnnotationOnProperty(targetClass, propertyName, findingAnnotation) != null;
     }

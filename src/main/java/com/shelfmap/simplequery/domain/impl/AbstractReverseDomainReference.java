@@ -18,11 +18,7 @@ package com.shelfmap.simplequery.domain.impl;
 import com.shelfmap.simplequery.Context;
 import com.shelfmap.simplequery.attribute.ConditionAttribute;
 import com.shelfmap.simplequery.domain.*;
-import com.shelfmap.simplequery.expression.Expression;
-import com.shelfmap.simplequery.expression.MultipleResultsExistException;
-import com.shelfmap.simplequery.expression.QueryResults;
-import com.shelfmap.simplequery.expression.SimpleQueryException;
-import com.shelfmap.simplequery.expression.SortOrder;
+import com.shelfmap.simplequery.expression.*;
 import static com.shelfmap.simplequery.expression.matcher.MatcherFactory.referTo;
 
 /**
@@ -59,7 +55,7 @@ public abstract class AbstractReverseDomainReference<M,T> implements DomainRefer
     }
 
     private Expression<T> createExpression() {
-        return getContext().getClientFactory().create().select().from(getTargetDomain().getDomainClass()).where(getTargetAttribute(), referTo(getMasterItemName())).orderBy(getTargetAttribute(), SortOrder.Asc);
+        return getContext().select().from(getTargetDomain().getDomainClass()).where(getTargetAttribute(), referTo(getMasterItemName())).orderBy(getTargetAttribute(), SortOrder.Asc);
     }
 
     public ConditionAttribute getTargetAttribute() {

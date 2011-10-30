@@ -57,7 +57,7 @@ public class DefaultToOneDomainReference<T> implements ToOneDomainReference<T>, 
     }
 
     private Expression<T> createExpression() {
-        return context.getClientFactory().create().select().from(getTargetDomain().getDomainClass()).whereItemName(is(getTargetItemName()));
+        return context.select().from(getTargetDomain().getDomainClass()).whereItemName(is(getTargetItemName()));
     }
 
     @Override

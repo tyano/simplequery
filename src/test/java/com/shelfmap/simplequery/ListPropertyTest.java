@@ -15,36 +15,31 @@
  */
 package com.shelfmap.simplequery;
 
-import static org.hamcrest.Matchers.isIn;
-import static org.hamcrest.Matchers.nullValue;
-import static com.shelfmap.simplequery.expression.matcher.MatcherFactory.is;
-import static org.junit.Assert.assertThat;
-import static org.hamcrest.Matchers.notNullValue;
-import com.shelfmap.simplequery.annotation.SimpleDbDomain;
 import com.amazonaws.services.simpledb.AmazonSimpleDB;
 import com.amazonaws.services.simpledb.model.BatchPutAttributesRequest;
 import com.amazonaws.services.simpledb.model.CreateDomainRequest;
 import com.amazonaws.services.simpledb.model.DeleteDomainRequest;
 import com.amazonaws.services.simpledb.model.ReplaceableItem;
-import com.shelfmap.simplequery.expression.MultipleResultsExistException;
-import com.shelfmap.simplequery.expression.SimpleQueryException;
-import static java.util.Arrays.asList;
-import static com.shelfmap.simplequery.SimpleDbUtil.*;
 import com.google.inject.Binder;
 import com.google.inject.Inject;
 import com.google.inject.Scopes;
+import static com.shelfmap.simplequery.SimpleDbUtil.attr;
+import static com.shelfmap.simplequery.SimpleDbUtil.item;
 import com.shelfmap.simplequery.annotation.Attribute;
 import com.shelfmap.simplequery.annotation.Container;
 import com.shelfmap.simplequery.annotation.ItemName;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
+import com.shelfmap.simplequery.annotation.SimpleDbDomain;
+import com.shelfmap.simplequery.expression.MultipleResultsExistException;
+import com.shelfmap.simplequery.expression.SimpleQueryException;
+import static com.shelfmap.simplequery.expression.matcher.MatcherFactory.is;
+import static java.util.Arrays.asList;
+import java.util.*;
 import org.hamcrest.Matchers;
+import static org.hamcrest.Matchers.*;
 import org.jbehave.core.annotations.Given;
 import org.jbehave.core.annotations.Then;
 import org.jbehave.core.annotations.When;
+import static org.junit.Assert.assertThat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -100,7 +95,7 @@ public class ListPropertyTest extends BaseStoryRunner {
 
     @When("selecting an item from the domain which have a multi-value column")
     public void selectItemsWithMultiValues() throws SimpleQueryException, MultipleResultsExistException {
-        result = ctx.getContext().getClientFactory().create().select().from(ListPropertyDomain.class).whereItemName(is("first")).getSingleResult(true);
+        result = ctx.getContext().select().from(ListPropertyDomain.class).whereItemName(is("first")).getSingleResult(true);
     }
 
     @Then("we can get the values through a property whose type is a kind of Collection")
@@ -122,7 +117,7 @@ public class ListPropertyTest extends BaseStoryRunner {
 
     @When("selecting an item from the same domain, but the properties type is not a kind of Collection")
     public void selectItemBySingleObjectProperty() throws SimpleQueryException, MultipleResultsExistException {
-        noListResult = ctx.getContext().getClientFactory().create().select().from(DomainWithoutList.class).whereItemName(is("first")).getSingleResult(true);
+        noListResult = ctx.getContext().select().from(DomainWithoutList.class).whereItemName(is("first")).getSingleResult(true);
     }
 
     @Then("we should get a random value from values of the multi-value column")
@@ -136,7 +131,7 @@ public class ListPropertyTest extends BaseStoryRunner {
 
     @When("the value of a multi-value column is null and the type of the property associated with the column is a kind of Collection")
     public void selectEmptyMultiValueColumnByList() throws SimpleQueryException, MultipleResultsExistException {
-        result = ctx.getContext().getClientFactory().create().select().from(ListPropertyDomain.class).whereItemName(is("empty")).getSingleResult(true);
+        result = ctx.getContext().select().from(ListPropertyDomain.class).whereItemName(is("empty")).getSingleResult(true);
     }
 
     @Then("the return value must be an empty collection")
@@ -148,7 +143,7 @@ public class ListPropertyTest extends BaseStoryRunner {
 
     @When("the value of a multi-value column is null and the type of the property associated with the column is not a Collection")
     public void selectEmptyMultiValueColumnBySingleObjectProperty() throws SimpleQueryException, MultipleResultsExistException {
-        noListResult = ctx.getContext().getClientFactory().create().select().from(DomainWithoutList.class).whereItemName(is("empty")).getSingleResult(true);
+        noListResult = ctx.getContext().select().from(DomainWithoutList.class).whereItemName(is("empty")).getSingleResult(true);
     }
 
     @Then("the return value must be a null")
@@ -160,7 +155,7 @@ public class ListPropertyTest extends BaseStoryRunner {
 
     @When("selecting an item from the domain which have a multi-value column and receive the result with an Array property")
     public void selectWithArray() throws SimpleQueryException, MultipleResultsExistException {
-        arrayResult = ctx.getContext().getClientFactory().create().select().from(ArrayDomain.class).whereItemName(is("first")).getSingleResult(true);
+        arrayResult = ctx.getContext().select().from(ArrayDomain.class).whereItemName(is("first")).getSingleResult(true);
     }
 
     @Then("we can get the values through a property whose type is an Array")
@@ -178,7 +173,7 @@ public class ListPropertyTest extends BaseStoryRunner {
 
     @When("the value of a multi-value column is null and the type of the property associated with the column is an array")
     public void selectEmptyValueByArray() throws SimpleQueryException, MultipleResultsExistException {
-        arrayResult = ctx.getContext().getClientFactory().create().select().from(ArrayDomain.class).whereItemName(is("empty")).getSingleResult(true);
+        arrayResult = ctx.getContext().select().from(ArrayDomain.class).whereItemName(is("empty")).getSingleResult(true);
     }
 
     @Then("the return value must be an array which size is zero")

@@ -18,10 +18,13 @@ package com.shelfmap.simplequery;
 import com.amazonaws.AmazonClientException;
 import com.amazonaws.AmazonServiceException;
 import com.amazonaws.auth.AWSCredentials;
+import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.simpledb.AmazonSimpleDB;
+import com.shelfmap.simplequery.attribute.SelectAttribute;
 import com.shelfmap.simplequery.domain.AttributeConverterFactory;
 import com.shelfmap.simplequery.domain.Domain;
 import com.shelfmap.simplequery.domain.DomainFactory;
-import com.shelfmap.simplequery.factory.ClientFactory;
+import com.shelfmap.simplequery.expression.SelectQuery;
 import com.shelfmap.simplequery.factory.DomainDescriptorFactory;
 import com.shelfmap.simplequery.factory.ItemConverterFactory;
 import java.io.Serializable;
@@ -32,13 +35,16 @@ import java.util.Set;
  * @author Tsutomu YANO
  */
 public interface Context extends Serializable {
-    ClientFactory getClientFactory();
     ItemConverterFactory getItemConverterFactory();
     <T> DomainInstanceFactory<T> getDomainInstanceFactory(Domain<T> domain);
     DomainFactory getDomainFactory();
     DomainDescriptorFactory getDomainDescriptorFactory();
     AttributeConverterFactory getAttributeConverterFactory();
     AWSCredentials getCredentials();
+
+    AmazonSimpleDB getSimpleDB();
+    AmazonS3 getS3();
+    SelectQuery select(SelectAttribute... attribute);
 
     void putObjectImmediately(Object domainObject) throws AmazonServiceException, AmazonClientException;
     void putObjects(Object... domainObjects);

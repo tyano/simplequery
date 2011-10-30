@@ -17,22 +17,27 @@ package com.shelfmap.simplequery;
 
 import com.amazonaws.AmazonClientException;
 import com.amazonaws.AmazonServiceException;
+import com.amazonaws.ClientConfiguration;
 import com.amazonaws.auth.AWSCredentials;
+import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.simpledb.AmazonSimpleDB;
+import com.amazonaws.services.simpledb.AmazonSimpleDBClient;
 import com.amazonaws.services.simpledb.model.*;
-import com.amazonaws.services.simpledb.model.ReplaceableItem;
+import com.shelfmap.simplequery.attribute.SelectAttribute;
 import com.shelfmap.simplequery.domain.*;
 import com.shelfmap.simplequery.domain.impl.DefaultDomainFactory;
 import com.shelfmap.simplequery.expression.ItemConverter;
-import com.shelfmap.simplequery.factory.ClientFactory;
+import com.shelfmap.simplequery.expression.SelectQuery;
+import com.shelfmap.simplequery.expression.impl.Select;
 import com.shelfmap.simplequery.factory.DomainDescriptorFactory;
 import com.shelfmap.simplequery.factory.ItemConverterFactory;
-import com.shelfmap.simplequery.factory.impl.DefaultClientFactory;
 import com.shelfmap.simplequery.factory.impl.DefaultDomainDescriptorFactory;
 import com.shelfmap.simplequery.factory.impl.DefaultItemConverterFactory;
-import java.util.*;
 import static java.util.Arrays.asList;
+import java.util.*;
 import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
@@ -46,6 +51,13 @@ public class DefaultContext implements Context {
 
     //TODO hey! AWSCredentials must be serializable! or must be transient!
     private final AWSCredentials credentials;
+
+    private AmazonSimpleDB simpleDB;
+    private final Lock simpleDBLock = new ReentrantLock();
+
+    private AmazonS3 s3;
+    private final Lock s3Lock = new ReentrantLock();
+
     private final Set<Object> putObjects = new LinkedHashSet<Object>();;
     private final Set<Object> deleteObjects = new LinkedHashSet<Object>();
 
@@ -59,11 +71,6 @@ public class DefaultContext implements Context {
 
     public DefaultContext(AWSCredentials credentials) {
         this.credentials = credentials;
-    }
-
-    @Override
-    public ClientFactory getClientFactory() {
-        return new DefaultClientFactory(this);
     }
 
     @Override
@@ -96,6 +103,65 @@ public class DefaultContext implements Context {
         return this.credentials;
     }
 
+
+    @Override
+    public AmazonSimpleDB getSimpleDB() {
+        simpleDBLock.lock();
+        try {
+            if(this.simpleDB == null) {
+                this.simpleDB = createSimpleDb(getCredentials());
+            }
+            return this.simpleDB;
+        } finally {
+            simpleDBLock.unlock();
+        }
+    }
+
+    @Override
+    public SelectQuery select(SelectAttribute... attributes) {
+        return newSelectQuery(attributes);
+    }
+
+    protected SelectQuery newSelectQuery(SelectAttribute... attributes) {
+        return new Select(this, attributes);
+    }
+
+    @Override
+    public AmazonS3 getS3() {
+        s3Lock.lock();
+        try {
+            if(this.s3 == null) {
+                this.s3 = createS3(getCredentials());
+            };
+            return this.s3;
+        } finally {
+            s3Lock.unlock();
+        }
+    }
+
+    protected AmazonSimpleDB createSimpleDb(AWSCredentials securityCredential) {
+        ClientConfiguration clientConfig = configureSimpleDb();
+        return clientConfig == null
+                ? new AmazonSimpleDBClient(securityCredential)
+                : new AmazonSimpleDBClient(securityCredential, clientConfig);
+    }
+
+    protected ClientConfiguration configureSimpleDb() {
+        return null;
+    }
+
+    protected AmazonS3 createS3(AWSCredentials securityCredential) {
+        ClientConfiguration clientConfig = configureS3();
+        return clientConfig == null
+                ? new AmazonS3Client(securityCredential)
+                : new AmazonS3Client(securityCredential, clientConfig);
+    }
+
+    protected ClientConfiguration configureS3() {
+        return null;
+    }
+
+
     @Override
     public void putObjects(Object... domainObjects) {
         putObjectWriteLock.lock();
@@ -122,9 +188,8 @@ public class DefaultContext implements Context {
         ItemConverter<?> itemConverter = getItemConverterFactory().create(domain);
         ReplaceableItem item = itemConverter.convertToItem(domainObject);
 
-        Client client = getClientFactory().create();
         PutAttributesRequest request = new PutAttributesRequest(domain.getDomainName(), item.getName(), item.getAttributes());
-        client.getSimpleDB().putAttributes(request);
+        getSimpleDB().putAttributes(request);
     }
 
     @Override
@@ -157,9 +222,8 @@ public class DefaultContext implements Context {
 
     @Override
     public void deleteItem(Domain<?> domain, String itemName) throws AmazonServiceException, AmazonClientException {
-        Client client = getClientFactory().create();
         DeleteAttributesRequest request = new DeleteAttributesRequest(domain.getDomainName(), itemName);
-        client.getSimpleDB().deleteAttributes(request);
+        getSimpleDB().deleteAttributes(request);
     }
 
     @Override
@@ -205,7 +269,7 @@ public class DefaultContext implements Context {
                 list.add(item);
             }
 
-            AmazonSimpleDB simpleDB = getClientFactory().create().getSimpleDB();
+            AmazonSimpleDB simpleDB = getSimpleDB();
             for (Domain<?> domain : deleteItems.keySet()) {
                 List<DeletableItem> items = deleteItems.get(domain);
                 BatchDeleteAttributesRequest request = new BatchDeleteAttributesRequest(domain.getDomainName(), items);

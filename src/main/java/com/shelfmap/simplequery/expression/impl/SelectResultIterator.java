@@ -87,7 +87,7 @@ public class SelectResultIterator<T> implements Iterator<T> {
         final String nextToken = currentResult.getNextToken();
         if(nextToken != null) {
             SelectRequest request = new SelectRequest(expression.describe()).withNextToken(nextToken);
-            SelectResult result = context.getClientFactory().create().getSimpleDB().select(request);
+            SelectResult result = context.getSimpleDB().select(request);
             currentResult = result;
             currentItemList = currentResult.getItems();
             currentListSize = currentItemList.size();

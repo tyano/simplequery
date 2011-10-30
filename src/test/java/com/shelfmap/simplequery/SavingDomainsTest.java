@@ -80,7 +80,7 @@ public class SavingDomainsTest extends BaseStoryRunner {
 
     @Given("2 test domains")
     public void createTestDomains() {
-        AmazonSimpleDB simpleDb = context.getClientFactory().create().getSimpleDB();
+        AmazonSimpleDB simpleDb = context.getSimpleDB();
 
         simpleDb.deleteDomain(new DeleteDomainRequest(MAIN_DOMAIN));
         simpleDb.deleteDomain(new DeleteDomainRequest(SUB_DOMAIN));
@@ -120,9 +120,8 @@ public class SavingDomainsTest extends BaseStoryRunner {
     @Given("A instance of the test domain which have a reference to another domain")
     public void createTestInstances() {
         try {
-            Client client = context.getClientFactory().create();
-            tokyo = client.select().from(Province.class).whereItemName(MatcherFactory.is("tokyo")).getSingleResult(true);
-            user1 = client.select().from(User.class).whereItemName(MatcherFactory.is("0001")).getSingleResult(true);
+            tokyo = context.select().from(Province.class).whereItemName(MatcherFactory.is("tokyo")).getSingleResult(true);
+            user1 = context.select().from(User.class).whereItemName(MatcherFactory.is("0001")).getSingleResult(true);
         } catch (Exception ex) {
             LOGGER.error("exception occur", ex);
             fail();
@@ -140,8 +139,7 @@ public class SavingDomainsTest extends BaseStoryRunner {
         try {
             context.putObjectImmediately(user1);
 
-            Client client = context.getClientFactory().create();
-            User assertUser = client.select().from(User.class).whereItemName(MatcherFactory.is("0001")).getSingleResult(true);
+            User assertUser = context.select().from(User.class).whereItemName(MatcherFactory.is("0001")).getSingleResult(true);
 
             assertThat(assertUser.getName(), is("User 1"));
             assertThat(assertUser.getAge(), is(24));
@@ -155,8 +153,7 @@ public class SavingDomainsTest extends BaseStoryRunner {
     @Then("the instance of another domain do not saved.")
     public void assertReferencedDomainsDoNotSaved() {
         try {
-            Client client = context.getClientFactory().create();
-            User assertUser = client.select().from(User.class).whereItemName(MatcherFactory.is("0001")).getSingleResult(true);
+            User assertUser = context.select().from(User.class).whereItemName(MatcherFactory.is("0001")).getSingleResult(true);
 
             Province assertTokyo = assertUser.getProvinceReference().get(true);
             assertThat(assertTokyo.getItemName(), is("tokyo"));
@@ -171,8 +168,7 @@ public class SavingDomainsTest extends BaseStoryRunner {
     @Given("some instances of the test domain which have a reference to another domain")
     public void createMultiInstances() {
         try {
-            Client client = context.getClientFactory().create();
-            QueryResults<Province> results = client.select().from(Province.class).whereItemName(MatcherFactory.in("tokyo", "chiba")).getResults(true);
+            QueryResults<Province> results = context.select().from(Province.class).whereItemName(MatcherFactory.in("tokyo", "chiba")).getResults(true);
             for (Province p : results) {
                 if (p.getItemName().equals("tokyo")) {
                     tokyo = p;
@@ -181,7 +177,7 @@ public class SavingDomainsTest extends BaseStoryRunner {
                 }
             }
 
-            QueryResults<User> users = client.select().from(User.class).whereItemName(MatcherFactory.in("0001", "0002")).getResults(true);
+            QueryResults<User> users = context.select().from(User.class).whereItemName(MatcherFactory.in("0001", "0002")).getResults(true);
             for (User u : users) {
                 if (u.getItemName().equals("0001")) {
                     user1 = u;
@@ -219,8 +215,7 @@ public class SavingDomainsTest extends BaseStoryRunner {
     @Then("we can save all instances, which put into Context, with one method call")
     public void assertChangesApplied() {
         try {
-            Client client = context.getClientFactory().create();
-            QueryResults<Province> results = client.select().from(Province.class).whereItemName(MatcherFactory.in("tokyo", "chiba")).getResults(true);
+            QueryResults<Province> results = context.select().from(Province.class).whereItemName(MatcherFactory.in("tokyo", "chiba")).getResults(true);
             for (Province p : results) {
                 if (p.getItemName().equals("tokyo")) {
                     assertThat(p.getName(), is("TOKYO"));
@@ -229,7 +224,7 @@ public class SavingDomainsTest extends BaseStoryRunner {
                 }
             }
 
-            QueryResults<User> users = client.select().from(User.class).whereItemName(MatcherFactory.in("0001", "0002")).getResults(true);
+            QueryResults<User> users = context.select().from(User.class).whereItemName(MatcherFactory.in("0001", "0002")).getResults(true);
             for (User u : users) {
                 if (u.getItemName().equals("0001")) {
                     assertThat(u.getName(), is("changed user 1"));

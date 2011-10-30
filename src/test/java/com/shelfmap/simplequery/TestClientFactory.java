@@ -45,7 +45,7 @@ public class TestClientFactory {
 
         Context context = new TokyoContext(credentials);
 
-        holder.setSimpleDb(context.getClientFactory().create().getSimpleDB());
+        holder.setSimpleDb(context.getSimpleDB());
         holder.setContext(context);
     }
 

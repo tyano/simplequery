@@ -38,7 +38,6 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.RandomStringUtils;
 import static org.hamcrest.Matchers.is;
 import org.jbehave.core.annotations.Given;
-import org.jbehave.core.annotations.Pending;
 import org.jbehave.core.annotations.Then;
 import org.jbehave.core.annotations.When;
 import static org.junit.Assert.assertThat;
@@ -52,7 +51,7 @@ import org.slf4j.LoggerFactory;
 @StoryPath("stories/BlobReferenceSpec.story")
 public class BlobReferenceTest extends BaseStoryRunner {
     private static final Logger LOGGER = LoggerFactory.getLogger(BlobReferenceTest.class);
-    
+
     @Override
     protected void configureTestContext(Binder binder) {
         binder.bind(ContextHolder.class).to(TestContext.class).in(Scopes.SINGLETON);
@@ -72,7 +71,7 @@ public class BlobReferenceTest extends BaseStoryRunner {
 
     @Given("a S3 resource")
     public void createTestS3Resource() throws IOException {
-        AmazonS3 s3 = ctx.getContext().getClientFactory().create().getS3();
+        AmazonS3 s3 = ctx.getContext().getS3();
 
         boolean found = false;
         ObjectListing listing = s3.listObjects(BUCKET_NAME);
@@ -207,7 +206,7 @@ public class BlobReferenceTest extends BaseStoryRunner {
     }
 
     private void deleteTestKey() {
-        AmazonS3 s3 = ctx.getContext().getClientFactory().create().getS3();
+        AmazonS3 s3 = ctx.getContext().getS3();
         if (s3.doesBucketExist(BUCKET_NAME)) {
             DeleteObjectRequest request = new DeleteObjectRequest(BUCKET_NAME, testKeyName);
             s3.deleteObject(request);
@@ -223,7 +222,7 @@ public class BlobReferenceTest extends BaseStoryRunner {
 
     @Given("a S3 bucket")
     public void initS3Bucket() {
-        AmazonS3 s3 = ctx.getContext().getClientFactory().create().getS3();
+        AmazonS3 s3 = ctx.getContext().getS3();
         if (!s3.doesBucketExist(BUCKET_NAME)) {
             CreateBucketRequest request = new CreateBucketRequest(BUCKET_NAME);
             request.setRegion("ap-northeast-1");

@@ -16,7 +16,8 @@
 package com.shelfmap.simplequery;
 
 import com.amazonaws.auth.AWSCredentials;
-import com.shelfmap.simplequery.factory.ClientFactory;
+import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.simpledb.AmazonSimpleDB;
 
 /**
  *
@@ -30,7 +31,16 @@ public class TokyoContext extends DefaultContext {
     }
 
     @Override
-    public ClientFactory getClientFactory() {
-        return new TokyoClientFactory(this);
+    public AmazonS3 createS3(AWSCredentials securityCredential) {
+        AmazonS3 s3 =  super.createS3(securityCredential);
+        s3.setEndpoint("s3-ap-northeast-1.amazonaws.com");
+        return s3;
+    }
+
+    @Override
+    protected AmazonSimpleDB createSimpleDb(AWSCredentials securityCredential) {
+        AmazonSimpleDB simpleDB = super.createSimpleDb(securityCredential);
+        simpleDB.setEndpoint("sdb.ap-northeast-1.amazonaws.com");
+        return simpleDB;
     }
 }

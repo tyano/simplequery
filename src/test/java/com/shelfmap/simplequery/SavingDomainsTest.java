@@ -17,9 +17,7 @@ package com.shelfmap.simplequery;
 
 import com.amazonaws.auth.PropertiesCredentials;
 import com.amazonaws.services.simpledb.AmazonSimpleDB;
-import com.amazonaws.services.simpledb.model.BatchPutAttributesRequest;
-import com.amazonaws.services.simpledb.model.CreateDomainRequest;
-import com.amazonaws.services.simpledb.model.DeleteDomainRequest;
+import com.amazonaws.services.simpledb.model.*;
 import static com.shelfmap.simplequery.SimpleDbUtil.attr;
 import static com.shelfmap.simplequery.SimpleDbUtil.item;
 import com.shelfmap.simplequery.annotation.ForwardDomainReference;
@@ -29,7 +27,9 @@ import com.shelfmap.simplequery.annotation.SimpleDbDomain;
 import com.shelfmap.simplequery.domain.Domain;
 import com.shelfmap.simplequery.domain.ToOneDomainReference;
 import com.shelfmap.simplequery.domain.impl.DefaultToOneDomainReference;
+import com.shelfmap.simplequery.expression.MultipleResultsExistException;
 import com.shelfmap.simplequery.expression.QueryResults;
+import com.shelfmap.simplequery.expression.SimpleQueryException;
 import com.shelfmap.simplequery.expression.matcher.MatcherFactory;
 import java.io.File;
 import java.io.IOException;
@@ -38,8 +38,7 @@ import static org.hamcrest.Matchers.*;
 import org.jbehave.core.annotations.Given;
 import org.jbehave.core.annotations.Then;
 import org.jbehave.core.annotations.When;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -246,10 +245,26 @@ public class SavingDomainsTest extends BaseStoryRunner {
 
     @Then("the attribute will be deleted in SimpleDB")
     public void assertTheAttributeDeletedInAWS() {
+        AmazonSimpleDB simpleDB = context.getSimpleDB();
+
+        GetAttributesRequest req = new GetAttributesRequest()
+                                        .withDomainName(MAIN_DOMAIN)
+                                        .withItemName("0001")
+                                        .withConsistentRead(true)
+                                        .withAttributeNames("name");
+
+        GetAttributesResult attributes = simpleDB.getAttributes(req);
+        for (Attribute attr : attributes.getAttributes()) {
+            if(attr.getName().equals("name")) {
+                fail("the 'name' attribute exists. It must be deleted.");
+            }
+        }
     }
 
     @Then("the property of the instance become null if the instance is refreshed")
-    public void assertThePropertyBecomeNull() {
+    public void assertThePropertyBecomeNull() throws SimpleQueryException, MultipleResultsExistException {
+        User refreshedUser1 = context.select().from(User.class).whereItemName(MatcherFactory.is("0001")).getSingleResult(true);
+        assertThat(refreshedUser1.getName(), is(nullValue()));
     }
 
     /**

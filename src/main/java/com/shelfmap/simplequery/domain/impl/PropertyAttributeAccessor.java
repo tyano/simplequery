@@ -106,7 +106,7 @@ public class PropertyAttributeAccessor<T> implements AttributeAccessor<T> {
         DomainFactory factory = getContext().getDomainFactory();
         Domain<T> domain = factory.createDomain(propertyType);
         DomainInstanceFactory<T> instanceFactory = getContext().getDomainInstanceFactory(domain);
-        return instanceFactory.create(domain);
+        return instanceFactory.create();
     }
 
     private <T> T newObjectInstance(Class<T> clazz) {

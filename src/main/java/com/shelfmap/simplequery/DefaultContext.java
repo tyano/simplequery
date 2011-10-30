@@ -73,7 +73,7 @@ public class DefaultContext implements Context {
 
     @Override
     public <T> DomainInstanceFactory<T> getDomainInstanceFactory(Domain<T> domain) {
-        return new DefaultInstanceFactory<T>();
+        return new DefaultInstanceFactory<T>(this, domain);
     }
 
     @Override

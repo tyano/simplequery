@@ -22,11 +22,26 @@ import com.shelfmap.simplequery.domain.Domain;
  * @author Tsutomu YANO
  */
 public class DefaultInstanceFactory<T> implements DomainInstanceFactory<T> {
+    private Context context;
+    private Domain<T> domain;
+
+    public DefaultInstanceFactory(Context context, Domain<T> domain) {
+        this.context = context;
+        this.domain = domain;
+    }
+
+    public Context getContext() {
+        return context;
+    }
+
+    public Domain<T> getDomain() {
+        return domain;
+    }
 
     @Override
-    public T create(Domain<T> domain) {
+    public T create() {
         try {
-            return domain.getDomainClass().newInstance();
+            return getDomain().getDomainClass().newInstance();
         } catch (InstantiationException ex) {
             throw new IllegalStateException("Could not instanciate the class: " + domain, ex);
         } catch (IllegalAccessException ex) {

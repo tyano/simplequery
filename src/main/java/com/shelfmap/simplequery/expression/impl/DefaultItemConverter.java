@@ -61,7 +61,7 @@ public class DefaultItemConverter<T> implements ItemConverter<T> {
             descriptor = getContext().getDomainDescriptorFactory().create(getDomain());
         }
 
-        T instance = instanceFactory.create(getDomain());
+        T instance = instanceFactory.create();
         for (Attribute attr : item.getAttributes()) {
             DomainAttribute<?,?> domainAttribute = null;
             try {

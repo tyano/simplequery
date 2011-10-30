@@ -23,5 +23,5 @@ import com.shelfmap.simplequery.domain.Domain;
  * @author Tsutomu YANO
  */
 public interface DomainInstanceFactory<T> {
-    T create(Domain<T> clazz);
+    T create();
 }

@@ -178,7 +178,7 @@ public class DomainReferenceTest extends BaseStoryRunner {
         }
 
         @Override
-        public Detail create(Domain<Detail> domain) {
+        public Detail create() {
             return new DefaultDetail(context);
         }
     }
@@ -191,7 +191,7 @@ public class DomainReferenceTest extends BaseStoryRunner {
         }
 
         @Override
-        public PurchaseRecord create(Domain<PurchaseRecord> domain) {
+        public PurchaseRecord create() {
             return new ToManyPurchaseRecord(context);
         }
     }
@@ -204,7 +204,7 @@ public class DomainReferenceTest extends BaseStoryRunner {
         }
 
         @Override
-        public PurchaseRecord2 create(Domain<PurchaseRecord2> domain) {
+        public PurchaseRecord2 create() {
             return new ToOnePurchaseRecord(context);
         }
     }

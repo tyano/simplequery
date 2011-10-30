@@ -15,6 +15,7 @@
  */
 package com.shelfmap.simplequery.expression.matcher;
 
+import com.amazonaws.services.simpledb.util.SimpleDBUtils;
 import com.shelfmap.simplequery.domain.AttributeConverter;
 import static com.shelfmap.simplequery.util.Assertion.*;
 import com.shelfmap.simplequery.domain.impl.DefaultAttributeConverter;
@@ -33,12 +34,12 @@ public abstract class BaseMatcher<T> implements Matcher<T> {
     public BaseMatcher(T... values) {
         this(new DefaultAttributeConverter<T>(values[0]), values);
     }
-    
+
     protected BaseMatcher(AttributeConverter<T> attributeConverter, T... values) {
         isNotNull("attributeConverter", attributeConverter);
         isNotNull("values", values);
         isNotEmpty("values", values);
-        
+
         this.attributeConverter = attributeConverter;
         this.values = values;
     }
@@ -49,7 +50,7 @@ public abstract class BaseMatcher<T> implements Matcher<T> {
     public String describe() {
         StringBuilder sb = new StringBuilder();
         sb.append(expression()).append(" ");
-        sb.append(attributeConverter.convertValue(values[0]));
+        sb.append(SimpleDBUtils.quoteValue(attributeConverter.convertValue(values[0])));
         return sb.toString();
     }
 
@@ -57,13 +58,13 @@ public abstract class BaseMatcher<T> implements Matcher<T> {
     public Matcher<T> withAttributeConverter(AttributeConverter<T> attributeConverter) {
         return newMatcher(attributeConverter, values);
     }
-    
+
     @Override
     public AttributeConverter<T> getAttributeConverter() {
         return this.attributeConverter;
     }
-    
-    @Override 
+
+    @Override
     public void setAttributeConverter(AttributeConverter<T> attributeConverter) {
         this.attributeConverter = attributeConverter;
     }

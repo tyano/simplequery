@@ -16,6 +16,7 @@
 
 package com.shelfmap.simplequery.expression.matcher;
 
+import com.amazonaws.services.simpledb.util.SimpleDBUtils;
 import com.shelfmap.simplequery.domain.AttributeConverter;
 
 /**
@@ -41,11 +42,11 @@ public class InMatcher<T> extends BaseMatcher<T> {
     public String describe() {
         StringBuilder sb = new StringBuilder();
         sb.append(expression()).append(" (");
-        
+
         StringBuilder parameters = new StringBuilder();
         for (T value : getValues()) {
             if(parameters.length() > 0) parameters.append(", ");
-            parameters.append(getAttributeConverter().convertValue(value));
+            parameters.append(SimpleDBUtils.quoteValue(getAttributeConverter().convertValue(value)));
         }
         sb.append(parameters.toString());
         sb.append(")");

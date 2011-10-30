@@ -16,6 +16,8 @@
 
 package com.shelfmap.simplequery.expression.matcher;
 
+import com.amazonaws.services.simpledb.util.SimpleDBUtils;
+import static com.amazonaws.services.simpledb.util.SimpleDBUtils.quoteValue;
 import com.shelfmap.simplequery.domain.AttributeConverter;
 
 /**
@@ -24,7 +26,7 @@ import com.shelfmap.simplequery.domain.AttributeConverter;
  */
 public class BetweenMatcher<T> extends BaseMatcher<T> {
     private T second;
-    
+
     @SuppressWarnings("unchecked")
     public BetweenMatcher(T value) {
         super(value);
@@ -34,7 +36,7 @@ public class BetweenMatcher<T> extends BaseMatcher<T> {
     protected BetweenMatcher(AttributeConverter<T> attributeConverter, T... value) {
         super(attributeConverter, value);
     }
-    
+
     public BetweenMatcher<T> and(T value) {
         this.second = value;
         return this;
@@ -48,7 +50,7 @@ public class BetweenMatcher<T> extends BaseMatcher<T> {
     @Override
     public String describe() {
         if(second == null) throw new IllegalStateException("the second argument not found. You need pass a second argument by the 'and()' method.");
-        return super.describe() + " and " + getAttributeConverter().convertValue(second);
+        return super.describe() + " and " + quoteValue(getAttributeConverter().convertValue(second));
     }
 
     @Override

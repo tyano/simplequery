@@ -28,7 +28,7 @@ import com.shelfmap.simplequery.expression.SelectQuery;
 import com.shelfmap.simplequery.factory.DomainDescriptorFactory;
 import com.shelfmap.simplequery.factory.ItemConverterFactory;
 import java.io.Serializable;
-import java.util.Set;
+import java.util.LinkedHashSet;
 
 /**
  *
@@ -48,12 +48,12 @@ public interface Context extends Serializable {
 
     void putObjectImmediately(Object domainObject) throws AmazonServiceException, AmazonClientException;
     void putObjects(Object... domainObjects);
-    Set<Object> getPutObjects();
+    LinkedHashSet<Object> getPutObjects();
 
     void deleteObjectImmediately(Object domainObject) throws AmazonServiceException, AmazonClientException;
     void deleteItem(Domain<?> domain, String itemName) throws AmazonServiceException, AmazonClientException;
     void deleteObjects(Object... domainObjects);
-    Set<Object> getDeleteObjects();
+    LinkedHashSet<Object> getDeleteObjects();
 
     void save() throws AmazonServiceException, AmazonClientException;
 }

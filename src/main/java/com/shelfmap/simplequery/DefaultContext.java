@@ -34,7 +34,6 @@ import com.shelfmap.simplequery.factory.DomainDescriptorFactory;
 import com.shelfmap.simplequery.factory.ItemConverterFactory;
 import com.shelfmap.simplequery.factory.impl.DefaultDomainDescriptorFactory;
 import com.shelfmap.simplequery.factory.impl.DefaultItemConverterFactory;
-import static java.util.Arrays.asList;
 import java.util.*;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -67,20 +66,11 @@ public class DefaultContext implements Context {
     private final Lock s3Lock = new ReentrantLock();
 
     private final Deque<CachedObject> cachedObjects = new ArrayDeque<CachedObject>();
-    private final Set<Object> putObjects = new LinkedHashSet<Object>();
-    private final Set<Object> deleteObjects = new LinkedHashSet<Object>();
 
     private final ReentrantReadWriteLock cachedObjectRwl = new ReentrantReadWriteLock();
     private final Lock cachedObjectReadLock = cachedObjectRwl.readLock();
     private final Lock cachedObjectWriteLock = cachedObjectRwl.writeLock();
 
-    private final ReentrantReadWriteLock putObjectRwl = new ReentrantReadWriteLock();
-    private final Lock putObjectReadLock = putObjectRwl.readLock();
-    private final Lock putObjectWriteLock = putObjectRwl.writeLock();
-
-    private final ReentrantReadWriteLock deleteObjectRwl = new ReentrantReadWriteLock();
-    private final Lock deleteObjectReadLock = deleteObjectRwl.readLock();
-    private final Lock deleteObjectWriteLock = deleteObjectRwl.writeLock();
 
     public DefaultContext(AWSCredentials credentials) {
         this.credentials = credentials;
@@ -202,12 +192,18 @@ public class DefaultContext implements Context {
     }
 
     @Override
-    public Set<Object> getPutObjects() {
-        putObjectReadLock.lock();
+    public LinkedHashSet<Object> getPutObjects() {
+        cachedObjectReadLock.lock();
         try {
-            return new LinkedHashSet<Object>(this.putObjects);
+            LinkedHashSet<Object> set = new LinkedHashSet<Object>();
+            for (CachedObject cached : cachedObjects) {
+                if(cached.getObjectType() == ObjectType.PUT) {
+                    set.add(cached.getObject());
+                }
+            }
+            return set;
         } finally {
-            putObjectReadLock.unlock();
+            cachedObjectReadLock.unlock();
         }
     }
 
@@ -251,12 +247,18 @@ public class DefaultContext implements Context {
     }
 
     @Override
-    public Set<Object> getDeleteObjects() {
-        deleteObjectReadLock.lock();
+    public LinkedHashSet<Object> getDeleteObjects() {
+        cachedObjectReadLock.lock();
         try {
-            return new LinkedHashSet<Object>(this.deleteObjects);
+            LinkedHashSet<Object> set = new LinkedHashSet<Object>();
+            for (CachedObject cached : cachedObjects) {
+                if(cached.getObjectType() == ObjectType.DELETE) {
+                    set.add(cached.getObject());
+                }
+            }
+            return set;
         } finally {
-            deleteObjectReadLock.unlock();
+            cachedObjectReadLock.unlock();
         }
     }
 

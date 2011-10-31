@@ -42,6 +42,14 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
  *
+ * Order of lock-aquisition:<br>
+ * all method which need have more than 1 lock must follow the following locking order.
+ * <ol>
+ * <li>cachedObjects' Lock
+ * <li>putObjects' Lock
+ * <li>deleteObjects' Lock
+ * </ol>
+ *
  * THIS CLASS IS THREAD SAFE
  *
  * @author Tsutomu YANO
@@ -58,8 +66,13 @@ public class DefaultContext implements Context {
     private AmazonS3 s3;
     private final Lock s3Lock = new ReentrantLock();
 
-    private final Set<Object> putObjects = new LinkedHashSet<Object>();;
+    private final Deque<CachedObject> cachedObjects = new ArrayDeque<CachedObject>();
+    private final Set<Object> putObjects = new LinkedHashSet<Object>();
     private final Set<Object> deleteObjects = new LinkedHashSet<Object>();
+
+    private final ReentrantReadWriteLock cachedObjectRwl = new ReentrantReadWriteLock();
+    private final Lock cachedObjectReadLock = cachedObjectRwl.readLock();
+    private final Lock cachedObjectWriteLock = cachedObjectRwl.writeLock();
 
     private final ReentrantReadWriteLock putObjectRwl = new ReentrantReadWriteLock();
     private final Lock putObjectReadLock = putObjectRwl.readLock();
@@ -162,13 +175,29 @@ public class DefaultContext implements Context {
     }
 
 
+    private Collection<CachedObject> asCachedUpdateObjects(Object... domainObjects) {
+        List<CachedObject> cachedList = new ArrayList<CachedObject>();
+        for (Object object : domainObjects) {
+            cachedList.add(new UpdateObject(object));
+        }
+        return cachedList;
+    }
+
+    private Collection<CachedObject> asCachedDeleteObjects(Object... domainObjects) {
+        List<CachedObject> cachedList = new ArrayList<CachedObject>();
+        for (Object object : domainObjects) {
+            cachedList.add(new DeleteObject(object));
+        }
+        return cachedList;
+    }
+
     @Override
     public void putObjects(Object... domainObjects) {
-        putObjectWriteLock.lock();
+        cachedObjectWriteLock.lock();
         try {
-            putObjects.addAll(asList(domainObjects));
+            cachedObjects.addAll(asCachedUpdateObjects(domainObjects));
         } finally {
-            putObjectWriteLock.unlock();
+            cachedObjectWriteLock.unlock();
         }
     }
 
@@ -213,11 +242,11 @@ public class DefaultContext implements Context {
 
     @Override
     public void deleteObjects(Object... domainObjects) {
-        deleteObjectWriteLock.lock();
+        cachedObjectWriteLock.lock();
         try {
-            deleteObjects.addAll(asList(domainObjects));
+            cachedObjects.addAll(asCachedDeleteObjects(domainObjects));
         } finally {
-            deleteObjectWriteLock.unlock();
+            cachedObjectWriteLock.unlock();
         }
     }
 
@@ -254,78 +283,168 @@ public class DefaultContext implements Context {
         //So we must get WRITE locks at first.
 
         //TODO I believe we can change this implementation more efficient. ex) putting and deleting data wtih some threads, and wait until all threads end.
-        putObjectWriteLock.lock();
-        deleteObjectWriteLock.lock();
+        cachedObjectWriteLock.lock();
         try {
-            if(putObjects.isEmpty() && deleteObjects.isEmpty()) return;
+            if(cachedObjects.isEmpty()) return;
 
             Map<Domain<?>, List<DeletableItem>> deleteItems = new HashMap<Domain<?>, List<DeletableItem>>();
             Map<Domain<?>, List<ReplaceableItem>> putItems = new HashMap<Domain<?>, List<ReplaceableItem>>();
 
-            for (Object object : deleteObjects) {
-                Domain<?> domain = getDomainFactory().findDomain(object.getClass());
-                DomainDescriptor descriptor = getDomainDescriptorFactory().create(domain);
-                String itemName = descriptor.getItemNameAttribute().getAttributeAccessor().read(object);
-                DeletableItem item = new DeletableItem().withName(itemName);
+            int handlingCount = 0;
+            ObjectType prevType = null;
+            for (CachedObject cached : new ArrayList<CachedObject>(cachedObjects)) {
+                ObjectType currentType = cached.getObjectType();
+                Object object = cached.getObject();
 
-                List<DeletableItem> list = deleteItems.get(domain);
-                if(list == null) {
-                    list = new ArrayList<DeletableItem>();
-                    deleteItems.put(domain, list);
-                }
-                list.add(item);
-            }
-
-            for (Object object : putObjects) {
-                Domain<?> domain = getDomainFactory().findDomain(object.getClass());
-                DomainDescriptor descriptor = getDomainDescriptorFactory().create(domain);
-                String itemName = descriptor.getItemNameAttribute().getAttributeAccessor().read(object);
-
-                ItemConverter<?> itemConverter = getItemConverterFactory().create(domain);
-                ItemState itemState = itemConverter.makeCurrentStateOf(object);
-                Collection<ReplaceableAttribute> changed = itemState.getChangedItems();
-                Collection<Attribute> deleted = itemState.getDeletedItems();
-
-                if(!changed.isEmpty()) {
-                    List<ReplaceableItem> list = putItems.get(domain);
-                    if(list == null) {
-                        list = new ArrayList<ReplaceableItem>();
-                        putItems.put(domain, list);
+                if(prevType != null && prevType != currentType) {
+                    switch(prevType) {
+                        case PUT:
+                            doPutObjects(putItems);
+                            break;
+                        case DELETE:
+                            doDeleteObjects(deleteItems);
+                            break;
+                        default:
+                            throw new IllegalStateException("No such objecType: " + currentType);
                     }
-                    list.add(new ReplaceableItem().withName(itemName).withAttributes(changed));
-                }
 
-                if(!deleted.isEmpty()){
-                    List<DeletableItem> list = deleteItems.get(domain);
-                    if(list == null) {
-                        list = new ArrayList<DeletableItem>();
-                        deleteItems.put(domain, list);
+                    for(int i = 0; i < handlingCount; i++) {
+                        cachedObjects.removeFirst();
                     }
-                    list.add(new DeletableItem().withName(itemName).withAttributes(deleted));
+                    handlingCount = 0;
                 }
+
+                switch(currentType) {
+                    case PUT:
+                        handlePutObject(object, putItems, deleteItems);
+                        break;
+                    case DELETE:
+                        handleDeleteObject(object, deleteItems);
+                        break;
+                    default:
+                        throw new IllegalStateException("No such objecType: " + currentType);
+                }
+                handlingCount++;
+                prevType = currentType;
             }
 
-            AmazonSimpleDB sdb = getSimpleDB();
-            for (Map.Entry<Domain<?>, List<DeletableItem>> entry : deleteItems.entrySet()) {
-                Domain<?> domain = entry.getKey();
-                List<DeletableItem> items = entry.getValue();
-                BatchDeleteAttributesRequest request = new BatchDeleteAttributesRequest(domain.getDomainName(), items);
-                sdb.batchDeleteAttributes(request);
-            }
-
-            for (Map.Entry<Domain<?>, List<ReplaceableItem>> entry : putItems.entrySet()) {
-                Domain<?> domain = entry.getKey();
-                List<ReplaceableItem> items = entry.getValue();
-                BatchPutAttributesRequest request = new BatchPutAttributesRequest(domain.getDomainName(), items);
-                sdb.batchPutAttributes(request);
-            }
+            //handle all remaining objects
+            doPutObjects(putItems);
+            doDeleteObjects(deleteItems);
 
             //all objects are processed successfully, then clear all objects from caches.
-            deleteObjects.clear();
-            putObjects.clear();
+            cachedObjects.clear();
         } finally {
-            putObjectWriteLock.unlock();
-            deleteObjectWriteLock.unlock();
+            cachedObjectWriteLock.unlock();
+        }
+    }
+
+    private void doPutObjects(Map<Domain<?>, List<ReplaceableItem>> putItems) throws AmazonClientException {
+        AmazonSimpleDB sdb = getSimpleDB();
+        for (Map.Entry<Domain<?>, List<ReplaceableItem>> entry : putItems.entrySet()) {
+            Domain<?> domain = entry.getKey();
+            List<ReplaceableItem> items = entry.getValue();
+            BatchPutAttributesRequest request = new BatchPutAttributesRequest(domain.getDomainName(), items);
+            sdb.batchPutAttributes(request);
+        }
+        putItems.clear();
+    }
+
+    private void doDeleteObjects(Map<Domain<?>, List<DeletableItem>> deleteItems) throws AmazonClientException {
+        AmazonSimpleDB sdb = getSimpleDB();
+        for (Map.Entry<Domain<?>, List<DeletableItem>> entry : deleteItems.entrySet()) {
+            Domain<?> domain = entry.getKey();
+            List<DeletableItem> items = entry.getValue();
+            BatchDeleteAttributesRequest request = new BatchDeleteAttributesRequest(domain.getDomainName(), items);
+            sdb.batchDeleteAttributes(request);
+        }
+        deleteItems.clear();
+    }
+
+    private void handleDeleteObject(Object object, Map<Domain<?>, List<DeletableItem>> deleteItems) {
+        Domain<?> domain = getDomainFactory().findDomain(object.getClass());
+        DomainDescriptor descriptor = getDomainDescriptorFactory().create(domain);
+        String itemName = descriptor.getItemNameAttribute().getAttributeAccessor().read(object);
+        DeletableItem item = new DeletableItem().withName(itemName);
+
+        List<DeletableItem> list = deleteItems.get(domain);
+        if(list == null) {
+            list = new ArrayList<DeletableItem>();
+            deleteItems.put(domain, list);
+        }
+        list.add(item);
+    }
+
+    private void handlePutObject(Object object, Map<Domain<?>, List<ReplaceableItem>> putItems, Map<Domain<?>, List<DeletableItem>> deleteItems) {
+        Domain<?> domain = getDomainFactory().findDomain(object.getClass());
+        DomainDescriptor descriptor = getDomainDescriptorFactory().create(domain);
+        String itemName = descriptor.getItemNameAttribute().getAttributeAccessor().read(object);
+
+        ItemConverter<?> itemConverter = getItemConverterFactory().create(domain);
+        ItemState itemState = itemConverter.makeCurrentStateOf(object);
+        Collection<ReplaceableAttribute> changed = itemState.getChangedItems();
+        Collection<Attribute> deleted = itemState.getDeletedItems();
+
+        if(!changed.isEmpty()) {
+            List<ReplaceableItem> list = putItems.get(domain);
+            if(list == null) {
+                list = new ArrayList<ReplaceableItem>();
+                putItems.put(domain, list);
+            }
+            list.add(new ReplaceableItem().withName(itemName).withAttributes(changed));
+        }
+
+        if(!deleted.isEmpty()){
+            List<DeletableItem> list = deleteItems.get(domain);
+            if(list == null) {
+                list = new ArrayList<DeletableItem>();
+                deleteItems.put(domain, list);
+            }
+            list.add(new DeletableItem().withName(itemName).withAttributes(deleted));
+        }
+    }
+
+    private enum ObjectType {
+        DELETE, PUT;
+    }
+
+    private static interface CachedObject {
+        Object getObject();
+        ObjectType getObjectType();
+    }
+
+    private static abstract class BaseCachedObject implements CachedObject {
+        private Object object;
+
+        public BaseCachedObject(Object object) {
+            this.object = object;
+        }
+
+        @Override
+        public Object getObject() {
+            return this.object;
+        }
+    }
+
+    private static class DeleteObject extends BaseCachedObject {
+        public DeleteObject(Object object) {
+            super(object);
+        }
+
+        @Override
+        public ObjectType getObjectType() {
+            return ObjectType.DELETE;
+        }
+    }
+
+    private static class UpdateObject extends BaseCachedObject {
+        public UpdateObject(Object object) {
+            super(object);
+        }
+
+        @Override
+        public ObjectType getObjectType() {
+            return ObjectType.PUT;
         }
     }
 }

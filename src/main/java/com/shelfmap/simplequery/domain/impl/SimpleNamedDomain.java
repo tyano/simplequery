@@ -34,7 +34,7 @@ public class SimpleNamedDomain<T> implements Domain<T> {
     public static <X> SimpleNamedDomain<X> of(final Class<X> domainClass) {
         return new SimpleNamedDomain<X>(domainClass);
     }
-    
+
     public static SimpleNamedDomain<?> find(final Class<?> domainClass) {
         Collection<Class<?>> linearized = Objects.linearize(domainClass);
         for (Class<?> clazz : linearized) {
@@ -44,7 +44,7 @@ public class SimpleNamedDomain<T> implements Domain<T> {
         }
         throw new IllegalArgumentException("domainClass must have a @SimpleDbDomain annotation.");
     }
-    
+
     private static <C> SimpleNamedDomain<C> newDomain(Class<C> clazz) {
         return new SimpleNamedDomain<C>(clazz);
     }
@@ -74,5 +74,33 @@ public class SimpleNamedDomain<T> implements Domain<T> {
     @Override
     public Class<T> getDomainClass() {
         return this.domainClass;
+    }
+
+    @Override
+    @SuppressWarnings("AccessingNonPublicFieldOfAnotherObject")
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        @SuppressWarnings("unchecked")
+        final SimpleNamedDomain<T> other = (SimpleNamedDomain<T>) obj;
+        if (this.domainClass != other.domainClass && (this.domainClass == null || !this.domainClass.equals(other.domainClass))) {
+            return false;
+        }
+        if ((this.domainName == null) ? (other.domainName != null) : !this.domainName.equals(other.domainName)) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 5;
+        hash = 71 * hash + (this.domainClass != null ? this.domainClass.hashCode() : 0);
+        hash = 71 * hash + (this.domainName != null ? this.domainName.hashCode() : 0);
+        return hash;
     }
 }

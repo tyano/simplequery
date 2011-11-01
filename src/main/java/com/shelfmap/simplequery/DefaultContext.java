@@ -278,13 +278,13 @@ public class DefaultContext implements Context {
 
     @Override
     public void save() throws AmazonServiceException, AmazonClientException {
-        //we must reading and writing putObjects and deleteObjects as atomic processing
-        //from reading putObjects and deleteObjects until clear the two collections,
-        //because if other thread writing data into the to collections and then we
-        //got writeLock and clear the collections, the wrote data written by other thread lost.
+        //we must reading and writing cachedObjects as atomic processing
+        //from reading the objects until clear the objects,
+        //because if other thread writing data into the collections and then we
+        //got writeLock and clear the collection, the wrote data written by other thread lost.
         //So we must get WRITE locks at first.
 
-        //TODO I believe we can change this implementation more efficient. ex) putting and deleting data wtih some threads, and wait until all threads end.
+        //TODO I believe we can make this implementation more efficient. ex) putting and deleting data wtih some threads, and wait until all threads end.
         cachedObjectWriteLock.lock();
         try {
             if(cachedObjects.isEmpty()) return;

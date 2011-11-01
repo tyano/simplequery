@@ -18,29 +18,33 @@ package com.shelfmap.simplequery;
 import com.amazonaws.auth.PropertiesCredentials;
 import com.amazonaws.services.simpledb.AmazonSimpleDB;
 import com.amazonaws.services.simpledb.model.*;
-import static com.shelfmap.simplequery.SimpleDbUtil.attr;
-import static com.shelfmap.simplequery.SimpleDbUtil.item;
 import com.shelfmap.simplequery.annotation.ForwardDomainReference;
 import com.shelfmap.simplequery.annotation.IntAttribute;
 import com.shelfmap.simplequery.annotation.ItemName;
 import com.shelfmap.simplequery.annotation.SimpleDbDomain;
 import com.shelfmap.simplequery.domain.Domain;
 import com.shelfmap.simplequery.domain.ToOneDomainReference;
-import com.shelfmap.simplequery.domain.impl.DefaultToOneDomainReference;
-import com.shelfmap.simplequery.expression.MultipleResultsExistException;
-import com.shelfmap.simplequery.expression.QueryResults;
 import com.shelfmap.simplequery.expression.SimpleQueryException;
 import com.shelfmap.simplequery.expression.matcher.MatcherFactory;
 import java.io.File;
-import java.io.IOException;
-import static java.util.Arrays.asList;
-import static org.hamcrest.Matchers.*;
 import org.jbehave.core.annotations.Given;
-import org.jbehave.core.annotations.Then;
-import org.jbehave.core.annotations.When;
-import static org.junit.Assert.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static java.util.Arrays.asList;
+
+import org.jbehave.core.annotations.When;
+
+import static com.shelfmap.simplequery.SimpleDbUtil.*;
+
+import com.shelfmap.simplequery.domain.impl.DefaultToOneDomainReference;
+import com.shelfmap.simplequery.expression.MultipleResultsExistException;
+import com.shelfmap.simplequery.expression.QueryResults;
+import java.io.IOException;
+import org.jbehave.core.annotations.Then;
+
+import static org.hamcrest.Matchers.*;
+import static org.junit.Assert.*;
 
 /**
  *
@@ -90,8 +94,8 @@ public class SavingDomainsTest extends BaseStoryRunner {
         BatchPutAttributesRequest subRequest = new BatchPutAttributesRequest(
                 SUB_DOMAIN,
                 asList(item("tokyo", attr("name", "Tokyo", true)),
-                item("osaka", attr("name", "Osaka", true)),
-                item("chiba", attr("name", "Chiba", true))));
+                       item("osaka", attr("name", "Osaka", true)),
+                       item("chiba", attr("name", "Chiba", true))));
 
         simpleDb.batchPutAttributes(subRequest);
 
@@ -99,15 +103,14 @@ public class SavingDomainsTest extends BaseStoryRunner {
         BatchPutAttributesRequest mainRequest =
                 new BatchPutAttributesRequest(
                 MAIN_DOMAIN,
-                asList(
-                item("0001",
-                attr("name", "User 1", true),
-                attr("age", "035", true),
-                attr("province", "tokyo", true)),
-                item("0002",
-                attr("name", "User 2", true),
-                attr("age", "022", true),
-                attr("province", "chiba", true))));
+                asList(item("0001",
+                            attr("name", "User 1", true),
+                            attr("age", "035", true),
+                            attr("province", "tokyo", true)),
+                       item("0002",
+                            attr("name", "User 2", true),
+                            attr("age", "022", true),
+                            attr("province", "chiba", true))));
 
         simpleDb.batchPutAttributes(mainRequest);
     }
@@ -247,15 +250,11 @@ public class SavingDomainsTest extends BaseStoryRunner {
     public void assertTheAttributeDeletedInAWS() {
         AmazonSimpleDB simpleDB = context.getSimpleDB();
 
-        GetAttributesRequest req = new GetAttributesRequest()
-                                        .withDomainName(MAIN_DOMAIN)
-                                        .withItemName("0001")
-                                        .withConsistentRead(true)
-                                        .withAttributeNames("name");
+        GetAttributesRequest req = new GetAttributesRequest().withDomainName(MAIN_DOMAIN).withItemName("0001").withConsistentRead(true).withAttributeNames("name");
 
         GetAttributesResult attributes = simpleDB.getAttributes(req);
         for (Attribute attr : attributes.getAttributes()) {
-            if(attr.getName().equals("name")) {
+            if (attr.getName().equals("name")) {
                 fail("the 'name' attribute exists. It must be deleted.");
             }
         }
@@ -265,6 +264,26 @@ public class SavingDomainsTest extends BaseStoryRunner {
     public void assertThePropertyBecomeNull() throws SimpleQueryException, MultipleResultsExistException {
         User refreshedUser1 = context.select().from(User.class).whereItemName(MatcherFactory.is("0001")).getSingleResult(true);
         assertThat(refreshedUser1.getName(), is(nullValue()));
+    }
+
+    @When("we put a changed object, delete it and put it again")
+    public void updateContext() {
+        tokyo.setName("TOKYO");
+        chiba.setName("CHIBA");
+        context.putObjects(tokyo, chiba);
+        context.deleteObjects(tokyo, chiba);
+        context.putObjects(tokyo);
+        context.save();
+    }
+
+    @Then("the last operation must be alive")
+    public void assertTheLastState() throws SimpleQueryException, MultipleResultsExistException {
+        Province changedTokyo = context.select().from(Province.class).whereItemName(MatcherFactory.is("tokyo")).getSingleResult(true);
+        Province changedChiba = context.select().from(Province.class).whereItemName(MatcherFactory.is("chiba")).getSingleResult(true);
+
+        assertThat(changedTokyo, is(not(nullValue())));
+        assertThat(changedTokyo.getName(), is("TOKYO"));
+        assertThat(changedChiba, is(nullValue()));
     }
 
     /**

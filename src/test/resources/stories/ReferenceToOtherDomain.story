@@ -13,3 +13,13 @@ Given a test-specific context
 Given domains which refer each other
 Given an instance of master-object which have multiple children but handle them with ReverseToOneDomainReference
 Then the master object can get only 1 child from the reference.
+
+
+Scenario: if changed the content of an ReverseDomainReference, the target objects of the reference automatically pushed into the current context.
+
+Given a test-specific context
+Given domains which refer each other
+Given an instance which have a ReverseToManyDomainReference and a ReverseToOneDomainReference
+
+When the content of the two references,
+Then objects previously referenced by ReverseToOneDomainReference and all new targets exist in the current context.

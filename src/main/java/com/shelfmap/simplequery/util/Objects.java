@@ -83,4 +83,15 @@ public final class Objects {
     public static <A extends Object & Annotation> boolean isAnnotationPresentOnProperty(Class<?> targetClass, String propertyName, Class<A> findingAnnotation) throws IntrospectionException {
         return findAnnotationOnProperty(targetClass, propertyName, findingAnnotation) != null;
     }
+
+    public static Class<?> primitiveToObject(Class<?> type) {
+        if(int.class.isAssignableFrom(type))
+            return Integer.class;
+        else if(long.class.isAssignableFrom(type))
+            return Long.class;
+        else if(float.class.isAssignableFrom(type))
+            return Float.class;
+        else
+            return type;
+    }
 }

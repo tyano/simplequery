@@ -15,8 +15,6 @@
  */
 package com.shelfmap.simplequery.domain.impl;
 
-import com.amazonaws.services.simpledb.util.SimpleDBUtils;
-import static com.shelfmap.simplequery.util.Assertion.isNotNull;
 import com.shelfmap.simplequery.domain.AttributeConverter;
 import com.shelfmap.simplequery.expression.CanNotRestoreAttributeException;
 import java.lang.reflect.Constructor;

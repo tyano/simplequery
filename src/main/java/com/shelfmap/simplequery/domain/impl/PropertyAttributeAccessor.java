@@ -76,6 +76,10 @@ public class PropertyAttributeAccessor<T> implements AttributeAccessor<T> {
             path = paths[pathSize - 1];
             PropertyDescriptor descriptor = findPropertyDescriptor(target, path);
             Method writeMethod = descriptor.getWriteMethod();
+
+            LOGGER.trace("property type: {}", descriptor.getPropertyType());
+            LOGGER.trace("value: {}", value == null ? "null" : value.getClass());
+
             writeMethod.invoke(target, value);
         } catch (IllegalAccessException ex) {
             throw new IllegalStateException("Could not access to a property of a class for a security reason. propertyName: " + path + ", class: " + target.getClass().getCanonicalName() + ", full property-path: " + propertyPath, ex);

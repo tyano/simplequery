@@ -20,6 +20,7 @@ import com.shelfmap.simplequery.attribute.ConditionAttribute;
 import com.shelfmap.simplequery.domain.Domain;
 import com.shelfmap.simplequery.domain.DomainAttribute;
 import com.shelfmap.simplequery.domain.ReverseToOneDomainReference;
+import com.shelfmap.simplequery.expression.MultipleResultsExistException;
 import com.shelfmap.simplequery.expression.QueryResults;
 import com.shelfmap.simplequery.expression.SimpleQueryException;
 import com.shelfmap.simplequery.expression.impl.InstanceQueryResult;
@@ -50,8 +51,25 @@ public class DefaultReverseToOneDomainReference<M,T> extends AbstractReverseDoma
     @Override
     public void set(T object) {
         if(object == null) return;
+        try {
+            DomainAttribute<String,String> targetAttribute = getTargetDomainAttribute(getTargetDomain(), getTargetAttribute());
+            T oldTarget = get(true);
+            Context context = getContext();
 
-        DomainAttribute<String,String> targetAttribute = getTargetDomainAttribute(getTargetDomain(), getTargetAttribute());
-        targetAttribute.getAttributeAccessor().write(object, getMasterItemName());
+            if(oldTarget != null) {
+                //change the referencial attribute of old referenced object to null value for detaching the old object from this reference.
+                targetAttribute.getAttributeAccessor().write(oldTarget, null);
+                context.putObjects(oldTarget);
+            }
+
+            targetAttribute.getAttributeAccessor().write(object, getMasterItemName());
+
+            //add the target object into context. it will be saved when context#save() is called.
+            getContext().putObjects(object);
+        } catch (SimpleQueryException ex) {
+            throw new IllegalStateException("Could not get the referenced object from a ReverseToOneDomainReference.", ex);
+        } catch (MultipleResultsExistException ex) {
+            throw new IllegalStateException("a ReverseToOneDomainReference has more than 1 object as the target.", ex);
+        }
     }
 }

@@ -34,9 +34,12 @@ public class DefaultReverseToManyDomainReference<M,T> extends AbstractReverseDom
     public void add(T... objects) {
         if(objects == null || objects.length == 0) return;
 
+        DomainAttribute<String,String> targetAttribute = getTargetDomainAttribute(getTargetDomain(), getTargetAttribute());
         for (T target : objects) {
-            DomainAttribute<String,String> targetAttribute = getTargetDomainAttribute(getTargetDomain(), getTargetAttribute());
             targetAttribute.getAttributeAccessor().write(target, getMasterItemName());
+
+            //add the target object into context. it will be saved when context#save() is called.
+            getContext().putObjects(target);
         }
     }
 }

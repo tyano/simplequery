@@ -26,6 +26,8 @@ import com.shelfmap.simplequery.expression.CanNotConvertItemException;
 import com.shelfmap.simplequery.expression.CanNotRestoreAttributeException;
 import com.shelfmap.simplequery.expression.ItemConverter;
 import static com.shelfmap.simplequery.util.Assertion.isNotNull;
+
+import com.shelfmap.simplequery.util.Objects;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -96,31 +98,40 @@ public class DefaultItemConverter<T> implements ItemConverter<T> {
         return instance;
     }
 
+    @SuppressWarnings("unchecked")
     private <VT,CT> void writeValueToDomain(DomainAttribute<VT,CT> domainAttribute, T instance, String attributeValue) throws CanNotRestoreAttributeException, CanNotConvertItemException {
         if(domainAttribute != null) {
             Class<VT> valueType = domainAttribute.getValueType();
             Class<CT> containerType = domainAttribute.getContainerType();
 
-            VT convertedValue = domainAttribute.getAttributeConverter().restoreValue(attributeValue);
             AttributeAccessor<CT> accessor = domainAttribute.getAttributeAccessor();
-            LOGGER.trace("valueType: " + valueType.getCanonicalName());
-            LOGGER.trace("containerType: " + containerType.getCanonicalName());
-            if(valueType.equals(containerType)) {
-                accessor.write(instance, containerType.cast(convertedValue));
+            LOGGER.trace("valueType: " + valueType);
+            LOGGER.trace("containerType: " + containerType);
+
+            Class<?> objValueType = Objects.primitiveToObject(valueType);
+            Class<?> objContainerType = Objects.primitiveToObject(containerType);
+
+            if(objValueType.equals(objContainerType)) {
+                VT convertedValue = domainAttribute.getAttributeConverter().restoreValue(attributeValue);
+                accessor.write(instance, (CT)convertedValue);
             } else if(containerType.isArray()) {
                 CT prev = accessor.read(instance);
                 if(attributeValue == null) {
                     if(prev == null) {
                         Object newArray = Array.newInstance(valueType, 0);
-                        accessor.write(instance, containerType.cast(newArray));
+                        LOGGER.trace("type of newArray: {}", newArray.getClass());
+                        accessor.write(instance, (CT)newArray);
                     }
                 } else {
                     int prevLength = prev == null ? 0 : Array.getLength(prev);
                     Object newArray = Array.newInstance(valueType, prevLength+1);
-                    for(int i = 0; i < prevLength; i++) {
-                        Object o = Array.get(prev, i);
-                        Array.set(newArray, i, o);
+                    if(prev != null) {
+                        for(int i = 0; i < prevLength; i++) {
+                            Object o = Array.get(prev, i);
+                            Array.set(newArray, i, o);
+                        }
                     }
+                    VT convertedValue = domainAttribute.getAttributeConverter().restoreValue(attributeValue);
                     Array.set(newArray, prevLength, convertedValue);
                     accessor.write(instance, containerType.cast(newArray));
                 }
@@ -135,16 +146,17 @@ public class DefaultItemConverter<T> implements ItemConverter<T> {
                         newCol.addAll(prev);
                     }
                     if(attributeValue != null) {
+                        VT convertedValue = domainAttribute.getAttributeConverter().restoreValue(attributeValue);
                         newCol.add(convertedValue);
                     }
-                    accessor.write(instance, containerType.cast(newCol));
+                    accessor.write(instance, (CT)newCol);
                 } catch (InstantiationException ex) {
                     throw new IllegalStateException("Could not instantiate a collection: " + containerType.getCanonicalName(), ex);
                 } catch (IllegalAccessException ex) {
                     throw new IllegalStateException("Could not access to the default constructor of the class: " + containerType.getCanonicalName(), ex);
                 }
             } else {
-                throw new IllegalStateException("The property's type with multiple value must be a subclass of Collection or an Array.");
+                throw new IllegalStateException("The property's type with multiple values must be a subclass of Collection or an Array.");
             }
         }
     }
@@ -186,42 +198,50 @@ public class DefaultItemConverter<T> implements ItemConverter<T> {
         List<ReplaceableAttribute> sdbChangedAttributes = new ArrayList<ReplaceableAttribute>();
         List<Attribute> sdbDeletedAttributes = new ArrayList<Attribute>();
 
-        if(valueType.equals(containerType)) {
-            VT attributeValue = valueType.cast(accessor.read(domainObject));
+        Class<?> objValueType = Objects.primitiveToObject(valueType);
+        Class<?> objContainerType = Objects.primitiveToObject(containerType);
+
+        if(objValueType.equals(objContainerType)) {
+            @SuppressWarnings("unchecked")
+            VT attributeValue = (VT)accessor.read(domainObject);
             if(attributeValue != null) {
                 String convertedAttributeValue = converter.convertValue(attributeValue);
-                ReplaceableAttribute sdbAttribute = new ReplaceableAttribute(attributeName, convertedAttributeValue, true);
-                sdbChangedAttributes.add(sdbAttribute);
+                registerAttributeAsPut(convertedAttributeValue, attributeName, true, sdbChangedAttributes);
             } else {
-                Attribute deleted = new Attribute().withName(attributeName);
-                sdbDeletedAttributes.add(deleted);
+                registerAttributeAsDeleted(attributeName, sdbDeletedAttributes);
             }
         } else if(containerType.isArray()) {
             CT array = accessor.read(domainObject);
-            int length = Array.getLength(array);
-            boolean isFirst = true;
-            for(int i = 0; i < length; i++) {
-                @SuppressWarnings("unchecked")
-                VT attributeValue = (VT) Array.get(domainObject, i);
+            if(array == null || Array.getLength(array) == 0) {
+                registerAttributeAsDeleted(attributeName, sdbDeletedAttributes);
+            } else {
+                int length = Array.getLength(array);
+                boolean isFirst = true;
+                for(int i = 0; i < length; i++) {
+                    @SuppressWarnings("unchecked")
+                    VT attributeValue = (VT) Array.get(array, i);
 
-                if(attributeValue != null) {
-                    String convertedAttributeValue = converter.convertValue(attributeValue);
-                    ReplaceableAttribute sdbAttribute = new ReplaceableAttribute(attributeName, convertedAttributeValue, isFirst);
-                    sdbChangedAttributes.add(sdbAttribute);
+                    if(attributeValue != null) {
+                        String convertedAttributeValue = converter.convertValue(attributeValue);
+                        registerAttributeAsPut(convertedAttributeValue, attributeName, isFirst, sdbChangedAttributes);
+                    }
+                    if(isFirst) isFirst = false;
                 }
-                if(isFirst) isFirst = false;
             }
         } else if(Collection.class.isAssignableFrom(containerType)) {
             @SuppressWarnings("unchecked")
             Collection<? extends VT> collection = (Collection<? extends VT>) accessor.read(domainObject);
-            boolean isFirst = true;
-            for (VT attributeValue : collection) {
-                if(attributeValue != null) {
-                    String convertedAttributeValue = converter.convertValue(attributeValue);
-                    ReplaceableAttribute sdbAttribute = new ReplaceableAttribute(attributeName, convertedAttributeValue, isFirst);
-                    sdbChangedAttributes.add(sdbAttribute);
+            if(collection == null || collection.isEmpty()) {
+                registerAttributeAsDeleted(attributeName, sdbDeletedAttributes);
+            } else {
+                boolean isFirst = true;
+                for (VT attributeValue : collection) {
+                    if(attributeValue != null) {
+                        String convertedAttributeValue = converter.convertValue(attributeValue);
+                        registerAttributeAsPut(convertedAttributeValue, attributeName, isFirst, sdbChangedAttributes);
+                    }
+                    if(isFirst) isFirst = false;
                 }
-                if(isFirst) isFirst = false;
             }
         }
 
@@ -235,6 +255,16 @@ public class DefaultItemConverter<T> implements ItemConverter<T> {
         }
 
         return state;
+    }
+
+    private <VT> void registerAttributeAsPut(String attributeValue, String attributeName, boolean replace, List<ReplaceableAttribute> sdbChangedAttributes) {
+        ReplaceableAttribute sdbAttribute = new ReplaceableAttribute(attributeName, attributeValue, replace);
+        sdbChangedAttributes.add(sdbAttribute);
+    }
+
+    private void registerAttributeAsDeleted(String attributeName, List<Attribute> sdbDeletedAttributes) {
+        Attribute deleted = new Attribute().withName(attributeName);
+        sdbDeletedAttributes.add(deleted);
     }
 
     @Override

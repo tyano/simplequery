@@ -39,3 +39,16 @@ Given A instance of the test domain which have a reference to another domain
 When we put a changed object, delete it and put it again
 Then the last operation must be alive
 
+
+Scenario: if the size of a List-property is zero, the attribute must be deleted.
+
+Given a test-specific context
+Given A test domains
+Given A instance of the test domain
+
+When we set all elements of a array property to null value,
+Then the array-attribute must become an empty array
+
+When we remove all elements from a collection property,
+Then the collection-attribute must become an empty collection
+

@@ -37,13 +37,17 @@ import org.jbehave.core.annotations.When;
 
 import static com.shelfmap.simplequery.SimpleDbUtil.*;
 
+import com.shelfmap.simplequery.annotation.Container;
 import com.shelfmap.simplequery.domain.impl.DefaultToOneDomainReference;
 import com.shelfmap.simplequery.expression.MultipleResultsExistException;
 import com.shelfmap.simplequery.expression.QueryResults;
 import java.io.IOException;
+import java.util.*;
 import org.jbehave.core.annotations.Then;
 
 import static org.hamcrest.Matchers.*;
+
+import org.jbehave.core.annotations.Alias;
 import static org.junit.Assert.*;
 
 /**
@@ -82,6 +86,7 @@ public class SavingDomainsTest extends BaseStoryRunner {
     }
 
     @Given("2 test domains")
+    @Alias("A test domains")
     public void createTestDomains() {
         AmazonSimpleDB simpleDb = context.getSimpleDB();
 
@@ -120,6 +125,7 @@ public class SavingDomainsTest extends BaseStoryRunner {
     User user2;
 
     @Given("A instance of the test domain which have a reference to another domain")
+    @Alias("A instance of the test domain")
     public void createTestInstances() {
         try {
             tokyo = context.select().from(Province.class).whereItemName(MatcherFactory.is("tokyo")).getSingleResult(true);
@@ -286,6 +292,56 @@ public class SavingDomainsTest extends BaseStoryRunner {
         assertThat(changedChiba, is(nullValue()));
     }
 
+    @When("we set all elements of a array property to null value,")
+    public void makeArrayPropertyEmpty() throws SimpleQueryException, MultipleResultsExistException {
+        user1.setPoints(new int[]{1,2,3});
+        context.putObjectImmediately(user1);
+
+        user1 = context.select().from(User.class).whereItemName(MatcherFactory.is("0001")).getSingleResult(true);
+        assertThat(user1.getPoints(), is(not(nullValue())));
+        Collection<Integer> expected = Arrays.asList(1,2,3);
+        for (int point : user1.getPoints()) {
+            assertThat(point, isIn(expected));
+        }
+
+        //make the property 'points' empty then save it
+        user1.setPoints(null);
+        context.putObjectImmediately(user1);
+    }
+
+    @Then("the array-attribute must become an empty array")
+    public void assertArrayAttributeDeleted() throws SimpleQueryException, MultipleResultsExistException {
+        User changedUser = context.select().from(User.class).whereItemName(MatcherFactory.is("0001")).getSingleResult(true);
+        assertThat(changedUser.getPoints(), is(not(nullValue())));
+        assertThat(changedUser.getPoints().length, is(0));
+    }
+
+    @When("we remove all elements from a collection property,")
+    public void removeAllElementsFromACollectionAttribute() throws SimpleQueryException, MultipleResultsExistException {
+        user1.addTags("blue", "red");
+        context.putObjectImmediately(user1);
+
+        user1 = context.select().from(User.class).whereItemName(MatcherFactory.is("0001")).getSingleResult(true);
+        assertThat(user1.getTags(), is(not(nullValue())));
+        assertThat(user1.getTags().size(), is(2));
+
+        Collection<String> expected = Arrays.asList("blue", "red");
+        for (String tag : user1.getTags()) {
+            assertThat(tag, isIn(expected));
+        }
+
+        //make the property 'tags' empty then save it.
+        user1.setTags(Collections.<String>emptyList());
+        context.putObjectImmediately(user1);
+    }
+    
+    @Then("the collection-attribute must become an empty collection")
+    public void assertCollectionAttributeDeleted() throws SimpleQueryException, MultipleResultsExistException {
+        User changedUser = context.select().from(User.class).whereItemName(MatcherFactory.is("0001")).getSingleResult(true);
+        assertThat(changedUser.getTags(), is(not(nullValue())));
+        assertThat(changedUser.getTags().isEmpty(), is(true));
+    }
+
     /**
      * テスト用インタフェース
      */
@@ -306,6 +362,15 @@ public class SavingDomainsTest extends BaseStoryRunner {
         int getAge();
 
         void setAge(int age);
+
+        @IntAttribute(padding=2)
+        int[] getPoints();
+        void setPoints(int[] poinsts);
+
+        @Container(containerType=ArrayList.class, valueType=String.class)
+        Collection<String> getTags();
+        void setTags(Collection<? extends String> tags);
+        void addTags(String... tag);
 
         @ForwardDomainReference(attributeName = "province", targetDomainClass = Province.class)
         ToOneDomainReference<Province> getProvinceReference();
@@ -337,6 +402,8 @@ public class SavingDomainsTest extends BaseStoryRunner {
         String itemName;
         String userName;
         int age;
+        List<String> tags = new ArrayList<String>();
+        int[] points;
         ToOneDomainReference<Province> provinceReference;
 
         public UserImpl(Context context, String itemName, String userName, int age) {
@@ -379,6 +446,31 @@ public class SavingDomainsTest extends BaseStoryRunner {
         @Override
         public void setAge(int age) {
             this.age = age;
+        }
+
+        @Override
+        public int[] getPoints() {
+            return this.points;
+        }
+
+        @Override
+        public void setPoints(int[] poinsts) {
+            this.points = poinsts;
+        }
+
+        @Override
+        public Collection<String> getTags() {
+            return new ArrayList<String>(this.tags);
+        }
+
+        @Override
+        public void setTags(Collection<? extends String> tags) {
+            this.tags = new ArrayList<String>(tags);
+        }
+
+        @Override
+        public void addTags(String... tag) {
+            this.tags.addAll(Arrays.asList(tag));
         }
 
         @Override

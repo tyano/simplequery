@@ -20,5 +20,6 @@ package com.shelfmap.simplequery.domain;
  * @author Tsutomu YANO
  */
 public interface ForwardReference {
-
+    String getTargetItemName();
+    void setTargetItemName(String itemName);
 }

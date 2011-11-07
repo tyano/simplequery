@@ -48,7 +48,7 @@ public class DefaultToOneDomainReferenceAttributeConverter implements AttributeC
         reference.setTargetItemName(targetValue);
         return reference;
     }
-    
+
     private <D> DefaultToOneDomainReference<D> createDefaultToOneDomainReference(Context context, Domain<D> targetDomain) {
         return new DefaultToOneDomainReference<D>(context, targetDomain);
     }

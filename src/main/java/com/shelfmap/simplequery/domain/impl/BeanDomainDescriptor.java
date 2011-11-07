@@ -68,7 +68,11 @@ public class BeanDomainDescriptor implements DomainDescriptor {
                         handleItemName(domainClass, propertyType, propertyName);
                     } else {
                         Class<?> valueType = propertyType;
-                        if(Collection.class.isAssignableFrom(propertyType)) {
+
+                        if(ForwardReference.class.isAssignableFrom(propertyType)) {
+                            propertyType = String.class;
+                            valueType = String.class;
+                        } else if(Collection.class.isAssignableFrom(propertyType)) {
                             Container container = Objects.findAnnotationOnProperty(domainClass, propertyName, Container.class);
                             if(container == null) throw new IllegalStateException("Collection property must have a @Container annotation.");
                             propertyType = container.containerType();
@@ -199,9 +203,8 @@ public class BeanDomainDescriptor implements DomainDescriptor {
         String attributeName = annotation.attributeName().isEmpty()
                 ? propertyName
                 : annotation.attributeName();
-        Class<?> targetDomainClass = annotation.targetDomainClass();
-        AttributeConverter<?> converter = new DefaultToOneDomainReferenceAttributeConverter(context, targetDomainClass);
-        return new DefaultDomainAttribute<VT,CT>(getDomain(), attributeName, valueType, containerType, (AttributeConverter<VT>) converter, newAttributeAccessor(containerType, fullPropertyPath(propertyName)));
+        AttributeConverter<?> converter = new DefaultAttributeConverter<String>(String.class);
+        return new DefaultDomainAttribute<VT,CT>(getDomain(), attributeName, valueType, containerType, (AttributeConverter<VT>) converter, (AttributeAccessor<CT>)new ForwardReferenceAttributeAccessor(context, fullPropertyPath(propertyName)));
     }
 
     @SuppressWarnings("unchecked")

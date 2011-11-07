@@ -16,7 +16,6 @@
 package com.shelfmap.simplequery.domain;
 
 import com.shelfmap.simplequery.Context;
-import com.shelfmap.simplequery.expression.MultipleResultsExistException;
 import com.shelfmap.simplequery.expression.QueryResults;
 import com.shelfmap.simplequery.expression.SimpleQueryException;
 
@@ -27,6 +26,5 @@ import com.shelfmap.simplequery.expression.SimpleQueryException;
 public interface DomainReference<T> {
     Context getContext();
     Domain<T> getTargetDomain();
-    T get(boolean consistent) throws SimpleQueryException, MultipleResultsExistException;
     QueryResults<T> getResults(boolean consistent) throws SimpleQueryException;
 }

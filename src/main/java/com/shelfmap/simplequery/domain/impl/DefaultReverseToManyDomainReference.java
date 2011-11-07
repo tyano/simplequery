@@ -20,6 +20,8 @@ import com.shelfmap.simplequery.attribute.ConditionAttribute;
 import com.shelfmap.simplequery.domain.Domain;
 import com.shelfmap.simplequery.domain.DomainAttribute;
 import com.shelfmap.simplequery.domain.ReverseToManyDomainReference;
+import com.shelfmap.simplequery.expression.MultipleResultsExistException;
+import com.shelfmap.simplequery.expression.SimpleQueryException;
 
 /**
  *
@@ -41,5 +43,10 @@ public class DefaultReverseToManyDomainReference<M,T> extends AbstractReverseDom
             //add the target object into context. it will be saved when context#save() is called.
             getContext().putObjects(target);
         }
+    }
+
+    @Override
+    public T get(boolean consistent) throws SimpleQueryException, MultipleResultsExistException {
+        return createExpression().getSingleResult(consistent);
     }
 }

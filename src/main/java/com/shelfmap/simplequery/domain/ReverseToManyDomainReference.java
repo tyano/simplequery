@@ -15,6 +15,9 @@
  */
 package com.shelfmap.simplequery.domain;
 
+import com.shelfmap.simplequery.expression.MultipleResultsExistException;
+import com.shelfmap.simplequery.expression.SimpleQueryException;
+
 /**
  *
  * @param <T>
@@ -22,4 +25,5 @@ package com.shelfmap.simplequery.domain;
  */
 public interface ReverseToManyDomainReference<T> extends DomainReference<T>, ReverseReference {
     void add(T... objects);
+    T get(boolean consistent) throws SimpleQueryException, MultipleResultsExistException;
 }

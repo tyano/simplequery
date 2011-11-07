@@ -15,10 +15,13 @@
  */
 package com.shelfmap.simplequery.domain;
 
+import com.shelfmap.simplequery.expression.SimpleQueryException;
+
 /**
  *
  * @author Tsutomu YANO
  */
 public interface ReverseToOneDomainReference<T> extends DomainReference<T>, ReverseReference{
     void set(T object);
+    T get(boolean consist) throws SimpleQueryException;
 }

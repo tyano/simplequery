@@ -20,7 +20,6 @@ import com.shelfmap.simplequery.attribute.ConditionAttribute;
 import com.shelfmap.simplequery.domain.Domain;
 import com.shelfmap.simplequery.domain.DomainAttribute;
 import com.shelfmap.simplequery.domain.ReverseToOneDomainReference;
-import com.shelfmap.simplequery.expression.MultipleResultsExistException;
 import com.shelfmap.simplequery.expression.QueryResults;
 import com.shelfmap.simplequery.expression.SimpleQueryException;
 import com.shelfmap.simplequery.expression.impl.InstanceQueryResult;
@@ -33,7 +32,7 @@ import java.util.List;
  */
 public class DefaultReverseToOneDomainReference<M,T> extends AbstractReverseDomainReference<M,T> implements ReverseToOneDomainReference<T> {
 
-    public DefaultReverseToOneDomainReference(Context context, M masterObject, Domain<T> targetDomain, ConditionAttribute targetAttribute) {
+    public DefaultReverseToOneDomainReference(Context context, M masterObject, Domain<? extends T> targetDomain, ConditionAttribute targetAttribute) {
         super(context, masterObject, targetDomain, targetAttribute);
     }
 
@@ -68,8 +67,14 @@ public class DefaultReverseToOneDomainReference<M,T> extends AbstractReverseDoma
             getContext().putObjects(object);
         } catch (SimpleQueryException ex) {
             throw new IllegalStateException("Could not get the referenced object from a ReverseToOneDomainReference.", ex);
-        } catch (MultipleResultsExistException ex) {
-            throw new IllegalStateException("a ReverseToOneDomainReference has more than 1 object as the target.", ex);
         }
+    }
+
+    @Override
+    public T get(boolean consist) throws SimpleQueryException {
+        for (T result : getResults(consist)) {
+            return result;
+        }
+        return null;
     }
 }

@@ -48,12 +48,12 @@ public class DefaultToOneDomainReference<T> implements ToOneDomainReference<T>, 
 
     @Override
     public T get(boolean consistent) throws SimpleQueryException, MultipleResultsExistException {
-        return createExpression().getSingleResult(consistent);
+        return getTargetItemName() == null ? null : createExpression().getSingleResult(consistent);
     }
 
     @Override
     public QueryResults<T> getResults(boolean consistent) throws SimpleQueryException {
-        return createExpression().getResults(consistent);
+        return getTargetItemName() == null ? null : createExpression().getResults(consistent);
     }
 
     private Expression<T> createExpression() {
@@ -65,10 +65,12 @@ public class DefaultToOneDomainReference<T> implements ToOneDomainReference<T>, 
         return context;
     }
 
+    @Override
     public String getTargetItemName() {
         return targetItemName;
     }
 
+    @Override
     public void setTargetItemName(String targetItemName) {
         this.targetItemName = targetItemName;
     }
@@ -84,5 +86,35 @@ public class DefaultToOneDomainReference<T> implements ToOneDomainReference<T>, 
     private DomainAttribute<String,String> findItemNameAttribute() {
         DomainDescriptor descriptor = getContext().getDomainDescriptorFactory().create(getTargetDomain());
         return descriptor.getItemNameAttribute();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final DefaultToOneDomainReference<T> other = (DefaultToOneDomainReference<T>) obj;
+        if (this.targetDomain != other.targetDomain && (this.targetDomain == null || !this.targetDomain.equals(other.targetDomain))) {
+            return false;
+        }
+        if ((this.targetItemName == null) ? (other.targetItemName != null) : !this.targetItemName.equals(other.targetItemName)) {
+            return false;
+        }
+        if (this.itemNameAttribute != other.itemNameAttribute && (this.itemNameAttribute == null || !this.itemNameAttribute.equals(other.itemNameAttribute))) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 11 * hash + (this.targetDomain != null ? this.targetDomain.hashCode() : 0);
+        hash = 11 * hash + (this.targetItemName != null ? this.targetItemName.hashCode() : 0);
+        hash = 11 * hash + (this.itemNameAttribute != null ? this.itemNameAttribute.hashCode() : 0);
+        return hash;
     }
 }

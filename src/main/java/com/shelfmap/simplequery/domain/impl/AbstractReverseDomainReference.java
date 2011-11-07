@@ -28,10 +28,10 @@ import static com.shelfmap.simplequery.expression.matcher.MatcherFactory.referTo
 public abstract class AbstractReverseDomainReference<M,T> implements DomainReference<T>, ReverseReference {
     private final Context context;
     private final M masterObject;
-    private final Domain<T> targetDomain;
+    private final Domain<? extends T> targetDomain;
     private final ConditionAttribute targetAttribute;
 
-    public AbstractReverseDomainReference(Context context, M masterObject, Domain<T> targetDomain, ConditionAttribute targetAttribute) {
+    public AbstractReverseDomainReference(Context context, M masterObject, Domain<? extends T> targetDomain, ConditionAttribute targetAttribute) {
         this.context = context;
         this.masterObject = masterObject;
         this.targetDomain = targetDomain;
@@ -40,13 +40,9 @@ public abstract class AbstractReverseDomainReference<M,T> implements DomainRefer
 
 
     @Override
+    @SuppressWarnings("unchecked")
     public Domain<T> getTargetDomain() {
-        return this.targetDomain;
-    }
-
-    @Override
-    public T get(boolean consistent) throws SimpleQueryException, MultipleResultsExistException {
-        return createExpression().getSingleResult(consistent);
+        return (Domain<T>) this.targetDomain;
     }
 
     @Override
@@ -54,7 +50,7 @@ public abstract class AbstractReverseDomainReference<M,T> implements DomainRefer
         return createExpression().getResults(consistent);
     }
 
-    private Expression<T> createExpression() {
+    protected Expression<T> createExpression() {
         return getContext().select().from(getTargetDomain().getDomainClass()).where(getTargetAttribute(), referTo(getMasterItemName())).orderBy(getTargetAttribute(), SortOrder.Asc);
     }
 
@@ -77,5 +73,31 @@ public abstract class AbstractReverseDomainReference<M,T> implements DomainRefer
     protected <T> DomainAttribute<String,String> getTargetDomainAttribute(Domain<T> targetDomain, ConditionAttribute attribute) {
         DomainDescriptor descriptor = getContext().getDomainDescriptorFactory().create(targetDomain);
         return descriptor.getAttribute(attribute.getAttributeName(), String.class, String.class);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final AbstractReverseDomainReference<M, T> other = (AbstractReverseDomainReference<M, T>) obj;
+        if (this.targetDomain != other.targetDomain && (this.targetDomain == null || !this.targetDomain.equals(other.targetDomain))) {
+            return false;
+        }
+        if (this.targetAttribute != other.targetAttribute && (this.targetAttribute == null || !this.targetAttribute.equals(other.targetAttribute))) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 29 * hash + (this.targetDomain != null ? this.targetDomain.hashCode() : 0);
+        hash = 29 * hash + (this.targetAttribute != null ? this.targetAttribute.hashCode() : 0);
+        return hash;
     }
 }

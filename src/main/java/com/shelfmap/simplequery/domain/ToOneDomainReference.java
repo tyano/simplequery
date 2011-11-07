@@ -15,11 +15,15 @@
  */
 package com.shelfmap.simplequery.domain;
 
+import com.shelfmap.simplequery.expression.MultipleResultsExistException;
+import com.shelfmap.simplequery.expression.SimpleQueryException;
+
 /**
  *
  * @param <T>
  * @author Tsutomu YANO
  */
 public interface ToOneDomainReference<T> extends DomainReference<T>, ForwardReference {
+    T get(boolean consistent) throws SimpleQueryException, MultipleResultsExistException;
     void set(T object);
 }

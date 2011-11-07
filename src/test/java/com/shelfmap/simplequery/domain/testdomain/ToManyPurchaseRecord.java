@@ -15,60 +15,27 @@
  */
 package com.shelfmap.simplequery.domain.testdomain;
 
-import com.shelfmap.simplequery.Context;
-import static com.shelfmap.simplequery.attribute.Attributes.attr;
-import com.shelfmap.simplequery.attribute.ConditionAttribute;
-import com.shelfmap.simplequery.domain.Domain;
-import com.shelfmap.simplequery.domain.DomainFactory;
+import com.shelfmap.simplequery.annotation.ItemName;
+import com.shelfmap.simplequery.annotation.SimpleDbDomain;
+import com.shelfmap.simplequery.domain.DomainReferenceTest;
 import com.shelfmap.simplequery.domain.ReverseToManyDomainReference;
-import com.shelfmap.simplequery.domain.impl.DefaultReverseToManyDomainReference;
 import java.util.Date;
 
 /**
  *
  * @author Tsutomu YANO
  */
-public class ToManyPurchaseRecord implements PurchaseRecord {
-    String itemName;
-    Date requestDate;
-    final ReverseToManyDomainReference<Detail> detailReference;
+@SimpleDbDomain(value = DomainReferenceTest.PARENT_DOMAIN)
+public interface ToManyPurchaseRecord {
 
-    public ToManyPurchaseRecord(Context context) {
-        this(context, null, null);
-    }
+    @ItemName
+    String getItemName();
 
-    public ToManyPurchaseRecord(Context context, String itemName, Date requestDate) {
-        this.itemName = itemName;
-        this.requestDate = requestDate == null ? null : new Date(requestDate.getTime());
-        DomainFactory factory = context.getDomainFactory();
-        Domain<Detail> detailDomain = factory.createDomain(Detail.class);
-        ConditionAttribute targetAttribute = attr("parentItemName");
-        this.detailReference = new DefaultReverseToManyDomainReference<PurchaseRecord, Detail>(context, this, detailDomain, targetAttribute);
-    }
+    void setItemName(String itemName);
 
-    @Override
-    public String getItemName() {
-        return this.itemName;
-    }
+    Date getRequestDate();
 
-    @Override
-    public void setItemName(String itemName) {
-        this.itemName = itemName;
-    }
+    void setRequestDate(Date requestDate);
 
-    @Override
-    public Date getRequestDate() {
-        return new Date(this.requestDate.getTime());
-    }
-
-    @Override
-    public void setRequestDate(Date requestDate) {
-        this.requestDate = new Date(requestDate.getTime());
-    }
-
-    @Override
-    public ReverseToManyDomainReference<Detail> getDetailReference() {
-        return this.detailReference;
-    }
-
+    ReverseToManyDomainReference<ToManyDetail> getDetailReference();
 }

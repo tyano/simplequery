@@ -15,28 +15,34 @@
  */
 package com.shelfmap.simplequery.domain.testdomain;
 
+import com.shelfmap.simplequery.annotation.ForwardDomainReference;
+import com.shelfmap.simplequery.annotation.IntAttribute;
 import com.shelfmap.simplequery.annotation.ItemName;
 import com.shelfmap.simplequery.annotation.SimpleDbDomain;
 import com.shelfmap.simplequery.domain.DomainReferenceTest;
-import com.shelfmap.simplequery.domain.ReverseToManyDomainReference;
-import java.util.Date;
+import com.shelfmap.simplequery.domain.ToOneDomainReference;
 
 /**
  *
  * @author Tsutomu YANO
  */
-@SimpleDbDomain(value = DomainReferenceTest.PARENT_DOMAIN)
-public interface PurchaseRecord {
+@SimpleDbDomain(value = DomainReferenceTest.CHILD_DOMAIN)
+public interface ToManyDetail {
 
     @ItemName
     String getItemName();
 
     void setItemName(String itemName);
 
-    Date getRequestDate();
+    String getName();
 
-    void setRequestDate(Date requestDate);
+    void setName(String name);
 
-    ReverseToManyDomainReference<Detail> getDetailReference();
+    @IntAttribute(padding = 5)
+    int getAmount();
 
+    void setAmount(int amount);
+
+    @ForwardDomainReference(attributeName = "parentItemName", targetDomainClass = ToManyPurchaseRecord.class)
+    ToOneDomainReference<ToManyPurchaseRecord> getParentRecordReference();
 }

@@ -24,22 +24,22 @@ import com.shelfmap.simplequery.domain.impl.DefaultToOneDomainReference;
  *
  * @author Tsutomu YANO
  */
-public class DefaultDetail implements Detail {
+public class ToManyDetailImpl implements ToManyDetail {
     String itemName;
     String name;
     int amount;
-    ToOneDomainReference<PurchaseRecord> parentReference;
+    ToOneDomainReference<ToManyPurchaseRecord> parentReference;
 
-    public DefaultDetail(Context context) {
+    public ToManyDetailImpl(Context context) {
         this(context, null, null, 0);
     }
 
-    public DefaultDetail(Context context, String itemName, String name, int amount) {
+    public ToManyDetailImpl(Context context, String itemName, String name, int amount) {
         this.itemName = itemName;
         this.name = name;
         this.amount = amount;
-        Domain<PurchaseRecord> domain = context.getDomainFactory().createDomain(PurchaseRecord.class);
-        this.parentReference = new DefaultToOneDomainReference<PurchaseRecord>(context, domain);
+        Domain<ToManyPurchaseRecord> domain = context.getDomainFactory().createDomain(ToManyPurchaseRecord.class);
+        this.parentReference = new DefaultToOneDomainReference<ToManyPurchaseRecord>(context, domain);
     }
 
     @Override
@@ -73,13 +73,29 @@ public class DefaultDetail implements Detail {
     }
 
     @Override
-    public ToOneDomainReference<PurchaseRecord> getParentRecordReference() {
+    public ToOneDomainReference<ToManyPurchaseRecord> getParentRecordReference() {
         return this.parentReference;
     }
 
     @Override
-    public void setParentRecordReference(ToOneDomainReference<PurchaseRecord> reference) {
-        this.parentReference = reference;
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final ToManyDetailImpl other = (ToManyDetailImpl) obj;
+        if ((this.itemName == null) ? (other.itemName != null) : !this.itemName.equals(other.itemName)) {
+            return false;
+        }
+        return true;
     }
 
+    @Override
+    public int hashCode() {
+        int hash = 5;
+        hash = 97 * hash + (this.itemName != null ? this.itemName.hashCode() : 0);
+        return hash;
+    }
 }

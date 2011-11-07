@@ -19,7 +19,7 @@ Scenario: if changed the content of an ReverseDomainReference, the target object
 
 Given a test-specific context
 Given domains which refer each other
-Given an instance which have a ReverseToManyDomainReference and a ReverseToOneDomainReference
+Given an instance which have a ReverseToOneDomainReference
 
-When the content of the two references,
+When the content of the reference is changed,
 Then objects previously referenced by ReverseToOneDomainReference and all new targets exist in the current context.

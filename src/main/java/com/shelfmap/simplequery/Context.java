@@ -34,7 +34,7 @@ import java.util.LinkedHashSet;
  *
  * @author Tsutomu YANO
  */
-public interface Context extends Serializable {
+public interface Context extends Serializable, Iterable<CachedObject> {
     ItemConverterFactory getItemConverterFactory();
     <T> DomainInstanceFactory<T> getDomainInstanceFactory(Domain<T> domain);
     DomainFactory getDomainFactory();

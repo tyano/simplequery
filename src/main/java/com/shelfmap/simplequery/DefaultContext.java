@@ -406,47 +406,8 @@ public class DefaultContext implements Context {
         }
     }
 
-    private enum ObjectType {
-        DELETE, PUT;
-    }
-
-    private static interface CachedObject {
-        Object getObject();
-        ObjectType getObjectType();
-    }
-
-    private static abstract class BaseCachedObject implements CachedObject {
-        private Object object;
-
-        public BaseCachedObject(Object object) {
-            this.object = object;
-        }
-
-        @Override
-        public Object getObject() {
-            return this.object;
-        }
-    }
-
-    private static class DeleteObject extends BaseCachedObject {
-        public DeleteObject(Object object) {
-            super(object);
-        }
-
-        @Override
-        public ObjectType getObjectType() {
-            return ObjectType.DELETE;
-        }
-    }
-
-    private static class UpdateObject extends BaseCachedObject {
-        public UpdateObject(Object object) {
-            super(object);
-        }
-
-        @Override
-        public ObjectType getObjectType() {
-            return ObjectType.PUT;
-        }
+    @Override
+    public Iterator<CachedObject> iterator() {
+        return new ArrayList<CachedObject>(cachedObjects).iterator();
     }
 }

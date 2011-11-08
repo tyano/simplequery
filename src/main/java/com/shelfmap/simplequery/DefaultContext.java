@@ -35,6 +35,7 @@ import com.shelfmap.simplequery.factory.ItemConverterFactory;
 import com.shelfmap.simplequery.factory.impl.DefaultDomainDescriptorFactory;
 import com.shelfmap.simplequery.factory.impl.DefaultItemConverterFactory;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -74,8 +75,7 @@ public class DefaultContext implements Context {
     private RemoteDomainBuilder remoteDomainBuilder;
     private final Lock remoteDomainBuilderLock = new ReentrantLock();
 
-    boolean autoCreateRemoteDomain = true;
-
+    AtomicBoolean autoCreateRemoteDomain = new AtomicBoolean(true);
 
     public DefaultContext(AWSCredentials credentials) {
         this.credentials = credentials;
@@ -140,12 +140,12 @@ public class DefaultContext implements Context {
 
     @Override
     public boolean isAutoCreateRemoteDomain() {
-        return autoCreateRemoteDomain;
+        return autoCreateRemoteDomain.get();
     }
 
     @Override
     public void setAutoCreateRemoteDomain(boolean auto) {
-        this.autoCreateRemoteDomain = auto;
+        this.autoCreateRemoteDomain.set(auto);
     }
 
     @Override

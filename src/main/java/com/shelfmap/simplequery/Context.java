@@ -43,6 +43,9 @@ public interface Context extends Serializable, Iterable<CachedObject> {
     AWSCredentials getCredentials();
     RemoteDomainBuilder getRemoteDomainBuilder();
 
+    boolean isAutoCreateRemoteDomain();
+    void setAutoCreateRemoteDomain(boolean auto);
+
     AmazonSimpleDB getSimpleDB();
     AmazonS3 getS3();
     SelectQuery select(SelectAttribute... attribute);

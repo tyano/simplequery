@@ -74,6 +74,8 @@ public class DefaultContext implements Context {
     private RemoteDomainBuilder remoteDomainBuilder;
     private final Lock remoteDomainBuilderLock = new ReentrantLock();
 
+    boolean autoCreateRemoteDomain = true;
+
 
     public DefaultContext(AWSCredentials credentials) {
         this.credentials = credentials;
@@ -134,6 +136,16 @@ public class DefaultContext implements Context {
         } finally {
             remoteDomainBuilderLock.unlock();
         }
+    }
+
+    @Override
+    public boolean isAutoCreateRemoteDomain() {
+        return autoCreateRemoteDomain;
+    }
+
+    @Override
+    public void setAutoCreateRemoteDomain(boolean auto) {
+        this.autoCreateRemoteDomain = auto;
     }
 
     @Override
@@ -268,20 +280,22 @@ public class DefaultContext implements Context {
         try {
             if(cachedObjects.isEmpty()) return;
 
-            RemoteDomainBuilder domainBuilder = getRemoteDomainBuilder();
+            if(isAutoCreateRemoteDomain()) {
+                RemoteDomainBuilder domainBuilder = getRemoteDomainBuilder();
 
-            //create remote domains if domains is not created yet.
-            for (CachedObject cachedObject : cachedObjects) {
-                Object o = cachedObject.getObject();
-                Domain<?> domain = getDomainFactory().findDomain(o.getClass());
-                if(domain == null) {
-                    throw new IllegalStateException("the domain object '" + o + "' is not a domain object. Could not find @SimpleDbDOmain annotation.");
+                //create remote domains if domains is not created yet.
+                for (CachedObject cachedObject : cachedObjects) {
+                    Object o = cachedObject.getObject();
+                    Domain<?> domain = getDomainFactory().findDomain(o.getClass());
+                    if(domain == null) {
+                        throw new IllegalStateException("the domain object '" + o + "' is not a domain object. Could not find @SimpleDbDOmain annotation.");
+                    }
+                    if(domainBuilder.isBuilt(domain)) {
+                        domainBuilder.add(domain);
+                    }
                 }
-                if(domainBuilder.isBuilt(domain)) {
-                    domainBuilder.add(domain);
-                }
+                domainBuilder.build();
             }
-            domainBuilder.build();
 
             Map<Domain<?>, List<DeletableItem>> deleteItems = new HashMap<Domain<?>, List<DeletableItem>>();
             Map<Domain<?>, List<ReplaceableItem>> putItems = new HashMap<Domain<?>, List<ReplaceableItem>>();

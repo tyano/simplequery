@@ -21,6 +21,7 @@ import com.amazonaws.services.simpledb.model.Item;
 import com.amazonaws.services.simpledb.model.SelectRequest;
 import com.amazonaws.services.simpledb.model.SelectResult;
 import com.shelfmap.simplequery.Context;
+import com.shelfmap.simplequery.RemoteDomainBuilder;
 import com.shelfmap.simplequery.attribute.impl.CountAttribute;
 import com.shelfmap.simplequery.domain.Domain;
 import com.shelfmap.simplequery.expression.*;
@@ -48,6 +49,7 @@ public abstract class BaseExpression<T> implements Expression<T> {
 
     @Override
     public T getSingleResult(boolean consistent) throws SimpleQueryException, MultipleResultsExistException {
+        createRemoteDomainIfNeed(getDomain());
         String expression = describe();
         SelectRequest selectReq = new SelectRequest(expression, consistent);
         SelectResult result = simpleDB.select(selectReq);
@@ -65,6 +67,7 @@ public abstract class BaseExpression<T> implements Expression<T> {
 
     @Override
     public QueryResults<T> getResults(boolean consistent) throws SimpleQueryException {
+        createRemoteDomainIfNeed(getDomain());
         SelectRequest selectReq = new SelectRequest(describe(), consistent);
         SelectResult result = simpleDB.select(selectReq);
         return new DefaultQueryResult<T>(getContext(), getDomain(), this, result);
@@ -72,6 +75,7 @@ public abstract class BaseExpression<T> implements Expression<T> {
 
     @Override
     public int count() throws SimpleQueryException {
+        createRemoteDomainIfNeed(getDomain());
         Expression<T> rebuilt = rebuildWith(CountAttribute.INSTANCE);
         SelectRequest req = new SelectRequest(rebuilt.describe());
         SelectResult selectResult = simpleDB.select(req);
@@ -98,6 +102,15 @@ public abstract class BaseExpression<T> implements Expression<T> {
         } catch (CloneNotSupportedException ex) {
             //never occured.
             throw new IllegalStateException(ex);
+        }
+    }
+
+    private void createRemoteDomainIfNeed(Domain<?> domain) {
+        Context c = getContext();
+        if(c.isAutoCreateRemoteDomain()) {
+            RemoteDomainBuilder domainBuilder = c.getRemoteDomainBuilder();
+            domainBuilder.add(domain);
+            domainBuilder.build();
         }
     }
 }

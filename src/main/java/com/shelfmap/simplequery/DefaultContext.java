@@ -224,35 +224,6 @@ public class DefaultContext implements Context {
     }
 
     @Override
-    public void putObjectImmediately(final Object domainObject) throws AmazonServiceException, AmazonClientException {
-        Domain<?> domain = getDomainFactory().findDomain(domainObject.getClass());
-        DomainDescriptor descriptor = getDomainDescriptorFactory().create(domain);
-        String itemName = descriptor.getItemNameAttribute().getAttributeAccessor().read(domainObject);
-
-        ItemConverter<?> itemConverter = getItemConverterFactory().create(domain);
-        ItemState itemState = itemConverter.makeCurrentStateOf(domainObject);
-
-        Collection<ReplaceableAttribute> changed = itemState.getChangedItems();
-        Collection<Attribute> deleted = itemState.getDeletedItems();
-
-        if(!changed.isEmpty()) {
-            PutAttributesRequest request = new PutAttributesRequest()
-                                                .withDomainName(domain.getDomainName())
-                                                .withItemName(itemName)
-                                                .withAttributes(changed);
-            getSimpleDB().putAttributes(request);
-        }
-
-        if(!deleted.isEmpty()) {
-            DeleteAttributesRequest request = new DeleteAttributesRequest()
-                                                .withDomainName(domain.getDomainName())
-                                                .withItemName(itemName)
-                                                .withAttributes(deleted);
-            getSimpleDB().deleteAttributes(request);
-        }
-    }
-
-    @Override
     public void deleteObjects(Object... domainObjects) {
         cachedObjectWriteLock.lock();
         try {
@@ -279,14 +250,6 @@ public class DefaultContext implements Context {
     }
 
     @Override
-    public void deleteObjectImmediately(Object domainObject) throws AmazonServiceException, AmazonClientException {
-        Domain<?> domain = getDomainFactory().findDomain(domainObject.getClass());
-        DomainDescriptor descriptor = getDomainDescriptorFactory().create(domain);
-        String itemName = descriptor.getItemNameAttribute().getAttributeAccessor().read(domainObject);
-        deleteItem(domain, itemName);
-    }
-
-    @Override
     public void deleteItem(Domain<?> domain, String itemName) throws AmazonServiceException, AmazonClientException {
         DeleteAttributesRequest request = new DeleteAttributesRequest(domain.getDomainName(), itemName);
         getSimpleDB().deleteAttributes(request);
@@ -306,7 +269,7 @@ public class DefaultContext implements Context {
             if(cachedObjects.isEmpty()) return;
 
             RemoteDomainBuilder domainBuilder = getRemoteDomainBuilder();
-            
+
             //create remote domains if domains is not created yet.
             for (CachedObject cachedObject : cachedObjects) {
                 Object o = cachedObject.getObject();

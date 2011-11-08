@@ -144,7 +144,8 @@ public class SavingDomainsTest extends BaseStoryRunner {
     @Then("we can apply the changes against the one instance immediately with one method.")
     public void saveTheMainInstanceAndAssert() {
         try {
-            context.putObjectImmediately(user1);
+            context.putObjects(user1);
+            context.save();
 
             User assertUser = context.select().from(User.class).whereItemName(MatcherFactory.is("0001")).getSingleResult(true);
 
@@ -248,7 +249,8 @@ public class SavingDomainsTest extends BaseStoryRunner {
     @When("we set null-value to an attribute of an instance")
     public void changeAPropertyNull() {
         user1.setName(null);
-        context.putObjectImmediately(user1);
+        context.putObjects(user1);
+        context.save();
     }
 
     @Then("the attribute will be deleted in SimpleDB")
@@ -294,7 +296,8 @@ public class SavingDomainsTest extends BaseStoryRunner {
     @When("we set all elements of a array property to null value,")
     public void makeArrayPropertyEmpty() throws SimpleQueryException, MultipleResultsExistException {
         user1.setPoints(new int[]{1,2,3});
-        context.putObjectImmediately(user1);
+        context.putObjects(user1);
+        context.save();
 
         user1 = context.select().from(User.class).whereItemName(MatcherFactory.is("0001")).getSingleResult(true);
         assertThat(user1.getPoints(), is(not(nullValue())));
@@ -305,7 +308,8 @@ public class SavingDomainsTest extends BaseStoryRunner {
 
         //make the property 'points' empty then save it
         user1.setPoints(null);
-        context.putObjectImmediately(user1);
+        context.putObjects(user1);
+        context.save();
     }
 
     @Then("the array-attribute must become an empty array")
@@ -318,7 +322,8 @@ public class SavingDomainsTest extends BaseStoryRunner {
     @When("we remove all elements from a collection property,")
     public void removeAllElementsFromACollectionAttribute() throws SimpleQueryException, MultipleResultsExistException {
         user1.addTags("blue", "red");
-        context.putObjectImmediately(user1);
+        context.putObjects(user1);
+        context.save();
 
         user1 = context.select().from(User.class).whereItemName(MatcherFactory.is("0001")).getSingleResult(true);
         assertThat(user1.getTags(), is(not(nullValue())));
@@ -331,7 +336,8 @@ public class SavingDomainsTest extends BaseStoryRunner {
 
         //make the property 'tags' empty then save it.
         user1.setTags(Collections.<String>emptyList());
-        context.putObjectImmediately(user1);
+        context.putObjects(user1);
+        context.save();
     }
 
     @Then("the collection-attribute must become an empty collection")

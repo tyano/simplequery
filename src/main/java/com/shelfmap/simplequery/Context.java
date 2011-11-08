@@ -47,11 +47,9 @@ public interface Context extends Serializable, Iterable<CachedObject> {
     AmazonS3 getS3();
     SelectQuery select(SelectAttribute... attribute);
 
-    void putObjectImmediately(Object domainObject) throws AmazonServiceException, AmazonClientException;
     void putObjects(Object... domainObjects);
     LinkedHashSet<Object> getPutObjects();
 
-    void deleteObjectImmediately(Object domainObject) throws AmazonServiceException, AmazonClientException;
     void deleteItem(Domain<?> domain, String itemName) throws AmazonServiceException, AmazonClientException;
     void deleteObjects(Object... domainObjects);
     LinkedHashSet<Object> getDeleteObjects();

@@ -146,10 +146,6 @@ public class BeanDomainDescriptor implements DomainDescriptor {
         return new PropertyAttributeAccessor<C>(context, propertyPath);
     }
 
-    protected <C> AttributeConverter<C> newAttributeConverter(Class<C> type) {
-        return new DefaultAttributeConverter<C>(type);
-    }
-
     private <VT,CT> DomainAttribute<VT,CT> processFloatAttribute(FloatAttribute annotation, String propertyName, Class<VT> valueType, Class<CT> containerType) {
         String attributeName = annotation.attributeName().isEmpty()
                 ? propertyName

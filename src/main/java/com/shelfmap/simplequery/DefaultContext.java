@@ -71,6 +71,9 @@ public class DefaultContext implements Context {
     private final Lock cachedObjectReadLock = cachedObjectRwl.readLock();
     private final Lock cachedObjectWriteLock = cachedObjectRwl.writeLock();
 
+    private RemoteDomainBuilder remoteDomainBuilder;
+    private final Lock remoteDomainBuilderLock = new ReentrantLock();
+
 
     public DefaultContext(AWSCredentials credentials) {
         this.credentials = credentials;
@@ -117,6 +120,19 @@ public class DefaultContext implements Context {
             return this.simpleDB;
         } finally {
             simpleDBLock.unlock();
+        }
+    }
+
+    @Override
+    public RemoteDomainBuilder getRemoteDomainBuilder() {
+        remoteDomainBuilderLock.lock();
+        try {
+            if(remoteDomainBuilder == null) {
+                remoteDomainBuilder = new SimpleRemoteDomainBuilder(this);
+            }
+            return remoteDomainBuilder;
+        } finally {
+            remoteDomainBuilderLock.unlock();
         }
     }
 
@@ -288,6 +304,21 @@ public class DefaultContext implements Context {
         cachedObjectWriteLock.lock();
         try {
             if(cachedObjects.isEmpty()) return;
+
+            RemoteDomainBuilder domainBuilder = getRemoteDomainBuilder();
+            
+            //create remote domains if domains is not created yet.
+            for (CachedObject cachedObject : cachedObjects) {
+                Object o = cachedObject.getObject();
+                Domain<?> domain = getDomainFactory().findDomain(o.getClass());
+                if(domain == null) {
+                    throw new IllegalStateException("the domain object '" + o + "' is not a domain object. Could not find @SimpleDbDOmain annotation.");
+                }
+                if(domainBuilder.isBuilt(domain)) {
+                    domainBuilder.add(domain);
+                }
+            }
+            domainBuilder.build();
 
             Map<Domain<?>, List<DeletableItem>> deleteItems = new HashMap<Domain<?>, List<DeletableItem>>();
             Map<Domain<?>, List<ReplaceableItem>> putItems = new HashMap<Domain<?>, List<ReplaceableItem>>();

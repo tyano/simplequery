@@ -41,6 +41,7 @@ public interface Context extends Serializable, Iterable<CachedObject> {
     DomainDescriptorFactory getDomainDescriptorFactory();
     AttributeConverterFactory getAttributeConverterFactory();
     AWSCredentials getCredentials();
+    RemoteDomainBuilder getRemoteDomainBuilder();
 
     AmazonSimpleDB getSimpleDB();
     AmazonS3 getS3();

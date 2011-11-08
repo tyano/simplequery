@@ -15,7 +15,7 @@
  */
 package com.shelfmap.simplequery.domain.testdomain;
 
-import com.shelfmap.simplequery.annotation.ForwardDomainReference;
+import com.shelfmap.simplequery.annotation.Attribute;
 import com.shelfmap.simplequery.annotation.IntAttribute;
 import com.shelfmap.simplequery.annotation.ItemName;
 import com.shelfmap.simplequery.annotation.SimpleDbDomain;
@@ -43,6 +43,6 @@ public interface ToManyDetail {
 
     void setAmount(int amount);
 
-    @ForwardDomainReference(attributeName = "parentItemName", targetDomainClass = ToManyPurchaseRecord.class)
+    @Attribute(attributeName = "parentItemName")
     ToOneDomainReference<ToManyPurchaseRecord> getParentRecordReference();
 }

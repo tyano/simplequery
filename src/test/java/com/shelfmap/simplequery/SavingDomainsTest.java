@@ -18,7 +18,6 @@ package com.shelfmap.simplequery;
 import com.amazonaws.auth.PropertiesCredentials;
 import com.amazonaws.services.simpledb.AmazonSimpleDB;
 import com.amazonaws.services.simpledb.model.*;
-import com.shelfmap.simplequery.annotation.ForwardDomainReference;
 import com.shelfmap.simplequery.annotation.IntAttribute;
 import com.shelfmap.simplequery.annotation.ItemName;
 import com.shelfmap.simplequery.annotation.SimpleDbDomain;
@@ -334,7 +333,7 @@ public class SavingDomainsTest extends BaseStoryRunner {
         user1.setTags(Collections.<String>emptyList());
         context.putObjectImmediately(user1);
     }
-    
+
     @Then("the collection-attribute must become an empty collection")
     public void assertCollectionAttributeDeleted() throws SimpleQueryException, MultipleResultsExistException {
         User changedUser = context.select().from(User.class).whereItemName(MatcherFactory.is("0001")).getSingleResult(true);
@@ -372,7 +371,7 @@ public class SavingDomainsTest extends BaseStoryRunner {
         void setTags(Collection<? extends String> tags);
         void addTags(String... tag);
 
-        @ForwardDomainReference(attributeName = "province", targetDomainClass = Province.class)
+        @com.shelfmap.simplequery.annotation.Attribute(attributeName = "province")
         ToOneDomainReference<Province> getProvinceReference();
 
         void setProvinceReference(ToOneDomainReference<Province> reference);

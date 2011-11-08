@@ -57,30 +57,31 @@ public class BeanDomainDescriptor implements DomainDescriptor {
                 //do not handle the properties of Object class.
                 //(Object class have only one property 'getClass()')
                 if(!descriptor.getName().equals("class")) {
-                    Class<?> propertyType = descriptor.getPropertyType();
+                    Class<?> originalPropertyType = descriptor.getPropertyType();
+                    Class<?> containerType = originalPropertyType;
+                    Class<?> valueType = originalPropertyType;
                     String propertyName = descriptor.getName();
 
-                    if(ReverseReference.class.isAssignableFrom(propertyType)) {
+                    if(ReverseReference.class.isAssignableFrom(originalPropertyType)) {
                         //ReverseReference do not have their own value in a domain.
                         //because it programmatically retrieve the value from another domain.
                         continue;
                     } else if(Objects.isAnnotationPresentOnProperty(domainClass, propertyName, ItemName.class)) {
-                        handleItemName(domainClass, propertyType, propertyName);
+                        handleItemName(domainClass, originalPropertyType, propertyName);
                     } else {
-                        Class<?> valueType = propertyType;
 
-                        if(ForwardReference.class.isAssignableFrom(propertyType)) {
-                            propertyType = String.class;
+                        if(ForwardReference.class.isAssignableFrom(originalPropertyType)) {
+                            containerType = String.class;
                             valueType = String.class;
-                        } else if(Collection.class.isAssignableFrom(propertyType)) {
+                        } else if(Collection.class.isAssignableFrom(originalPropertyType)) {
                             Container container = Objects.findAnnotationOnProperty(domainClass, propertyName, Container.class);
                             if(container == null) throw new IllegalStateException("Collection property must have a @Container annotation.");
-                            propertyType = container.containerType();
+                            containerType = container.containerType();
                             valueType = container.valueType();
-                        } else if(propertyType.isArray()) {
-                            valueType = propertyType.getComponentType();
+                        } else if(originalPropertyType.isArray()) {
+                            valueType = originalPropertyType.getComponentType();
                         }
-                        handleAttributeWithType(domainClass, valueType, propertyType, propertyName);
+                        handleAttributeWithType(domainClass, originalPropertyType, valueType, containerType, propertyName);
                     }
                 }
             }
@@ -93,22 +94,22 @@ public class BeanDomainDescriptor implements DomainDescriptor {
         if(!String.class.isAssignableFrom(type)) {
             throw new IllegalStateException("Can not handle a domain class: " + getDomain().getDomainClass().getName() + " - The type of @ItemName property must be String.class.");
         }
-        DomainAttribute<String,String> itemNameAttribute = createAttribute(domainClass, propertyName, String.class, String.class);
+        DomainAttribute<String,String> itemNameAttribute = createAttribute(domainClass, propertyName, String.class, String.class, String.class);
         attributeStore.putAttribute(propertyName, String.class, String.class, itemNameAttribute);
         this.itemNameProperty = propertyName;
     }
 
-    private <VT,CT> void handleAttributeWithType(Class<?> domainClass, Class<VT> valueType, Class<CT> containerType, String propertyName) throws IntrospectionException {
+    private <VT,CT> void handleAttributeWithType(Class<?> domainClass, Class<?> originalPropertyType, Class<VT> valueType, Class<CT> containerType, String propertyName) throws IntrospectionException {
         if(Objects.isAnnotationPresentOnProperty(domainClass, propertyName, FlatAttribute.class)) {
-            buildFlatAttribute(valueType, propertyName);
+            buildFlatAttribute(originalPropertyType, propertyName);
         } else {
-            DomainAttribute<VT,CT> attribute = createAttribute(domainClass, propertyName, valueType, containerType);
+            DomainAttribute<VT,CT> attribute = createAttribute(domainClass, propertyName, originalPropertyType, valueType, containerType);
             attributeStore.putAttribute(attribute.getAttributeName(), valueType, containerType, attribute);
         }
     }
 
     @SuppressWarnings("unchecked")
-    private <VT,CT> DomainAttribute<VT,CT> createAttribute(Class<?> domainClass, String propertyName, Class<VT> valueType, Class<CT> containerType) throws IntrospectionException {
+    private <VT,CT> DomainAttribute<VT,CT> createAttribute(Class<?> domainClass, String propertyName, Class<?> originalPropertyType, Class<VT> valueType, Class<CT> containerType) throws IntrospectionException {
         DomainAttribute<VT,CT> result = null;
 
         if (Objects.isAnnotationPresentOnProperty(domainClass, propertyName, FloatAttribute.class) && (valueType.equals(Float.class) || valueType.equals(float.class))) {
@@ -123,13 +124,14 @@ public class BeanDomainDescriptor implements DomainDescriptor {
             LongAttribute annotation = Objects.findAnnotationOnProperty(domainClass, propertyName, LongAttribute.class);
             result = processLongAttribute(annotation, propertyName, valueType, containerType);
 
-        } else if (Objects.isAnnotationPresentOnProperty(domainClass, propertyName, ForwardDomainReference.class)) {
-            ForwardDomainReference annotation = Objects.findAnnotationOnProperty(domainClass, propertyName, ForwardDomainReference.class);
+        } else if (ForwardReference.class.isAssignableFrom(originalPropertyType)) {
+            Attribute annotation = Objects.findAnnotationOnProperty(domainClass, propertyName, Attribute.class);
             result = processForwardDomainReference(annotation, propertyName, valueType, containerType);
 
         } else if (Objects.isAnnotationPresentOnProperty(domainClass, propertyName, Attribute.class)) {
             Attribute annotation = Objects.findAnnotationOnProperty(domainClass, propertyName, Attribute.class);
             result = processAttribute(annotation, propertyName, valueType, containerType);
+
         } else {
             //No Annotation. the attribute name of this property become same with the property name.
             //AttributeConverter is created by the type of this attribute.
@@ -199,11 +201,11 @@ public class BeanDomainDescriptor implements DomainDescriptor {
     }
 
     @SuppressWarnings("unchecked")
-    private <VT,CT> DomainAttribute<VT,CT> processForwardDomainReference(ForwardDomainReference annotation, String propertyName, Class<VT> valueType, Class<CT> containerType) {
-        String attributeName = annotation.attributeName().isEmpty()
+    private <VT,CT> DomainAttribute<VT,CT> processForwardDomainReference(Attribute annotation, String propertyName, Class<VT> valueType, Class<CT> containerType) {
+        String attributeName = annotation != null && annotation.attributeName().isEmpty()
                 ? propertyName
                 : annotation.attributeName();
-        AttributeConverter<?> converter = new DefaultAttributeConverter<String>(String.class);
+        AttributeConverter<?> converter = createConverter(valueType);
         return new DefaultDomainAttribute<VT,CT>(getDomain(), attributeName, valueType, containerType, (AttributeConverter<VT>) converter, (AttributeAccessor<CT>)new ForwardReferenceAttributeAccessor(context, fullPropertyPath(propertyName)));
     }
 

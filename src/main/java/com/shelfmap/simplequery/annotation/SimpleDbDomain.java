@@ -31,4 +31,8 @@ import java.lang.annotation.Target;
 public @interface SimpleDbDomain {
     String value();
     AttributeType attributeType() default AttributeType.PROPERTY;
+    boolean autoGenerate() default false;
+    String packageName() default "";
+    boolean isPackageNameRelative() default false;
+    String className() default "";
 }

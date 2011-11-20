@@ -21,15 +21,54 @@ import java.beans.PropertyDescriptor;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Arrays;
 import static java.util.Arrays.asList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  *
  * @author Tsutomu YANO
  */
 public final class Objects {
+
+    private static final class Preserved {
+        private static final Set<String> WORDS = new HashSet<String>();
+
+        static {
+            WORDS.addAll(Arrays.asList(
+                        "byte", "char", "short", "int", "long", "float", "double"
+                        ,"boolean", "true", "false"
+                        ,"void"
+                        ,"if", "else"
+                        ,"switch", "case", "default"
+                        ,"for", "while", "do"
+                        ,"continue", "break", "return"
+                        ,"package", "import", "class"
+                        ,"interface", "extends", "implements"
+                        ,"this", "super", "new"
+                        ,"null", "instanceof"
+                        ,"public", "protected", "private"
+                        ,"final"
+                        ,"static"
+                        ,"abstract"
+                        ,"native", "synchronized"
+                        ,"volatile", "volatile"
+                        ,"transient", "try", "catch", "finally"
+                        ,"throw", "throws"
+                        ,"assert", "enum"
+                        ,"const", "goto"
+                        ,"strictfp"
+                    ));
+        }
+
+        private Preserved() {
+            super();
+        }
+    }
+
 
     private Objects() {
     }
@@ -93,5 +132,9 @@ public final class Objects {
             return Float.class;
         else
             return type;
+    }
+
+    public static boolean isPreserved(String word) {
+        return Preserved.WORDS.contains(word);
     }
 }

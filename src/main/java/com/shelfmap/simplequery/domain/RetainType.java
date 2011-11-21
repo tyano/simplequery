@@ -13,27 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.shelfmap.simplequery.processing;
-
-import com.shelfmap.simplequery.domain.RetainType;
-import javax.lang.model.type.TypeMirror;
+package com.shelfmap.simplequery.domain;
 
 /**
  *
  * @author Tsutomu YANO
  */
-public interface Property {
-    boolean isReadable();
-    void setReadable(boolean readable);
-    boolean isWritable();
-    void setWritable(boolean writable);
-
-    String getName();
-    TypeMirror getType();
-
-    String getRetainType();
-    void setRetainType(String type);
-
-    TypeMirror getRealType();
-    void setRealType(TypeMirror type);
+public enum RetainType {
+    HOLD,
+    NEW,
+    CLONE;
 }

@@ -17,6 +17,10 @@ package com.shelfmap.simplequery.processing;
 
 import com.shelfmap.simplequery.processing.impl.DefaultProperty;
 import static com.shelfmap.simplequery.util.Strings.*;
+
+import java.util.List;
+import java.util.Map;
+import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.*;
 
 
@@ -24,6 +28,7 @@ import javax.lang.model.type.PrimitiveType;
 import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.ElementScanner6;
+import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
 
 /**
@@ -82,8 +87,8 @@ public class DomainInterfaceVisitor extends ElementScanner6<Void, Environment> {
 
         InterfaceDefinition definition = env.getInterfaceDefinition();
 
+        Property property = buildPropertyFromExecutableElement(ee, env.getProcessingEnvironment());
         Types typeUtils = env.getProcessingEnvironment().getTypeUtils();
-        Property property = buildPropertyFromExecutableElement(ee, typeUtils);
 
         //if the building of property object is succeed, the ee is a variation of a property (readable or writable)
         if(property != null) {
@@ -114,24 +119,68 @@ public class DomainInterfaceVisitor extends ElementScanner6<Void, Environment> {
         }
     }
 
-    private Property buildPropertyFromExecutableElement(ExecutableElement ee, Types types) {
+    private Property buildPropertyFromExecutableElement(ExecutableElement ee, ProcessingEnvironment p) {
         String name = ee.getSimpleName().toString();
 
-        if(name.startsWith("get")) {
-            return new DefaultProperty(uncapitalize(name.substring(3)), ee.getReturnType(), true, false);
-        } else if(name.startsWith("set")) {
-            if(ee.getParameters().size() == 1) {
-                return new DefaultProperty(uncapitalize(name.substring(3)), ee.getParameters().get(0).asType(), false, true);
-            }
-        } else if(name.startsWith("is")) {
-            PrimitiveType bool = types.getPrimitiveType(TypeKind.BOOLEAN);
-            if(types.isSameType(ee.getReturnType(), bool) ||
-               types.isSameType(ee.getReturnType(), types.boxedClass(bool).asType())) {
+        Types types = p.getTypeUtils();
+        Elements elements = p.getElementUtils();
 
-                return new DefaultProperty(uncapitalize(name.substring(2)), ee.getReturnType(), true, false);
+        Property property = null;
+        if(name.startsWith("get") || name.startsWith("set") || name.startsWith("is")) {
+            if(name.startsWith("get")) {
+                property = new DefaultProperty(uncapitalize(name.substring(3)), ee.getReturnType(), true, false);
+            } else if(name.startsWith("set")) {
+                if(ee.getParameters().size() == 1) {
+                    property = new DefaultProperty(uncapitalize(name.substring(3)), ee.getParameters().get(0).asType(), false, true);
+                }
+            } else if(name.startsWith("is")) {
+                PrimitiveType bool = types.getPrimitiveType(TypeKind.BOOLEAN);
+                if(types.isSameType(ee.getReturnType(), bool) ||
+                   types.isSameType(ee.getReturnType(), types.boxedClass(bool).asType())) {
+
+                    property =  new DefaultProperty(uncapitalize(name.substring(2)), ee.getReturnType(), true, false);
+                }
+            }
+
+            if(property != null) {
+                //if a method have a @Property annotation,
+                //then we record the value of the @Property annotation into a Property object.
+                List<? extends AnnotationMirror> annotations = ee.getAnnotationMirrors();
+                for (AnnotationMirror annotation : annotations) {
+
+                    //is the annotationMirror same with "com.shelfmap.simplequery.annotation.Property" ?
+                    TypeElement propertyAnnotationType = elements.getTypeElement(com.shelfmap.simplequery.annotation.Property.class.getName());
+                    if(types.isSameType(propertyAnnotationType.asType(), annotation.getAnnotationType())) {
+
+                        //check all values through the found annotation
+                        //and record the values into a Property instance.
+                        //we can not use our loving useful Class<?> object here, because this program run in compile-time (no classloader for loading them!).
+                        //so we must record the value as TypeMirror or a simple String object.
+                        Map<? extends ExecutableElement, ? extends AnnotationValue> valueMap = elements.getElementValuesWithDefaults(annotation);
+                        for (Map.Entry<? extends ExecutableElement, ? extends AnnotationValue> entry : valueMap.entrySet()) {
+                            ExecutableElement key = entry.getKey();
+                            if(key.getSimpleName().toString().equals("retainType")) {
+                                //the return value of the method 'retainType' is an enum value RetainType.
+                                //but it is manageable as only a VariableElement, and we can get the name of the enum object from the VariableElement.
+                                //we can resolve the correct enum-value from the String value through the RetainType.valueOf(String) method.
+                                AnnotationValue value = entry.getValue();
+                                VariableElement type = (VariableElement) value.getValue();
+                                property.setRetainType(type.getSimpleName().toString());
+                            } else if(key.getSimpleName().toString().equals("realType")) {
+                                //the return value of the method 'realType' is a Class<?> object.
+                                //but in annotation-processing time, all Class<?> is expressed as TypeMirror.
+                                //TypeMirror object contains all information about the Class<?> in source-code level,
+                                //so we can retrieve full-class-name from it when it is needed.
+                                AnnotationValue value = entry.getValue();
+                                TypeMirror type = (TypeMirror) value.getValue();
+                                property.setRealType(type);
+                            }
+                        }
+                    }
+                }
             }
         }
-        return null;
+        return property;
     }
 
 

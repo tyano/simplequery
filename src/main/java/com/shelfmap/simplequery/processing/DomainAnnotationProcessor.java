@@ -16,6 +16,7 @@
 package com.shelfmap.simplequery.processing;
 
 import com.shelfmap.simplequery.annotation.SimpleDbDomain;
+import com.shelfmap.simplequery.domain.RetainType;
 import com.shelfmap.simplequery.processing.impl.BuildingEnvironment;
 import com.shelfmap.simplequery.processing.impl.DefaultInterfaceDefinition;
 import com.shelfmap.simplequery.util.IO;
@@ -35,11 +36,9 @@ import javax.tools.JavaFileObject;
 import static com.shelfmap.simplequery.util.Strings.capitalize;
 
 import java.util.Date;
-import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.Types;
-import javax.media.jai.WritablePropertySource;
 
 /**
  *
@@ -117,7 +116,7 @@ public class DomainAnnotationProcessor extends AbstractProcessor {
                         writer.append(indent(shift)).append("super();\n");
                         for (Property property : definition.getProperties()) {
                             if(!property.isWritable() && property.isReadable()) {
-                                writer.append(indent(shift)).append("this.").append(toSafeName(property.getName())).append(" = ").append(toSafeName(property.getName())).append(";\n");
+                                writer.append(indent(shift)).append("this.").append(toSafeName(property.getName())).append(" = ").append(retain(property)).append(";\n");
                             }
                         }
                         shift--;
@@ -140,7 +139,7 @@ public class DomainAnnotationProcessor extends AbstractProcessor {
                         shift++;
                         writer.append(indent(shift)).append("super();\n");
                         for (Property property : definition.getProperties()) {
-                            writer.append(indent(shift)).append("this.").append(toSafeName(property.getName())).append(" = ").append(toSafeName(property.getName())).append(";\n");
+                            writer.append(indent(shift)).append("this.").append(toSafeName(property.getName())).append(" = ").append(retain(property)).append(";\n");
                         }
                         shift--;
                         writer.append(indent(shift)).append("}\n\n");
@@ -151,14 +150,14 @@ public class DomainAnnotationProcessor extends AbstractProcessor {
                         if(property.isReadable()) {
                             writer.append(indent(shift)).append("@Override\n");
                             writer.append(indent(shift)).append("public ").append(propertyType).append(isBoolean(property.getType(), typeUtils) ? " is" : " get").append(capitalize(property.getName())).append("() {\n");
-                            writer.append(indent(++shift)).append("return this.").append(toSafeName(property.getName())).append(";\n");
+                            writer.append(indent(++shift)).append("return ").append(retain(property, "this.")).append(";\n");
                             writer.append(indent(--shift)).append("}\n\n");
                         }
 
                         if(property.isWritable()) {
                             writer.append(indent(shift)).append("@Override\n");
                             writer.append(indent(shift)).append("public void set").append(capitalize(property.getName())).append("(").append(propertyType).append(" ").append(toSafeName(property.getName())).append(") {\n");
-                            writer.append(indent(++shift)).append("this.").append(toSafeName(property.getName())).append(" = ").append(toSafeName(property.getName())).append(";\n");
+                            writer.append(indent(++shift)).append("this.").append(toSafeName(property.getName())).append(" = ").append(retain(property)).append(";\n");
                             writer.append(indent(--shift)).append("}\n\n");
                         }
                     }
@@ -173,6 +172,33 @@ public class DomainAnnotationProcessor extends AbstractProcessor {
             }
         }
         return processed;
+    }
+
+
+    private String retain(Property property) {
+        return retain(property, "");
+    }
+
+    private String retain(Property property, String prefix) {
+        assert property != null;
+
+        String safeName = prefix + toSafeName(property.getName());
+        String result;
+        RetainType type = RetainType.valueOf(property.getRetainType());
+        switch(type) {
+            case HOLD:
+                result = safeName;
+                break;
+            case NEW:
+                result = "new " + property.getRealType().toString() + "(" + safeName + ")";
+                break;
+            case CLONE:
+                result = safeName + ".clone();";
+                break;
+            default:
+                throw new IllegalStateException("No such retainType: " + property.getRetainType());
+        }
+        return result;
     }
 
     private String toSafeName(String word) {

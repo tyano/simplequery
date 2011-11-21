@@ -15,6 +15,7 @@
  */
 package com.shelfmap.simplequery.processing.impl;
 
+import com.shelfmap.simplequery.domain.RetainType;
 import com.shelfmap.simplequery.processing.Property;
 import javax.lang.model.type.TypeMirror;
 
@@ -28,6 +29,8 @@ public class DefaultProperty implements Property {
     private boolean readable;
     private final String name;
     private final TypeMirror type;
+    private String retainType = "HOLD";
+    private TypeMirror realType;
 
     public DefaultProperty(String name, TypeMirror type, boolean readable, boolean writable) {
         this.name = name;
@@ -64,5 +67,25 @@ public class DefaultProperty implements Property {
     @Override
     public TypeMirror getType() {
         return type;
+    }
+
+    @Override
+    public String getRetainType() {
+        return this.retainType;
+    }
+
+    @Override
+    public void setRetainType(String type) {
+        this.retainType = type;
+    }
+
+    @Override
+    public TypeMirror getRealType() {
+        return this.realType;
+    }
+
+    @Override
+    public void setRealType(TypeMirror type) {
+        this.realType = type;
     }
 }

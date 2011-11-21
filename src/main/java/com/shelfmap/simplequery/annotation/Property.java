@@ -13,27 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.shelfmap.simplequery.processing;
+package com.shelfmap.simplequery.annotation;
 
 import com.shelfmap.simplequery.domain.RetainType;
-import javax.lang.model.type.TypeMirror;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
  *
  * @author Tsutomu YANO
  */
-public interface Property {
-    boolean isReadable();
-    void setReadable(boolean readable);
-    boolean isWritable();
-    void setWritable(boolean writable);
-
-    String getName();
-    TypeMirror getType();
-
-    String getRetainType();
-    void setRetainType(String type);
-
-    TypeMirror getRealType();
-    void setRealType(TypeMirror type);
+@Target(ElementType.METHOD)
+@Retention(RetentionPolicy.SOURCE)
+public @interface Property {
+    RetainType retainType() default RetainType.HOLD;
+    Class<?> realType() default Void.class;
 }

@@ -15,7 +15,7 @@
  */
 package com.shelfmap.simplequery.processing;
 
-import com.shelfmap.simplequery.annotation.SimpleDbDomain;
+import com.shelfmap.simplequery.annotation.GenerateClass;
 import com.shelfmap.simplequery.domain.RetainType;
 import com.shelfmap.simplequery.processing.impl.BuildingEnvironment;
 import com.shelfmap.simplequery.processing.impl.DefaultInterfaceDefinition;
@@ -45,7 +45,7 @@ import javax.lang.model.util.Types;
  * @author Tsutomu YANO
  */
 @SupportedSourceVersion(SourceVersion.RELEASE_6)
-@SupportedAnnotationTypes({"com.shelfmap.simplequery.annotation.SimpleDbDomain"})
+@SupportedAnnotationTypes({"com.shelfmap.simplequery.annotation.GenerateClass"})
 public class DomainAnnotationProcessor extends AbstractProcessor {
 
     @Override
@@ -53,21 +53,21 @@ public class DomainAnnotationProcessor extends AbstractProcessor {
         if(annotations.isEmpty()) return false;
 
         boolean processed = false;
-        Set<? extends Element> elements = re.getElementsAnnotatedWith(SimpleDbDomain.class);
+        Set<? extends Element> elements = re.getElementsAnnotatedWith(GenerateClass.class);
         for (Element element : elements) {
             if(element.getKind() == ElementKind.INTERFACE) {
-                SimpleDbDomain domain = element.getAnnotation(SimpleDbDomain.class);
-                assert domain != null;
+                GenerateClass generateAnnotation = element.getAnnotation(GenerateClass.class);
+                assert generateAnnotation != null;
 
-                if(!domain.autoGenerate()) continue;
+                if(!generateAnnotation.autoGenerate()) continue;
 
                 InterfaceDefinition definition = new DefaultInterfaceDefinition();
                 Environment visitorEnvironment = new BuildingEnvironment(processingEnv, definition);
                 DomainInterfaceVisitor visitor = new DomainInterfaceVisitor();
                 visitor.visit(element, visitorEnvironment);
 
-                String packageName = resolvePackageName(domain, definition.getPackage());
-                String className = resolveImplementationClassName(domain, definition.getInterfaceName());
+                String packageName = resolvePackageName(generateAnnotation, definition.getPackage());
+                String className = resolveImplementationClassName(generateAnnotation, definition.getInterfaceName());
                 String fullClassName = packageName + "." + className;
 
                 int readablePropertyCount = 0;
@@ -193,7 +193,7 @@ public class DomainAnnotationProcessor extends AbstractProcessor {
                 result = "new " + property.getRealType().toString() + "(" + safeName + ")";
                 break;
             case CLONE:
-                result = safeName + ".clone();";
+                result = safeName + ".clone()";
                 break;
             default:
                 throw new IllegalStateException("No such retainType: " + property.getRetainType());
@@ -240,7 +240,7 @@ public class DomainAnnotationProcessor extends AbstractProcessor {
         return sb.toString();
     }
 
-    private String resolvePackageName(SimpleDbDomain domain, String interfacePackageName) {
+    private String resolvePackageName(GenerateClass domain, String interfacePackageName) {
         String packageName = domain.packageName();
         boolean isRelative = domain.isPackageNameRelative();
 
@@ -255,7 +255,7 @@ public class DomainAnnotationProcessor extends AbstractProcessor {
         }
     }
 
-    private String resolveImplementationClassName(SimpleDbDomain domain, String interfaceName) {
+    private String resolveImplementationClassName(GenerateClass domain, String interfaceName) {
         String className = domain.className();
         if(className.isEmpty()) {
             return "Default" + capitalize(interfaceName);

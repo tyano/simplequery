@@ -30,8 +30,10 @@ import com.shelfmap.simplequery.domain.impl.DefaultDomainFactory;
 import com.shelfmap.simplequery.expression.ItemConverter;
 import com.shelfmap.simplequery.expression.SelectQuery;
 import com.shelfmap.simplequery.expression.impl.Select;
+import com.shelfmap.simplequery.factory.DomainAttributeFactory;
 import com.shelfmap.simplequery.factory.DomainDescriptorFactory;
 import com.shelfmap.simplequery.factory.ItemConverterFactory;
+import com.shelfmap.simplequery.factory.impl.DefaultDomainAttributeFactory;
 import com.shelfmap.simplequery.factory.impl.DefaultDomainDescriptorFactory;
 import com.shelfmap.simplequery.factory.impl.DefaultItemConverterFactory;
 import java.util.*;
@@ -97,8 +99,8 @@ public class DefaultContext implements Context {
     }
 
     @Override
-    public AttributeConverterFactory getAttributeConverterFactory() {
-        return new DefaultAttributeConverterFactory(this);
+    public DomainAttributeFactory getDomainAttributeFactory() {
+        return new DefaultDomainAttributeFactory(this);
     }
 
     @Override

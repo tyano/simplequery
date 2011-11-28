@@ -25,6 +25,7 @@ import com.shelfmap.simplequery.domain.AttributeConverterFactory;
 import com.shelfmap.simplequery.domain.Domain;
 import com.shelfmap.simplequery.domain.DomainFactory;
 import com.shelfmap.simplequery.expression.SelectQuery;
+import com.shelfmap.simplequery.factory.DomainAttributeFactory;
 import com.shelfmap.simplequery.factory.DomainDescriptorFactory;
 import com.shelfmap.simplequery.factory.ItemConverterFactory;
 import java.io.Serializable;
@@ -39,7 +40,7 @@ public interface Context extends Serializable, Iterable<CachedObject> {
     <T> DomainInstanceFactory<T> getDomainInstanceFactory(Domain<T> domain);
     DomainFactory getDomainFactory();
     DomainDescriptorFactory getDomainDescriptorFactory();
-    AttributeConverterFactory getAttributeConverterFactory();
+    DomainAttributeFactory getDomainAttributeFactory();
     AWSCredentials getCredentials();
     RemoteDomainBuilder getRemoteDomainBuilder();
 

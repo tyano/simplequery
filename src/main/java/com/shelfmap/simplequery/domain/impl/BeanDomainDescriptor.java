@@ -18,6 +18,7 @@ package com.shelfmap.simplequery.domain.impl;
 import com.shelfmap.simplequery.Context;
 import com.shelfmap.simplequery.annotation.*;
 import com.shelfmap.simplequery.domain.*;
+import com.shelfmap.simplequery.factory.DomainAttributeFactory;
 import static com.shelfmap.simplequery.util.Assertion.isNotNull;
 import com.shelfmap.simplequery.util.Objects;
 import java.beans.BeanInfo;
@@ -112,31 +113,48 @@ public class BeanDomainDescriptor implements DomainDescriptor {
     private <VT,CT> DomainAttribute<VT,CT> createAttribute(Class<?> domainClass, String propertyName, Class<?> originalPropertyType, Class<VT> valueType, Class<CT> containerType) throws IntrospectionException {
         DomainAttribute<VT,CT> result = null;
 
+        DomainAttributeFactory factory = getContext().getDomainAttributeFactory();
+        AttributeAccessor<CT> accessor = factory.createAttributeAccessor(originalPropertyType, containerType, fullPropertyPath(propertyName));
+
         if (Objects.isAnnotationPresentOnProperty(domainClass, propertyName, FloatAttribute.class) && (valueType.equals(Float.class) || valueType.equals(float.class))) {
             FloatAttribute annotation = Objects.findAnnotationOnProperty(domainClass, propertyName, FloatAttribute.class);
-            result = processFloatAttribute(annotation, propertyName, valueType, containerType);
+            AttributeConverter<VT> converter = (AttributeConverter<VT>) factory.createFloatAttributeConverter(annotation.maxDigitLeft(), annotation.maxDigitRight(), annotation.offset());
+
+            String attributeName = annotation.attributeName().isEmpty()
+                ? propertyName
+                : annotation.attributeName();
+
+            result = factory.createAttribute(getDomain(), attributeName, valueType, containerType, converter, accessor);
 
         } else if (Objects.isAnnotationPresentOnProperty(domainClass, propertyName, IntAttribute.class) && (valueType.equals(Integer.class) || valueType.equals(int.class))) {
             IntAttribute annotation = Objects.findAnnotationOnProperty(domainClass, propertyName, IntAttribute.class);
-            result = processIntAttribute(annotation, propertyName, valueType, containerType);
+            AttributeConverter<VT> converter = (AttributeConverter<VT>) factory.createIntAttributeConverter(annotation.padding(), annotation.offset());
+
+            String attributeName = annotation.attributeName().isEmpty()
+                ? propertyName
+                : annotation.attributeName();
+
+            result = factory.createAttribute(getDomain(), attributeName, valueType, containerType, converter, accessor);
 
         } else if (Objects.isAnnotationPresentOnProperty(domainClass, propertyName, LongAttribute.class) && (valueType.equals(Long.class) || valueType.equals(long.class))) {
             LongAttribute annotation = Objects.findAnnotationOnProperty(domainClass, propertyName, LongAttribute.class);
-            result = processLongAttribute(annotation, propertyName, valueType, containerType);
+            AttributeConverter<VT> converter = (AttributeConverter<VT>) factory.createLongAttributeConverter(annotation.padding(), annotation.offset());
 
-        } else if (ForwardReference.class.isAssignableFrom(originalPropertyType)) {
-            Attribute annotation = Objects.findAnnotationOnProperty(domainClass, propertyName, Attribute.class);
-            result = processForwardDomainReference(annotation, propertyName, valueType, containerType);
+            String attributeName = annotation.attributeName().isEmpty()
+                ? propertyName
+                : annotation.attributeName();
+
+            result = factory.createAttribute(getDomain(), attributeName, valueType, containerType, converter, accessor);
 
         } else if (Objects.isAnnotationPresentOnProperty(domainClass, propertyName, Attribute.class)) {
             Attribute annotation = Objects.findAnnotationOnProperty(domainClass, propertyName, Attribute.class);
-            result = processAttribute(annotation, propertyName, valueType, containerType);
+            result = processAttribute(annotation, propertyName, valueType, containerType, factory, accessor);
 
         } else {
             //No Annotation. the attribute name of this property become same with the property name.
             //AttributeConverter is created by the type of this attribute.
-            AttributeConverter<VT> converter = createConverter(valueType);
-            result = new DefaultDomainAttribute<VT,CT>(getDomain(), propertyName, valueType, containerType, converter, newAttributeAccessor(containerType, fullPropertyPath(propertyName)));
+            AttributeConverter<VT> converter = factory.createAttributeConverter(valueType);
+            result = new DefaultDomainAttribute<VT,CT>(getDomain(), propertyName, valueType, containerType, converter, accessor);
         }
 
         return result;
@@ -146,67 +164,8 @@ public class BeanDomainDescriptor implements DomainDescriptor {
         return new PropertyAttributeAccessor<C>(context, propertyPath);
     }
 
-    private <VT,CT> DomainAttribute<VT,CT> processFloatAttribute(FloatAttribute annotation, String propertyName, Class<VT> valueType, Class<CT> containerType) {
-        String attributeName = annotation.attributeName().isEmpty()
-                ? propertyName
-                : annotation.attributeName();
-
-        @SuppressWarnings("unchecked")
-        AttributeConverter<VT> converter = (AttributeConverter<VT>) createFloatConverter(annotation);
-        AttributeAccessor<CT> accessor = newAttributeAccessor(containerType, fullPropertyPath(propertyName));
-        return new DefaultDomainAttribute<VT, CT>(getDomain(), attributeName, valueType, containerType, converter, accessor);
-    }
-
-    private AttributeConverter<Float> createFloatConverter(FloatAttribute annotation) {
-        return new FloatAttributeConverter(annotation.maxDigitLeft(), annotation.maxDigitRight(), annotation.offset());
-    }
-
-    private <VT,CT> DomainAttribute<VT,CT> processIntAttribute(IntAttribute annotation, String propertyName, Class<VT> valueType, Class<CT> containerType) {
-        String attributeName = annotation.attributeName().isEmpty()
-                ? propertyName
-                : annotation.attributeName();
-
-        @SuppressWarnings("unchecked")
-        AttributeConverter<VT> converter = (AttributeConverter<VT>) createIntConverter(annotation);
-        AttributeAccessor<CT> accessor = newAttributeAccessor(containerType, fullPropertyPath(propertyName));
-        return new DefaultDomainAttribute<VT, CT>(getDomain(), attributeName, valueType, containerType, converter, accessor);
-    }
-
-    private AttributeConverter<Integer> createIntConverter(IntAttribute annotation) {
-        return new IntAttributeConverter(annotation.padding(), annotation.offset());
-    }
-
-    private <VT,CT> DomainAttribute<VT,CT> processLongAttribute(LongAttribute annotation, String propertyName, Class<VT> valueType, Class<CT> containerType) {
-        String attributeName = annotation.attributeName().isEmpty()
-                ? propertyName
-                : annotation.attributeName();
-
-        @SuppressWarnings("unchecked")
-        AttributeConverter<VT> converter = (AttributeConverter<VT>) createLongConverter(annotation);
-        AttributeAccessor<CT> accessor = newAttributeAccessor(containerType, fullPropertyPath(propertyName));
-        return new DefaultDomainAttribute<VT, CT>(getDomain(), attributeName, valueType, containerType, converter, accessor);
-    }
-
-    private AttributeConverter<Long> createLongConverter(LongAttribute annotation) {
-        return new LongAttributeConverter(annotation.padding(), annotation.offset());
-    }
-
-    private <VT> AttributeConverter<VT> createConverter(Class<VT> attributeType) {
-        AttributeConverterFactory factory = context.getAttributeConverterFactory();
-        return factory.getAttributeConverter(attributeType);
-    }
-
     @SuppressWarnings("unchecked")
-    private <VT,CT> DomainAttribute<VT,CT> processForwardDomainReference(Attribute annotation, String propertyName, Class<VT> valueType, Class<CT> containerType) {
-        String attributeName = annotation != null && annotation.attributeName().isEmpty()
-                ? propertyName
-                : annotation.attributeName();
-        AttributeConverter<?> converter = createConverter(valueType);
-        return new DefaultDomainAttribute<VT,CT>(getDomain(), attributeName, valueType, containerType, (AttributeConverter<VT>) converter, (AttributeAccessor<CT>)new ForwardReferenceAttributeAccessor(context, fullPropertyPath(propertyName)));
-    }
-
-    @SuppressWarnings("unchecked")
-    private <VT,CT> DomainAttribute<VT,CT> processAttribute(Attribute annotation, String propertyName, Class<VT> valueType, Class<CT> containerType) {
+    private <VT,CT> DomainAttribute<VT,CT> processAttribute(Attribute annotation, String propertyName, Class<VT> valueType, Class<CT> containerType, DomainAttributeFactory factory, AttributeAccessor<CT> accessor) {
         try {
             String attributeName = annotation.attributeName().isEmpty()
                     ? propertyName
@@ -215,9 +174,10 @@ public class BeanDomainDescriptor implements DomainDescriptor {
 
             AttributeConverter<?> converter =
                     (converterClass.equals(NullAttributeConverter.class))
-                    ? createConverter(valueType)
+                    ? factory.createAttributeConverter(valueType)
                     : converterClass.newInstance();
-            return new DefaultDomainAttribute<VT,CT>(getDomain(), attributeName, valueType, containerType, (AttributeConverter<VT>) converter, newAttributeAccessor(containerType, fullPropertyPath(propertyName)));
+
+            return factory.createAttribute(getDomain(), attributeName, valueType, containerType, (AttributeConverter<VT>) converter, accessor);
         } catch (InstantiationException ex) {
             throw new IllegalArgumentException("Can not instanciate a converter. possible cause is that the converter class specified in @Attribute do not have a default constructor.", ex);
         } catch (IllegalAccessException ex) {

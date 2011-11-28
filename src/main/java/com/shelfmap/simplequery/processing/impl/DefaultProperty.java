@@ -15,7 +15,7 @@
  */
 package com.shelfmap.simplequery.processing.impl;
 
-import com.shelfmap.simplequery.domain.RetainType;
+import com.shelfmap.simplequery.processing.RetainType;
 import com.shelfmap.simplequery.processing.Property;
 import javax.lang.model.type.TypeMirror;
 

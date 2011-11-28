@@ -16,7 +16,6 @@
 package com.shelfmap.simplequery.processing;
 
 import com.shelfmap.simplequery.annotation.GenerateClass;
-import com.shelfmap.simplequery.domain.RetainType;
 import com.shelfmap.simplequery.processing.impl.BuildingEnvironment;
 import com.shelfmap.simplequery.processing.impl.DefaultInterfaceDefinition;
 import com.shelfmap.simplequery.util.IO;
@@ -183,22 +182,8 @@ public class DomainAnnotationProcessor extends AbstractProcessor {
         assert property != null;
 
         String safeName = prefix + toSafeName(property.getName());
-        String result;
         RetainType type = RetainType.valueOf(property.getRetainType());
-        switch(type) {
-            case HOLD:
-                result = safeName;
-                break;
-            case NEW:
-                result = "new " + property.getRealType().toString() + "(" + safeName + ")";
-                break;
-            case CLONE:
-                result = safeName + ".clone()";
-                break;
-            default:
-                throw new IllegalStateException("No such retainType: " + property.getRetainType());
-        }
-        return result;
+        return type.codeFor(safeName, property);
     }
 
     private String toSafeName(String word) {

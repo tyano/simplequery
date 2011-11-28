@@ -13,21 +13,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.shelfmap.simplequery.annotation;
-
-import com.shelfmap.simplequery.processing.RetainType;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+package com.shelfmap.simplequery.processing;
 
 /**
  *
  * @author Tsutomu YANO
  */
-@Target(ElementType.METHOD)
-@Retention(RetentionPolicy.SOURCE)
-public @interface Property {
-    RetainType retainType() default RetainType.HOLD;
-    Class<?> realType() default Void.class;
+public enum RetainType implements RetainCode {
+    HOLD {
+        @Override
+        public String codeFor(String argName, Property property) {
+            return argName;
+        }
+    },
+    NEW {
+        @Override
+        public String codeFor(String argName, Property property) {
+            return "new " + property.getRealType().toString() + "(" + argName + ")";
+        }
+    },
+    CLONE {
+        @Override
+        public String codeFor(String argName, Property property) {
+            return argName + ".clone()";
+        }
+    };
 }

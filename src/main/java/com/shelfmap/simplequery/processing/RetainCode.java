@@ -13,14 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.shelfmap.simplequery.domain;
+package com.shelfmap.simplequery.processing;
 
 /**
  *
  * @author Tsutomu YANO
  */
-public enum RetainType {
-    HOLD,
-    NEW,
-    CLONE;
+public interface RetainCode {
+    String codeFor(String argName, Property property);
 }

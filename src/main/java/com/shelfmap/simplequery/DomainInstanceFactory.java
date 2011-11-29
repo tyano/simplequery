@@ -16,8 +16,6 @@
 
 package com.shelfmap.simplequery;
 
-import com.shelfmap.simplequery.domain.Domain;
-
 /**
  *
  * @author Tsutomu YANO

@@ -27,16 +27,16 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.annotation.processing.*;
 import javax.lang.model.SourceVersion;
-import javax.lang.model.element.Element;
-import javax.lang.model.element.ElementKind;
-import javax.lang.model.element.TypeElement;
 import javax.tools.JavaFileObject;
 
 import static com.shelfmap.simplequery.util.Strings.capitalize;
 
 import java.util.Date;
+import java.util.Map;
+import javax.lang.model.element.*;
 import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
+import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
 
 /**
@@ -50,6 +50,9 @@ public class DomainAnnotationProcessor extends AbstractProcessor {
     @Override
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment re) {
         if(annotations.isEmpty()) return false;
+
+        Elements elementUtils = processingEnv.getElementUtils();
+        Types typeUtils = processingEnv.getTypeUtils();
 
         boolean processed = false;
         Set<? extends Element> elements = re.getElementsAnnotatedWith(GenerateClass.class);
@@ -82,11 +85,19 @@ public class DomainAnnotationProcessor extends AbstractProcessor {
                     writer = javaFile.openWriter();
 
                     String generationTime = String.format("%1$tY%1$tm%1$td-%1$tH%1$tk%1$tS-%1$tN%1$tz", new Date());
-                    Types typeUtils = processingEnv.getTypeUtils();
 
                     writer.append("package ").append(packageName).append(";\n\n");
                     writer.append("@javax.annotation.Generated(\"" + generationTime + "\")\n");
-                    writer.append("public ").append(definition.getMethods().isEmpty() ? "" : "abstract ").append("class ").append(className).append(" implements ").append(definition.getPackage() + "." + definition.getInterfaceName()).append(" {\n");
+                    writer.append("public ").append(definition.getMethods().isEmpty() ? "" : "abstract ").append("class ").append(className);
+
+                    AnnotationMirror mirror = findAnnotation(element, GenerateClass.class, elementUtils, typeUtils);
+                    String superClassName = getSuperClassValue(elementUtils, typeUtils, mirror.getElementValues());
+                    if(!superClassName.isEmpty()) {
+                        writer.append(" extends ").append(superClassName);
+                    }
+
+                    writer.append(" implements ").append(definition.getPackage() + "." + definition.getInterfaceName())
+                          .append(" {\n");
 
                     int shift = 1;
                     for (Property property : definition.getProperties()) {
@@ -171,6 +182,41 @@ public class DomainAnnotationProcessor extends AbstractProcessor {
             }
         }
         return processed;
+    }
+
+
+    private AnnotationMirror findAnnotation(Element element, Class<?> annotationClass, Elements elementUtils, Types typeUtils) {
+        TypeElement propertyAnnotationType = elementUtils.getTypeElement(annotationClass.getName());
+        for (AnnotationMirror mirror : element.getAnnotationMirrors()) {
+            if(typeUtils.isSameType(propertyAnnotationType.asType(), mirror.getAnnotationType())) {
+                return mirror;
+            }
+        }
+        return null;
+    }
+
+    private String getSuperClassValue(Elements elementUtils, Types typeUtils, Map<? extends ExecutableElement, ? extends AnnotationValue> elementValues) {
+        AnnotationValue superClassValue = getValueOfAnnotation(elementValues, "superClass");
+        assert superClassValue != null;
+        TypeMirror superClassMirror = (TypeMirror) superClassValue.getValue();
+        TypeMirror voidType = elementUtils.getTypeElement(Void.class.getName()).asType();
+
+        if(typeUtils.isSameType(voidType, superClassMirror)) {
+            return "";
+        }
+
+        return superClassMirror.toString();
+    }
+
+
+    private AnnotationValue getValueOfAnnotation(Map<? extends ExecutableElement, ? extends AnnotationValue> elementValues, String keyName) {
+        for (Map.Entry<? extends ExecutableElement, ? extends AnnotationValue> entry : elementValues.entrySet()) {
+            ExecutableElement key = entry.getKey();
+            if(key.getSimpleName().toString().equals(keyName)) {
+                return entry.getValue();
+            }
+        }
+        return null;
     }
 
 

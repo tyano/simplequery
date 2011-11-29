@@ -24,4 +24,5 @@ public @interface GenerateClass {
     String packageName() default "";
     boolean isPackageNameRelative() default false;
     String className() default "";
+    Class<?> superClass() default Void.class;
 }

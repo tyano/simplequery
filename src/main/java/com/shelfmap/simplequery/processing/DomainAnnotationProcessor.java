@@ -86,6 +86,8 @@ public class DomainAnnotationProcessor extends AbstractProcessor {
                     shift = generateFields(writer, shift, definition);
                     shift = generateConstructors(writer, shift, className, definition);
                     shift = generatePropertyAccessors(writer, shift, definition, typeUtils);
+                    shift = generateEquals(writer, shift, definition, className);
+                    shift = generateHashCode(writer, shift, definition, className);
 
                     writer.append("}");
                     writer.flush();
@@ -117,7 +119,7 @@ public class DomainAnnotationProcessor extends AbstractProcessor {
               .append(" {\n");
     }
 
-    private int generateFields(Writer writer, int shift, InterfaceDefinition definition) throws IOException {
+    protected int generateFields(Writer writer, int shift, InterfaceDefinition definition) throws IOException {
         for (Property property : definition.getProperties()) {
             String typeName = property.getType().toString();
             writer.append(indent(shift)).append("private ").append(typeName).append(" ").append(toSafeName(property.getName())).append(";\n");
@@ -126,7 +128,7 @@ public class DomainAnnotationProcessor extends AbstractProcessor {
         return shift;
     }
 
-    private int generateFullArgConstructor(Writer writer, int shift, String className, InterfaceDefinition definition) throws IOException {
+    protected int generateFullArgConstructor(Writer writer, int shift, String className, InterfaceDefinition definition) throws IOException {
         writer.append(indent(shift)).append("public ").append(className).append("(");
         boolean isFirst = true;
         for (Property property : definition.getProperties()) {
@@ -153,7 +155,7 @@ public class DomainAnnotationProcessor extends AbstractProcessor {
         return shift;
     }
 
-    private int generatePropertyAccessors(Writer writer, int shift, InterfaceDefinition definition, Types typeUtils) throws IOException {
+    protected int generatePropertyAccessors(Writer writer, int shift, InterfaceDefinition definition, Types typeUtils) throws IOException {
         for (Property property : definition.getProperties()) {
             String propertyType = property.getType().toString();
             if(property.isReadable()) {
@@ -173,7 +175,7 @@ public class DomainAnnotationProcessor extends AbstractProcessor {
         return shift;
     }
 
-    private int generateConstructors(Writer writer, int shift, String className, InterfaceDefinition definition) throws IOException {
+    protected int generateConstructors(Writer writer, int shift, String className, InterfaceDefinition definition) throws IOException {
         shift = generateFullArgConstructor(writer, shift, className, definition);
 
         int readablePropertyCount = 0;
@@ -190,7 +192,7 @@ public class DomainAnnotationProcessor extends AbstractProcessor {
         return shift;
     }
 
-    private int generateReadOnlyFieldConstructor(Writer writer, int shift, String className, InterfaceDefinition definition) throws IOException {
+    protected int generateReadOnlyFieldConstructor(Writer writer, int shift, String className, InterfaceDefinition definition) throws IOException {
         writer.append(indent(shift)).append("public ").append(className).append("(");
         boolean isFirst = true;
         for (Property property : definition.getProperties()) {
@@ -213,8 +215,87 @@ public class DomainAnnotationProcessor extends AbstractProcessor {
         return shift;
     }
 
+    protected int generateEquals(Writer writer, int shift, InterfaceDefinition definition, String className) throws IOException {
 
-    private AnnotationMirror findAnnotation(Element element, Class<?> annotationClass, Elements elementUtils, Types typeUtils) {
+        writer.append(indent(shift)).append("@Override\n")
+              .append(indent(shift)).append("public boolean equals(Object obj) {\n")
+              .append(indent(++shift)).append("if (obj == null) {\n")
+              .append(indent(++shift)).append("return false;\n")
+              .append(indent(--shift)).append("}\n\n")
+              .append(indent(shift)).append("if (!(obj instanceof ").append(className).append(")) {\n")
+              .append(indent(++shift)).append("return false;\n")
+              .append(indent(--shift)).append("}\n\n")
+              .append(indent(shift)).append("final ").append(className).append(" other = (").append(className).append(") obj;\n");
+
+        for (Property property : definition.getProperties()) {
+            final String fieldName = toSafeName(property.getName());
+            if(isPrimitive(property.getType())) {
+                switch(property.getType().getKind()) {
+                    case FLOAT:
+                        writer.append(indent(shift)).append("if (Float.floatToIntBits(this.").append(fieldName).append(") != Float.floatToIntBits(other.").append(fieldName).append(")) {\n")
+                              .append(indent(++shift)).append("return false;\n")
+                              .append(indent(--shift)).append("}\n");
+                        break;
+                    case DOUBLE:
+                        writer.append(indent(shift)).append("if (Double.doubleToLongBits(this.").append(fieldName).append(") != Double.doubleToLongBits(other.").append(fieldName).append(")) {\n")
+                              .append(indent(++shift)).append("return false;\n")
+                              .append(indent(--shift)).append("}\n");
+                        break;
+                    default:
+                        writer.append(indent(shift)).append("if (this.").append(fieldName).append(" != other.").append(fieldName).append(") {\n")
+                              .append(indent(++shift)).append("return false;\n")
+                              .append(indent(--shift)).append("}\n");
+                }
+            } else {
+                writer.append(indent(shift)).append("if (this.").append(fieldName).append(" != other.").append(fieldName).append(" && (this.").append(fieldName).append(" == null || !this.").append(fieldName).append(".equals(other.").append(fieldName).append("))) {\n")
+                      .append(indent(++shift)).append("return false;\n")
+                      .append(indent(--shift)).append("}\n");
+            }
+        }
+
+        writer.append(indent(shift)).append("return true;\n");
+        writer.append(indent(--shift)).append("}\n\n");
+        return shift;
+    }
+
+    protected int generateHashCode(Writer writer, int shift, InterfaceDefinition definition, String className) throws IOException {
+        writer.append(indent(shift)).append("@Override\n")
+              .append(indent(shift)).append("public int hashCode() {\n")
+              .append(indent(++shift)).append("int result = 17;\n");
+
+        for (Property property : definition.getProperties()) {
+            final String fieldName = toSafeName(property.getName());
+            String expression = null;
+            if(isPrimitive(property.getType())) {
+                switch(property.getType().getKind()) {
+                    case FLOAT:
+                        expression = "Float.floatToIntBits(this." + fieldName + ")";
+                        break;
+                    case DOUBLE:
+                        expression = "(int) (Double.doubleToLongBits(this." + fieldName + ") ^ (Double.doubleToLongBits(this." + fieldName + ") >>> 32))";
+                        break;
+                    case BOOLEAN:
+                        expression = "(this." + fieldName + " ? 1 : 0)";
+                        break;
+                    case LONG:
+                        expression = "(int) (this." + fieldName + " ^ (this." + fieldName + " >>> 32))";
+                        break;
+                    default:
+                        expression = "this." + fieldName;
+                }
+            } else {
+                expression = "(this." + fieldName + " != null ? this." + fieldName + ".hashCode() : 0)";
+            }
+            writer.append(indent(shift)).append("result = 31 * result + ").append(expression).append(";\n");
+        }
+
+        writer.append(indent(shift)).append("return result;\n");
+        writer.append(indent(--shift)).append("}\n\n");
+
+        return shift;
+    }
+
+    protected AnnotationMirror findAnnotation(Element element, Class<?> annotationClass, Elements elementUtils, Types typeUtils) {
         TypeElement propertyAnnotationType = elementUtils.getTypeElement(annotationClass.getName());
         for (AnnotationMirror mirror : element.getAnnotationMirrors()) {
             if(typeUtils.isSameType(propertyAnnotationType.asType(), mirror.getAnnotationType())) {
@@ -224,7 +305,7 @@ public class DomainAnnotationProcessor extends AbstractProcessor {
         return null;
     }
 
-    private String getSuperClassValue(Elements elementUtils, Types typeUtils, Map<? extends ExecutableElement, ? extends AnnotationValue> elementValues) {
+    protected String getSuperClassValue(Elements elementUtils, Types typeUtils, Map<? extends ExecutableElement, ? extends AnnotationValue> elementValues) {
         AnnotationValue superClassValue = getValueOfAnnotation(elementValues, "superClass");
         assert superClassValue != null;
         TypeMirror superClassMirror = (TypeMirror) superClassValue.getValue();
@@ -238,7 +319,7 @@ public class DomainAnnotationProcessor extends AbstractProcessor {
     }
 
 
-    private AnnotationValue getValueOfAnnotation(Map<? extends ExecutableElement, ? extends AnnotationValue> elementValues, String keyName) {
+    protected AnnotationValue getValueOfAnnotation(Map<? extends ExecutableElement, ? extends AnnotationValue> elementValues, String keyName) {
         for (Map.Entry<? extends ExecutableElement, ? extends AnnotationValue> entry : elementValues.entrySet()) {
             ExecutableElement key = entry.getKey();
             if(key.getSimpleName().toString().equals(keyName)) {
@@ -249,11 +330,11 @@ public class DomainAnnotationProcessor extends AbstractProcessor {
     }
 
 
-    private String retain(Property property) {
+    protected String retain(Property property) {
         return retain(property, "");
     }
 
-    private String retain(Property property, String prefix) {
+    protected String retain(Property property, String prefix) {
         assert property != null;
 
         String safeName = prefix + toSafeName(property.getName());
@@ -261,11 +342,11 @@ public class DomainAnnotationProcessor extends AbstractProcessor {
         return type.codeFor(safeName, property);
     }
 
-    private String toSafeName(String word) {
+    protected String toSafeName(String word) {
         return Objects.isPreserved(word) ? "_" + word : word;
     }
 
-    private boolean isBoolean(TypeMirror type, Types typeUtils) {
+    protected final boolean isBoolean(TypeMirror type, Types typeUtils) {
         switch(type.getKind()) {
             case BOOLEAN:
                 return true;
@@ -274,7 +355,7 @@ public class DomainAnnotationProcessor extends AbstractProcessor {
         }
     }
 
-    private boolean isPrimitive(TypeMirror type) {
+    protected final boolean isPrimitive(TypeMirror type) {
         switch(type.getKind()) {
             case BOOLEAN:
             case BYTE:
@@ -291,7 +372,7 @@ public class DomainAnnotationProcessor extends AbstractProcessor {
         }
     }
 
-    private String indent(int indent) {
+    protected final String indent(int indent) {
         if(indent <= 0) return "";
         StringBuilder sb = new StringBuilder();
         for(int i = 0; i < indent; i++) {
@@ -300,7 +381,7 @@ public class DomainAnnotationProcessor extends AbstractProcessor {
         return sb.toString();
     }
 
-    private String resolvePackageName(GenerateClass domain, String interfacePackageName) {
+    protected String resolvePackageName(GenerateClass domain, String interfacePackageName) {
         String packageName = domain.packageName();
         boolean isRelative = domain.isPackageNameRelative();
 
@@ -315,7 +396,7 @@ public class DomainAnnotationProcessor extends AbstractProcessor {
         }
     }
 
-    private String resolveImplementationClassName(GenerateClass domain, String interfaceName) {
+    protected String resolveImplementationClassName(GenerateClass domain, String interfaceName) {
         String className = domain.className();
         if(className.isEmpty()) {
             return "Default" + capitalize(interfaceName);

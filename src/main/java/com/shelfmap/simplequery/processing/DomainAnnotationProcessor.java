@@ -70,8 +70,8 @@ public class DomainAnnotationProcessor extends AbstractProcessor {
                 //collect information about the current interface into visitorEnviroment
                 visitor.visit(element, visitorEnvironment);
 
-                String packageName = resolvePackageName(generateAnnotation, definition.getPackage());
-                String className = resolveImplementationClassName(generateAnnotation, definition.getInterfaceName());
+                String packageName = resolvePackageName(generateAnnotation, definition);
+                String className = resolveImplementationClassName(generateAnnotation, definition);
                 String fullClassName = packageName + "." + className;
 
                 Writer writer = null;
@@ -103,10 +103,10 @@ public class DomainAnnotationProcessor extends AbstractProcessor {
     }
 
     private void generateClassDefinition(Writer writer, String packageName, InterfaceDefinition definition, String className, Element element, Elements elementUtils, Types typeUtils) throws IOException {
-        String generationTime = String.format("%1$tY%1$tm%1$td-%1$tH%1$tk%1$tS-%1$tN%1$tz", new Date());
+        String generationTime = String.format("%1$tFT%1$tH:%1$tM:%1$tS.%1$tL%1$tz", new Date()); //%1$tY%1$tm%1$td-%1$tH%1$tk%1$tS-%1$tN%1$tz
 
         writer.append("package ").append(packageName).append(";\n\n");
-        writer.append("@javax.annotation.Generated(\"" + generationTime + "\")\n");
+        writer.append("@javax.annotation.Generated(value = \"" + this.getClass().getName() + "\", date = \"" + generationTime + "\")\n");
         writer.append("public ").append(definition.getMethods().isEmpty() ? "" : "abstract ").append("class ").append(className);
 
         AnnotationMirror mirror = findAnnotation(element, GenerateClass.class, elementUtils, typeUtils);
@@ -125,33 +125,6 @@ public class DomainAnnotationProcessor extends AbstractProcessor {
             writer.append(indent(shift)).append("private ").append(typeName).append(" ").append(toSafeName(property.getName())).append(";\n");
         }
         writer.append("\n");
-        return shift;
-    }
-
-    protected int generateFullArgConstructor(Writer writer, int shift, String className, InterfaceDefinition definition) throws IOException {
-        writer.append(indent(shift)).append("public ").append(className).append("(");
-        boolean isFirst = true;
-        for (Property property : definition.getProperties()) {
-            if(!property.isWritable() && property.isReadable()) {
-                String type = property.getType().toString();
-                if(!isFirst) {
-                    writer.append(", ");
-                } else {
-                    isFirst = false;
-                }
-                writer.append(type).append(" ").append(toSafeName(property.getName()));
-            }
-        }
-        writer.append(") {\n");
-        shift++;
-        writer.append(indent(shift)).append("super();\n");
-        for (Property property : definition.getProperties()) {
-            if(!property.isWritable() && property.isReadable()) {
-                writer.append(indent(shift)).append("this.").append(toSafeName(property.getName())).append(" = ").append(retain(property)).append(";\n");
-            }
-        }
-        shift--;
-        writer.append(indent(shift)).append("}\n\n");
         return shift;
     }
 
@@ -185,14 +158,14 @@ public class DomainAnnotationProcessor extends AbstractProcessor {
             if(property.isWritable()) writablePropertyCount++;
         }
 
-        if(readablePropertyCount > writablePropertyCount) {
+        if(readablePropertyCount >= writablePropertyCount) {
             shift = generateReadOnlyFieldConstructor(writer, shift, className, definition);
         }
 
         return shift;
     }
 
-    protected int generateReadOnlyFieldConstructor(Writer writer, int shift, String className, InterfaceDefinition definition) throws IOException {
+    protected int generateFullArgConstructor(Writer writer, int shift, String className, InterfaceDefinition definition) throws IOException {
         writer.append(indent(shift)).append("public ").append(className).append("(");
         boolean isFirst = true;
         for (Property property : definition.getProperties()) {
@@ -205,13 +178,56 @@ public class DomainAnnotationProcessor extends AbstractProcessor {
             writer.append(type).append(" ").append(toSafeName(property.getName()));
         }
         writer.append(") {\n");
-        shift++;
-        writer.append(indent(shift)).append("super();\n");
+        writer.append(indent(++shift)).append("super();\n");
         for (Property property : definition.getProperties()) {
             writer.append(indent(shift)).append("this.").append(toSafeName(property.getName())).append(" = ").append(retain(property)).append(";\n");
         }
+        writer.append(indent(--shift)).append("}\n\n");
+        return shift;
+    }
+
+    /**
+     * Generate source of a constructor having parameters for all read-only properties.<br/>
+     * If there is no read-only property, a default no-arg constructor is generated.
+     *
+     * @param writer source-writer
+     * @param shift current count of indents.
+     * @param className generated class name
+     * @param definition InterfaceDefinition which have all information about an interface for generating.
+     * @return last indent-count
+     * @throws IOException occurs when this method could not write to a writer.
+     */
+    protected int generateReadOnlyFieldConstructor(Writer writer, int shift, String className, InterfaceDefinition definition) throws IOException {
+        writer.append(indent(shift)).append("public ").append(className).append("(");
+        boolean isFirst = true;
+        for (Property property : definition.getProperties()) {
+            if(!property.isWritable() && property.isReadable()) {
+                String type = property.getType().toString();
+                if(!isFirst) {
+                    writer.append(", ");
+                } else {
+                    isFirst = false;
+                }
+                writer.append(type).append(" ").append(toSafeName(property.getName()));
+            }
+        }
+        writer.append(") {\n");
+        shift++;
+        writer.append(indent(shift)).append("super();\n");
+        for (Property property : definition.getProperties()) {
+            if(!property.isWritable() && property.isReadable()) {
+                writer.append(indent(shift)).append("this.").append(toSafeName(property.getName())).append(" = ").append(retain(property)).append(";\n");
+            }
+        }
         shift--;
         writer.append(indent(shift)).append("}\n\n");
+        return shift;
+    }
+
+    protected int generateDefaultConstructor(Writer writer, int shift, String className, InterfaceDefinition definition) throws IOException {
+        writer.append(indent(shift)).append("public ").append(className).append("(").append(") {\n")
+              .append(indent(++shift)).append("super();\n")
+              .append(indent(--shift)).append("}\n\n");
         return shift;
     }
 
@@ -381,7 +397,8 @@ public class DomainAnnotationProcessor extends AbstractProcessor {
         return sb.toString();
     }
 
-    protected String resolvePackageName(GenerateClass domain, String interfacePackageName) {
+    protected String resolvePackageName(GenerateClass domain, InterfaceDefinition definition) {
+        String interfacePackageName = definition.getPackage();
         String packageName = domain.packageName();
         boolean isRelative = domain.isPackageNameRelative();
 
@@ -396,10 +413,15 @@ public class DomainAnnotationProcessor extends AbstractProcessor {
         }
     }
 
-    protected String resolveImplementationClassName(GenerateClass domain, String interfaceName) {
+    protected String resolveImplementationClassName(GenerateClass domain, InterfaceDefinition definition) {
+        String interfaceName = definition.getInterfaceName();
         String className = domain.className();
         if(className.isEmpty()) {
-            return "Default" + capitalize(interfaceName);
+            if(definition.getMethods().isEmpty()) {
+                return "Default" + capitalize(interfaceName);
+            } else {
+                return "Abstract" + capitalize(interfaceName);
+            }
         } else {
             return className;
         }

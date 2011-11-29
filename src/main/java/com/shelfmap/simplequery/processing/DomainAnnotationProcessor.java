@@ -66,111 +66,27 @@ public class DomainAnnotationProcessor extends AbstractProcessor {
                 InterfaceDefinition definition = new DefaultInterfaceDefinition();
                 Environment visitorEnvironment = new BuildingEnvironment(processingEnv, definition);
                 DomainInterfaceVisitor visitor = new DomainInterfaceVisitor();
+
+                //collect information about the current interface into visitorEnviroment
                 visitor.visit(element, visitorEnvironment);
 
                 String packageName = resolvePackageName(generateAnnotation, definition.getPackage());
                 String className = resolveImplementationClassName(generateAnnotation, definition.getInterfaceName());
                 String fullClassName = packageName + "." + className;
 
-                int readablePropertyCount = 0;
-                int writablePropertyCount = 0;
-                for (Property property : definition.getProperties()) {
-                    if(property.isReadable()) readablePropertyCount++;
-                    if(property.isWritable()) writablePropertyCount++;
-                }
-
                 Writer writer = null;
                 try {
-                    JavaFileObject javaFile = processingEnv.getFiler().createSourceFile(fullClassName);
+                    Filer filer = processingEnv.getFiler();
+                    JavaFileObject javaFile = filer.createSourceFile(fullClassName, element);
                     writer = javaFile.openWriter();
 
-                    String generationTime = String.format("%1$tY%1$tm%1$td-%1$tH%1$tk%1$tS-%1$tN%1$tz", new Date());
-
-                    writer.append("package ").append(packageName).append(";\n\n");
-                    writer.append("@javax.annotation.Generated(\"" + generationTime + "\")\n");
-                    writer.append("public ").append(definition.getMethods().isEmpty() ? "" : "abstract ").append("class ").append(className);
-
-                    AnnotationMirror mirror = findAnnotation(element, GenerateClass.class, elementUtils, typeUtils);
-                    String superClassName = getSuperClassValue(elementUtils, typeUtils, mirror.getElementValues());
-                    if(!superClassName.isEmpty()) {
-                        writer.append(" extends ").append(superClassName);
-                    }
-
-                    writer.append(" implements ").append(definition.getPackage() + "." + definition.getInterfaceName())
-                          .append(" {\n");
+                    generateClassDefinition(writer, packageName, definition, className, element, elementUtils, typeUtils);
 
                     int shift = 1;
-                    for (Property property : definition.getProperties()) {
-                        String typeName = property.getType().toString();
-                        writer.append(indent(shift)).append("private ").append(typeName).append(" ").append(toSafeName(property.getName())).append(";\n");
-                    }
+                    shift = generateFields(writer, shift, definition);
+                    shift = generateConstructors(writer, shift, className, definition);
+                    shift = generatePropertyAccessors(writer, shift, definition, typeUtils);
 
-                    writer.append("\n");
-
-                    {
-                        writer.append(indent(shift)).append("public ").append(className).append("(");
-                        boolean isFirst = true;
-                        for (Property property : definition.getProperties()) {
-                            if(!property.isWritable() && property.isReadable()) {
-                                String type = property.getType().toString();
-                                if(!isFirst) {
-                                    writer.append(", ");
-                                } else {
-                                    isFirst = false;
-                                }
-                                writer.append(type).append(" ").append(toSafeName(property.getName()));
-                            }
-                        }
-                        writer.append(") {\n");
-                        shift++;
-                        writer.append(indent(shift)).append("super();\n");
-                        for (Property property : definition.getProperties()) {
-                            if(!property.isWritable() && property.isReadable()) {
-                                writer.append(indent(shift)).append("this.").append(toSafeName(property.getName())).append(" = ").append(retain(property)).append(";\n");
-                            }
-                        }
-                        shift--;
-                        writer.append(indent(shift)).append("}\n\n");
-                    }
-
-                    if(readablePropertyCount > writablePropertyCount) {
-                        writer.append(indent(shift)).append("public ").append(className).append("(");
-                        boolean isFirst = true;
-                        for (Property property : definition.getProperties()) {
-                            String type = property.getType().toString();
-                            if(!isFirst) {
-                                writer.append(", ");
-                            } else {
-                                isFirst = false;
-                            }
-                            writer.append(type).append(" ").append(toSafeName(property.getName()));
-                        }
-                        writer.append(") {\n");
-                        shift++;
-                        writer.append(indent(shift)).append("super();\n");
-                        for (Property property : definition.getProperties()) {
-                            writer.append(indent(shift)).append("this.").append(toSafeName(property.getName())).append(" = ").append(retain(property)).append(";\n");
-                        }
-                        shift--;
-                        writer.append(indent(shift)).append("}\n\n");
-                    }
-
-                    for (Property property : definition.getProperties()) {
-                        String propertyType = property.getType().toString();
-                        if(property.isReadable()) {
-                            writer.append(indent(shift)).append("@Override\n");
-                            writer.append(indent(shift)).append("public ").append(propertyType).append(isBoolean(property.getType(), typeUtils) ? " is" : " get").append(capitalize(property.getName())).append("() {\n");
-                            writer.append(indent(++shift)).append("return ").append(retain(property, "this.")).append(";\n");
-                            writer.append(indent(--shift)).append("}\n\n");
-                        }
-
-                        if(property.isWritable()) {
-                            writer.append(indent(shift)).append("@Override\n");
-                            writer.append(indent(shift)).append("public void set").append(capitalize(property.getName())).append("(").append(propertyType).append(" ").append(toSafeName(property.getName())).append(") {\n");
-                            writer.append(indent(++shift)).append("this.").append(toSafeName(property.getName())).append(" = ").append(retain(property)).append(";\n");
-                            writer.append(indent(--shift)).append("}\n\n");
-                        }
-                    }
                     writer.append("}");
                     writer.flush();
                 } catch (IOException ex) {
@@ -182,6 +98,119 @@ public class DomainAnnotationProcessor extends AbstractProcessor {
             }
         }
         return processed;
+    }
+
+    private void generateClassDefinition(Writer writer, String packageName, InterfaceDefinition definition, String className, Element element, Elements elementUtils, Types typeUtils) throws IOException {
+        String generationTime = String.format("%1$tY%1$tm%1$td-%1$tH%1$tk%1$tS-%1$tN%1$tz", new Date());
+
+        writer.append("package ").append(packageName).append(";\n\n");
+        writer.append("@javax.annotation.Generated(\"" + generationTime + "\")\n");
+        writer.append("public ").append(definition.getMethods().isEmpty() ? "" : "abstract ").append("class ").append(className);
+
+        AnnotationMirror mirror = findAnnotation(element, GenerateClass.class, elementUtils, typeUtils);
+        String superClassName = getSuperClassValue(elementUtils, typeUtils, mirror.getElementValues());
+        if(!superClassName.isEmpty()) {
+            writer.append(" extends ").append(superClassName);
+        }
+
+        writer.append(" implements ").append(definition.getPackage() + "." + definition.getInterfaceName())
+              .append(" {\n");
+    }
+
+    private int generateFields(Writer writer, int shift, InterfaceDefinition definition) throws IOException {
+        for (Property property : definition.getProperties()) {
+            String typeName = property.getType().toString();
+            writer.append(indent(shift)).append("private ").append(typeName).append(" ").append(toSafeName(property.getName())).append(";\n");
+        }
+        writer.append("\n");
+        return shift;
+    }
+
+    private int generateFullArgConstructor(Writer writer, int shift, String className, InterfaceDefinition definition) throws IOException {
+        writer.append(indent(shift)).append("public ").append(className).append("(");
+        boolean isFirst = true;
+        for (Property property : definition.getProperties()) {
+            if(!property.isWritable() && property.isReadable()) {
+                String type = property.getType().toString();
+                if(!isFirst) {
+                    writer.append(", ");
+                } else {
+                    isFirst = false;
+                }
+                writer.append(type).append(" ").append(toSafeName(property.getName()));
+            }
+        }
+        writer.append(") {\n");
+        shift++;
+        writer.append(indent(shift)).append("super();\n");
+        for (Property property : definition.getProperties()) {
+            if(!property.isWritable() && property.isReadable()) {
+                writer.append(indent(shift)).append("this.").append(toSafeName(property.getName())).append(" = ").append(retain(property)).append(";\n");
+            }
+        }
+        shift--;
+        writer.append(indent(shift)).append("}\n\n");
+        return shift;
+    }
+
+    private int generatePropertyAccessors(Writer writer, int shift, InterfaceDefinition definition, Types typeUtils) throws IOException {
+        for (Property property : definition.getProperties()) {
+            String propertyType = property.getType().toString();
+            if(property.isReadable()) {
+                writer.append(indent(shift)).append("@Override\n");
+                writer.append(indent(shift)).append("public ").append(propertyType).append(isBoolean(property.getType(), typeUtils) ? " is" : " get").append(capitalize(property.getName())).append("() {\n");
+                writer.append(indent(++shift)).append("return ").append(retain(property, "this.")).append(";\n");
+                writer.append(indent(--shift)).append("}\n\n");
+            }
+
+            if(property.isWritable()) {
+                writer.append(indent(shift)).append("@Override\n");
+                writer.append(indent(shift)).append("public void set").append(capitalize(property.getName())).append("(").append(propertyType).append(" ").append(toSafeName(property.getName())).append(") {\n");
+                writer.append(indent(++shift)).append("this.").append(toSafeName(property.getName())).append(" = ").append(retain(property)).append(";\n");
+                writer.append(indent(--shift)).append("}\n\n");
+            }
+        }
+        return shift;
+    }
+
+    private int generateConstructors(Writer writer, int shift, String className, InterfaceDefinition definition) throws IOException {
+        shift = generateFullArgConstructor(writer, shift, className, definition);
+
+        int readablePropertyCount = 0;
+        int writablePropertyCount = 0;
+        for (Property property : definition.getProperties()) {
+            if(property.isReadable()) readablePropertyCount++;
+            if(property.isWritable()) writablePropertyCount++;
+        }
+
+        if(readablePropertyCount > writablePropertyCount) {
+            shift = generateReadOnlyFieldConstructor(writer, shift, className, definition);
+        }
+
+        return shift;
+    }
+
+    private int generateReadOnlyFieldConstructor(Writer writer, int shift, String className, InterfaceDefinition definition) throws IOException {
+        writer.append(indent(shift)).append("public ").append(className).append("(");
+        boolean isFirst = true;
+        for (Property property : definition.getProperties()) {
+            String type = property.getType().toString();
+            if(!isFirst) {
+                writer.append(", ");
+            } else {
+                isFirst = false;
+            }
+            writer.append(type).append(" ").append(toSafeName(property.getName()));
+        }
+        writer.append(") {\n");
+        shift++;
+        writer.append(indent(shift)).append("super();\n");
+        for (Property property : definition.getProperties()) {
+            writer.append(indent(shift)).append("this.").append(toSafeName(property.getName())).append(" = ").append(retain(property)).append(";\n");
+        }
+        shift--;
+        writer.append(indent(shift)).append("}\n\n");
+        return shift;
     }
 
 

@@ -35,7 +35,7 @@ import java.util.Set;
 public final class Objects {
 
     private static final class Preserved {
-        private static final Set<String> WORDS = new HashSet<String>();
+        public static final Set<String> WORDS = new HashSet<String>();
 
         static {
             WORDS.addAll(Arrays.asList(

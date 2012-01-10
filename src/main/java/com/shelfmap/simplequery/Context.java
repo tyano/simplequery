@@ -21,7 +21,6 @@ import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.simpledb.AmazonSimpleDB;
 import com.shelfmap.simplequery.attribute.SelectAttribute;
-import com.shelfmap.simplequery.domain.AttributeConverterFactory;
 import com.shelfmap.simplequery.domain.Domain;
 import com.shelfmap.simplequery.domain.DomainFactory;
 import com.shelfmap.simplequery.expression.SelectQuery;

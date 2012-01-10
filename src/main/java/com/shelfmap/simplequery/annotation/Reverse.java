@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Tsutomu YANO.
+ * Copyright 2012 Tsutomu YANO.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,13 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.shelfmap.simplequery.annotation;
 
-package com.shelfmap.simplequery;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
- *
+ * An annotation for property typed as one of ReverseDomainReference.
+ * this annotation is for holding the attribute's name of a target domain, which references the
+ * master object on which this annotation put.
+ * 
  * @author Tsutomu YANO
  */
-public enum AttributeType {
-    PROPERTY, FIELD;
+@Retention(RetentionPolicy.SOURCE)
+@Target(ElementType.METHOD)
+public @interface Reverse {
+    String attributeName();
 }

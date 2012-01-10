@@ -16,7 +16,6 @@
 
 package com.shelfmap.simplequery.annotation;
 
-import com.shelfmap.simplequery.AttributeType;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -30,5 +29,4 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface SimpleDbDomain {
     String value();
-    AttributeType attributeType() default AttributeType.PROPERTY;
 }

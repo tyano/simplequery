@@ -67,7 +67,7 @@ public abstract class AbstractReverseDomainReference<M,T> implements DomainRefer
         Class<?> clazz = masterObject.getClass();
         Domain<?> domain = context.getDomainFactory().findDomain(clazz);
         DomainDescriptor descriptor = context.getDomainDescriptorFactory().create(domain);
-        return descriptor.getItemNameAttribute().getAttributeAccessor().read(masterObject);
+        return descriptor.getItemNameFrom(masterObject);
     }
 
     protected <T> DomainAttribute<String,String> getTargetDomainAttribute(Domain<T> targetDomain, ConditionAttribute attribute) {

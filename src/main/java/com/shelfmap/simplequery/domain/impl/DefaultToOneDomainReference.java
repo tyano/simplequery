@@ -34,8 +34,6 @@ public class DefaultToOneDomainReference<T> implements ToOneDomainReference<T>, 
     private final Domain<T> targetDomain;
     private String targetItemName = null;
 
-    private DomainAttribute<String,String> itemNameAttribute;
-
     public DefaultToOneDomainReference(Context context, Domain<T> targetDomain) {
         this.context = context;
         this.targetDomain = targetDomain;
@@ -77,13 +75,10 @@ public class DefaultToOneDomainReference<T> implements ToOneDomainReference<T>, 
 
     @Override
     public void set(T object) {
-        if(this.itemNameAttribute == null) {
-            this.itemNameAttribute = findItemNameAttribute();
-        }
-        this.targetItemName = this.itemNameAttribute.getAttributeAccessor().read(object);
+        this.targetItemName = getContext().getDomainDescriptorFactory().create(getTargetDomain()).getItemNameFrom(object);
     }
 
-    private DomainAttribute<String,String> findItemNameAttribute() {
+    private DomainAttribute<?,?> findItemNameAttribute() {
         DomainDescriptor descriptor = getContext().getDomainDescriptorFactory().create(getTargetDomain());
         return descriptor.getItemNameAttribute();
     }
@@ -103,18 +98,14 @@ public class DefaultToOneDomainReference<T> implements ToOneDomainReference<T>, 
         if ((this.targetItemName == null) ? (other.targetItemName != null) : !this.targetItemName.equals(other.targetItemName)) {
             return false;
         }
-        if (this.itemNameAttribute != other.itemNameAttribute && (this.itemNameAttribute == null || !this.itemNameAttribute.equals(other.itemNameAttribute))) {
-            return false;
-        }
         return true;
     }
 
     @Override
     public int hashCode() {
         int hash = 7;
-        hash = 11 * hash + (this.targetDomain != null ? this.targetDomain.hashCode() : 0);
-        hash = 11 * hash + (this.targetItemName != null ? this.targetItemName.hashCode() : 0);
-        hash = 11 * hash + (this.itemNameAttribute != null ? this.itemNameAttribute.hashCode() : 0);
+        hash = 73 * hash + (this.targetDomain != null ? this.targetDomain.hashCode() : 0);
+        hash = 73 * hash + (this.targetItemName != null ? this.targetItemName.hashCode() : 0);
         return hash;
     }
 }

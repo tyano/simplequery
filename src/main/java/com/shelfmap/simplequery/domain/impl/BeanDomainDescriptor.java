@@ -68,7 +68,12 @@ public class BeanDomainDescriptor implements DomainDescriptor {
                         //because it programmatically retrieve the value from another domain.
                         continue;
                     } else if(Objects.isAnnotationPresentOnProperty(domainClass, propertyName, ItemName.class)) {
-                        handleItemName(domainClass, originalPropertyType, propertyName);
+                        if(DomainReference.class.isAssignableFrom(originalPropertyType) ||
+                           Collection.class.isAssignableFrom(originalPropertyType) ||
+                           originalPropertyType.isArray()) {
+                            throw new IllegalStateException("the 'itemName' property should not be an array, collection or DomainReference. it should be an primitive or String which is persistable as an simple attribute on SimpleDB.");
+                        }
+                        handleItemName(domainClass, originalPropertyType, valueType, containerType, propertyName);
                     } else {
 
                         if(ForwardReference.class.isAssignableFrom(originalPropertyType)) {
@@ -91,12 +96,9 @@ public class BeanDomainDescriptor implements DomainDescriptor {
         }
     }
 
-    private void handleItemName(Class<?> domainClass, Class<?> type, String propertyName) throws IntrospectionException {
-        if(!String.class.isAssignableFrom(type)) {
-            throw new IllegalStateException("Can not handle a domain class: " + getDomain().getDomainClass().getName() + " - The type of @ItemName property must be String.class.");
-        }
-        DomainAttribute<String,String> itemNameAttribute = createAttribute(domainClass, propertyName, String.class, String.class, String.class);
-        attributeStore.putAttribute(propertyName, String.class, String.class, itemNameAttribute);
+    private <VT,CT> void handleItemName(Class<?> domainClass, Class<?> originalPropertyType, Class<VT> valueType, Class<CT> containerType, String propertyName) throws IntrospectionException {
+        DomainAttribute<VT,CT> itemNameAttribute = createAttribute(domainClass, propertyName, originalPropertyType, valueType, containerType);
+        attributeStore.putAttribute(itemNameAttribute.getAttributeName(), valueType, containerType, itemNameAttribute);
         this.itemNameProperty = propertyName;
     }
 
@@ -191,7 +193,7 @@ public class BeanDomainDescriptor implements DomainDescriptor {
 
     /**
      * If an @FlatAttribute annotation is applied on a method, we must handle the class of
-     * the return type of the method on which the annotation is applied.
+     * the return type of the method on which the annotation is applied as another domain.
      *
      * @param type the return type of the method on which FlatAttribute annotation is applied.
      */
@@ -258,7 +260,20 @@ public class BeanDomainDescriptor implements DomainDescriptor {
     }
 
     @Override
-    public DomainAttribute<String, String> getItemNameAttribute() {
-        return attributeStore.getAttribute(this.itemNameProperty, String.class, String.class);
+    public DomainAttribute<?, ?> getItemNameAttribute() {
+        return attributeStore.getAttribute(this.itemNameProperty);
+    }
+
+    public String getItemNameFrom(Object object) {
+        return asItemName(getItemNameAttribute(), object);
+    }
+
+    @SuppressWarnings("unchecked")
+    private <VT,CT> String asItemName(DomainAttribute<VT,CT> attribute, Object object) {
+        CT attributeValue = attribute.getAttributeAccessor().read(object);
+        AttributeConverter<VT> converter = attribute.getAttributeConverter();
+
+        //ValueType(VT) and ContainerType(CT) must be a same type;
+        return converter.convertValue((VT)attributeValue);
     }
 }

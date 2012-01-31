@@ -376,7 +376,7 @@ public class DefaultContext implements Context {
     private void handleDeleteObject(Object object, Map<Domain<?>, List<DeletableItem>> deleteItems) {
         Domain<?> domain = getDomainFactory().findDomain(object.getClass());
         DomainDescriptor descriptor = getDomainDescriptorFactory().create(domain);
-        String itemName = descriptor.getItemNameAttribute().getAttributeAccessor().read(object);
+        String itemName = descriptor.getItemNameFrom(object);
         DeletableItem item = new DeletableItem().withName(itemName);
 
         List<DeletableItem> list = deleteItems.get(domain);
@@ -390,7 +390,7 @@ public class DefaultContext implements Context {
     private void handlePutObject(Object object, Map<Domain<?>, List<ReplaceableItem>> putItems, Map<Domain<?>, List<DeletableItem>> deleteItems) {
         Domain<?> domain = getDomainFactory().findDomain(object.getClass());
         DomainDescriptor descriptor = getDomainDescriptorFactory().create(domain);
-        String itemName = descriptor.getItemNameAttribute().getAttributeAccessor().read(object);
+        String itemName = descriptor.getItemNameFrom(object);
 
         ItemConverter<?> itemConverter = getItemConverterFactory().create(domain);
         ItemState itemState = itemConverter.makeCurrentStateOf(object);

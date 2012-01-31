@@ -24,7 +24,8 @@ import com.shelfmap.simplequery.Context;
  */
 public interface DomainDescriptor extends Iterable<DomainAttribute<?,?>> {
     Context getContext();
-    DomainAttribute<String,String> getItemNameAttribute();
+    DomainAttribute<?,?> getItemNameAttribute();
+    String getItemNameFrom(Object object);
     boolean isAttributeDefined(String attributeName);
     <VT,CT> DomainAttribute<VT,CT> getAttribute(String attributeName, Class<VT> valueType, Class<CT> containerType);
     Class<?> getValueType(String attributeName);

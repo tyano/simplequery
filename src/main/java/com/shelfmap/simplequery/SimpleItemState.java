@@ -16,9 +16,8 @@
 package com.shelfmap.simplequery;
 
 import com.amazonaws.services.simpledb.model.Attribute;
-import com.amazonaws.services.simpledb.model.DeletableItem;
 import com.amazonaws.services.simpledb.model.ReplaceableAttribute;
-import com.amazonaws.services.simpledb.model.ReplaceableItem;
+import com.shelfmap.simplequery.domain.Domain;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -28,18 +27,18 @@ import java.util.List;
  * @author Tsutomu YANO
  */
 public class SimpleItemState implements ItemState {
-    final String domainName;
+    final Domain<?> domain;
     List<Attribute> deletedList = new ArrayList<Attribute>();
     List<ReplaceableAttribute> changedList = new ArrayList<ReplaceableAttribute>();
 
-    public SimpleItemState(String domainName) {
+    public SimpleItemState(Domain<?> domain) {
         super();
-        this.domainName = domainName;
+        this.domain = domain;
     }
 
     @Override
-    public String getDomainName() {
-        return domainName;
+    public Domain<?> getDomain() {
+        return domain;
     }
 
     @Override

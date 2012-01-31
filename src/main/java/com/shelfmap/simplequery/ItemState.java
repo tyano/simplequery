@@ -17,6 +17,7 @@ package com.shelfmap.simplequery;
 
 import com.amazonaws.services.simpledb.model.Attribute;
 import com.amazonaws.services.simpledb.model.ReplaceableAttribute;
+import com.shelfmap.simplequery.domain.Domain;
 import java.util.Collection;
 
 /**
@@ -24,7 +25,7 @@ import java.util.Collection;
  * @author Tsutomu YANO
  */
 public interface ItemState {
-    String getDomainName();
+    Domain<?> getDomain();
 
     Collection<Attribute> getDeletedItems();
     Collection<ReplaceableAttribute> getChangedItems();

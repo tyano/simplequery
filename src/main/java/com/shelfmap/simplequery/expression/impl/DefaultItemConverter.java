@@ -32,6 +32,7 @@ import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.logging.Level;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -89,13 +90,24 @@ public class DefaultItemConverter<T> implements ItemConverter<T> {
             }
         }
 
-        DomainAttribute<String,String> itemNameAttribute = descriptor.getItemNameAttribute();
+        DomainAttribute<?,?> itemNameAttribute = descriptor.getItemNameAttribute();
         String itemNameValue = item.getName();
         if(itemNameAttribute != null) {
-           itemNameAttribute.getAttributeAccessor().write(instance, itemNameValue);
+            try {
+                writeItemNameToDomain(itemNameAttribute, instance, itemNameValue);
+            } catch (CanNotRestoreAttributeException ex) {
+                throw new CanNotConvertItemException("could not write the itemName: " + itemNameAttribute.getAttributeName() + ". the value of itemName: " + item.getName(), ex, item);
+            }
         }
 
         return instance;
+    }
+
+    private <VT,CT> void writeItemNameToDomain(DomainAttribute<VT,CT> itemNameAttribute, T instance, String itemNameValue) throws CanNotRestoreAttributeException {
+        AttributeConverter<VT> converter = itemNameAttribute.getAttributeConverter();
+        @SuppressWarnings("unchecked")
+        CT value = (CT) converter.restoreValue(itemNameValue);
+        itemNameAttribute.getAttributeAccessor().write(instance, value);
     }
 
     @SuppressWarnings("unchecked")
@@ -167,11 +179,10 @@ public class DefaultItemConverter<T> implements ItemConverter<T> {
             descriptor = getContext().getDomainDescriptorFactory().create(getDomain());
         }
 
-        String itemName = descriptor.getItemNameAttribute().getAttributeAccessor().read(domainObject);
-        ItemState lastState = new SimpleItemState(itemName);
+        ItemState lastState = new SimpleItemState(getDomain());
 
         for (DomainAttribute<?,?> domainAttribute : descriptor) {
-            ItemState state = updateState(itemName, domainAttribute, domainObject);
+            ItemState state = updateState(domain, domainAttribute, domainObject);
             Collection<ReplaceableAttribute> changed = state.getChangedItems();
             Collection<Attribute> deleted = state.getDeletedItems();
 
@@ -187,7 +198,7 @@ public class DefaultItemConverter<T> implements ItemConverter<T> {
         return lastState;
     }
 
-    private <VT,CT> ItemState updateState(String itemName, DomainAttribute<VT,CT> domainAttribute, Object domainObject) {
+    private <VT,CT> ItemState updateState(Domain<?> domain, DomainAttribute<VT,CT> domainAttribute, Object domainObject) {
         Class<CT> containerType = domainAttribute.getContainerType();
         Class<VT> valueType = domainAttribute.getValueType();
 
@@ -245,7 +256,7 @@ public class DefaultItemConverter<T> implements ItemConverter<T> {
             }
         }
 
-        ItemState state = new SimpleItemState(itemName);
+        ItemState state = new SimpleItemState(domain);
         if(!sdbChangedAttributes.isEmpty()) {
             state.addChanged(sdbChangedAttributes.toArray(new ReplaceableAttribute[0]));
         }

@@ -45,7 +45,7 @@ import javax.lang.model.util.Types;
 import javax.tools.Diagnostic;
 
 /**
- * 
+ *
  * @author Tsutomu YANO
  */
 @SupportedSourceVersion(SourceVersion.RELEASE_6)
@@ -103,7 +103,7 @@ public class SimpleQueryProcessor extends InterfaceProcessor {
     @Override
     protected int generatePropertyFieldInitializer(Writer writer, int shift, TypeElement element, Property property) throws IOException {
         TypeMirror propertyType = property.getType();
-        
+
         if(isForwardToOneReference(propertyType)) {
             shift = generateForwardToOneReferenceInitialization(writer, shift, element, property);
         } else if(isReverseToOneDomainReference(propertyType)) {
@@ -122,11 +122,11 @@ public class SimpleQueryProcessor extends InterfaceProcessor {
         DeclaredType propertyType = (DeclaredType)property.getType();
         TypeMirror targetDomainType = propertyType.getTypeArguments().get(0);
         TypeMirror domainType = typeUtils.erasure(getTypeMirrorOf(Domain.class));
-        
+
         String domainVarName = property.getName() + "TargetDomain";
         writer.append(indent(shift)).append(domainType.toString()).append("<").append(targetDomainType.toString()).append("> ")
               .append(domainVarName).append(" = context.getDomainFactory().createDomain(").append(targetDomainType.toString()).append(".class);\n");
-        
+
         writer.append(indent(shift))
               .append("this.").append(toSafeName(property.getName()))
               .append(" = new ").append(getForwardToOneDomainReferenceType().toString())
@@ -134,10 +134,10 @@ public class SimpleQueryProcessor extends InterfaceProcessor {
                                 .append("(context, ")
                                 .append(domainVarName)
                                 .append(");\n");
-        
+
         return shift;
     }
-    
+
     protected int generateReverseReferenceInitalization(Writer writer, int shift, TypeElement element, Property property, boolean toMany) throws IOException {
         Types typeUtils = processingEnv.getTypeUtils();
 
@@ -148,11 +148,11 @@ public class SimpleQueryProcessor extends InterfaceProcessor {
         TypeMirror domainType = typeUtils.erasure(getTypeMirrorOf(Domain.class));
         TypeMirror conditionAttributeType = getTypeMirrorOf(ConditionAttribute.class);
         TypeMirror attributesType = getTypeMirrorOf(Attributes.class);
-        
+
         String domainVarName = property.getName() + "TargetDomain";
         writer.append(indent(shift)).append(domainType.toString()).append("<").append(targetDomainType.toString()).append("> ")
               .append(domainVarName).append(" = context.getDomainFactory().createDomain(").append(targetDomainType.toString()).append(".class);\n");
-        
+
         //retrieve @Reverse annotation from a property.
         //all properties typed as one of ReverseDomainReference must have a @Reverse annotation on the getter method definition.
         ExecutableElement getter = property.getReader();
@@ -162,7 +162,7 @@ public class SimpleQueryProcessor extends InterfaceProcessor {
             messager.printMessage(Diagnostic.Kind.ERROR, "Property typed as ReverseDomainReference must have a @Reverse annotation on the getter method.", getter);
         }
 
-        String targetAttribute = reverseAnnotation.attributeName();
+        String targetAttribute = reverseAnnotation.targetAttributeName();
         String targetAttributeVarName = property.getName() + "TargetAttribute";
         writer.append(indent(shift)).append(conditionAttributeType.toString()).append(" ")
               .append(targetAttributeVarName).append(" = ")
@@ -179,32 +179,32 @@ public class SimpleQueryProcessor extends InterfaceProcessor {
                                 .append(domainVarName).append(", ")
                                 .append(targetAttributeVarName)
                                 .append(");\n");
-        
-        return shift;        
+
+        return shift;
     }
 
     protected int generateReverseToOneReferenceInitialization(Writer writer, int shift, TypeElement element, Property property) throws IOException {
         return generateReverseReferenceInitalization(writer, shift, element, property, false);
     }
-    
+
     protected int generateReverseToManyReferenceInitialization(Writer writer, int shift, TypeElement element, Property property) throws IOException {
         return generateReverseReferenceInitalization(writer, shift, element, property, true);
-    }    
-    
+    }
+
     protected final DeclaredType getTypeMirrorOf(Class<?> clazz) {
         Elements elementUtils = processingEnv.getElementUtils();
         return (DeclaredType) elementUtils.getTypeElement(clazz.getName()).asType();
     }
-    
+
     protected int generateReverseToOneReferenceField(Property property, Writer writer, int shift, FieldModifier modifier) throws IOException {
         TypeMirror propertyType = property.getType();
         String modifierStr = modifier.getModifier() + (modifier == FieldModifier.DEFAULT ? "" : " ");
         String typeName = propertyType.toString();
-        
+
         writer.append(indent(shift)).append(modifierStr).append(typeName).append(" ").append(toSafeName(property.getName())).append(";\n");
         return shift;
     }
-    
+
     protected TypeMirror getReverseToManyDomainReferenceType() {
         Types typeUtils = processingEnv.getTypeUtils();
         return typeUtils.erasure(getTypeMirrorOf(DefaultReverseToManyDomainReference.class));
@@ -214,7 +214,7 @@ public class SimpleQueryProcessor extends InterfaceProcessor {
         Types typeUtils = processingEnv.getTypeUtils();
         return typeUtils.erasure(getTypeMirrorOf(DefaultReverseToOneDomainReference.class));
     }
-    
+
     protected TypeMirror getForwardToOneDomainReferenceType() {
         Types typeUtils = processingEnv.getTypeUtils();
         return typeUtils.erasure(getTypeMirrorOf(DefaultToOneDomainReference.class));
@@ -226,22 +226,22 @@ public class SimpleQueryProcessor extends InterfaceProcessor {
 
         TypeMirror erasedTargetType = typeUtils.erasure(elementUtils.getTypeElement(targetType.getName()).asType());
         TypeMirror erasedType = typeUtils.erasure(type);
-        
+
         return typeUtils.isSubtype(erasedType, erasedTargetType);
     }
-    
+
     private boolean isDomainReference(TypeMirror type) {
         return isSubtypeIfErased(type, DomainReference.class);
     }
-    
+
     private boolean isForwardToOneReference(TypeMirror type) {
         return isSubtypeIfErased(type, ToOneDomainReference.class);
     }
-    
+
     private boolean isReverseToOneDomainReference(TypeMirror type) {
         return isSubtypeIfErased(type, ReverseToOneDomainReference.class);
     }
-    
+
     private boolean isReverseToManyDomainReference(TypeMirror type) {
         return isSubtypeIfErased(type, ReverseToManyDomainReference.class);
     }

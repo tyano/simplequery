@@ -24,11 +24,11 @@ import java.lang.annotation.Target;
  * An annotation for property typed as one of ReverseDomainReference.
  * this annotation is for holding the attribute's name of a target domain, which references the
  * master object on which this annotation put.
- * 
+ *
  * @author Tsutomu YANO
  */
 @Retention(RetentionPolicy.SOURCE)
 @Target(ElementType.METHOD)
 public @interface Reverse {
-    String attributeName();
+    String targetAttributeName();
 }

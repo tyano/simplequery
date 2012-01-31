@@ -63,6 +63,10 @@ public class BeanDomainDescriptor implements DomainDescriptor {
                     Class<?> valueType = originalPropertyType;
                     String propertyName = descriptor.getName();
 
+                    //skip an attribute when ignore == true
+                    Attribute attributeAnnotation = Objects.findAnnotationOnProperty(domainClass, descriptor.getName(), Attribute.class);
+                    if(attributeAnnotation != null && attributeAnnotation.ignore()) continue;
+
                     if(ReverseReference.class.isAssignableFrom(originalPropertyType)) {
                         //ReverseReference do not have their own value in a domain.
                         //because it programmatically retrieve the value from another domain.

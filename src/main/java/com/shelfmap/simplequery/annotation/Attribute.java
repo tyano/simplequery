@@ -32,4 +32,5 @@ import java.lang.annotation.Target;
 public @interface Attribute {
     String attributeName() default "";
     Class<? extends AttributeConverter<?>> attributeConverter() default NullAttributeConverter.class;
+    boolean ignore() default false;
 }

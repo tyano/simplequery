@@ -15,6 +15,8 @@
  */
 package com.shelfmap.simplequery.processor;
 
+import com.shelfmap.interfaceprocessor.ConstructorGenerationPhase;
+import com.shelfmap.interfaceprocessor.ConstructorGenerationType;
 import com.shelfmap.interfaceprocessor.FieldModifier;
 import com.shelfmap.interfaceprocessor.InterfaceDefinition;
 import com.shelfmap.interfaceprocessor.InterfaceProcessor;
@@ -98,6 +100,21 @@ public class SimpleQueryProcessor extends InterfaceProcessor {
         } else {
             return result;
         }
+    }
+
+    @Override
+    protected boolean canInitializeField(Property property, ConstructorGenerationType generationType, ConstructorGenerationPhase generationPhase) {
+        //if the type of a property is a kind of DomainReference,
+        //the property will be initialized automatically by simplequery.
+        //so it must not be declared as a constructor-argument.
+        if(generationPhase == ConstructorGenerationPhase.CONSTRUCTOR_ARGUMENTS) {
+            ExecutableElement getter = property.getReader();
+            TypeMirror returnType = getter.getReturnType();
+            if(isDomainReference(returnType)) {
+                return false;
+            }
+        }
+        return super.canInitializeField(property, generationType, generationPhase);
     }
 
     @Override

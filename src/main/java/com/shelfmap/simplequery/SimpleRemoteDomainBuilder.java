@@ -18,13 +18,16 @@ package com.shelfmap.simplequery;
 import com.amazonaws.services.simpledb.AmazonSimpleDB;
 import com.amazonaws.services.simpledb.model.CreateDomainRequest;
 import com.shelfmap.simplequery.domain.Domain;
+import java.io.Serializable;
 import java.util.*;
 
 /**
  *
  * @author Tsutomu YANO
  */
-public class SimpleRemoteDomainBuilder implements RemoteDomainBuilder {
+public class SimpleRemoteDomainBuilder implements RemoteDomainBuilder, Serializable {
+    private static final long serialVersionUID = 1L;
+    
     private Context context;
     private final List<Domain<?>> domains = new ArrayList<Domain<?>>();
     private final Set<String> builtSet = new HashSet<String>();

@@ -25,6 +25,7 @@ import java.beans.BeanInfo;
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.Iterator;
 
@@ -32,7 +33,8 @@ import java.util.Iterator;
  *
  * @author Tsutomu YANO
  */
-public class BeanDomainDescriptor implements DomainDescriptor {
+public class BeanDomainDescriptor implements DomainDescriptor, Serializable {
+    private static final long serialVersionUID = 1L;
     private final AttributeStore attributeStore = new DefaultAttributeStore();
     private final Domain<?> domain;
     private final String parentPropertyPath;

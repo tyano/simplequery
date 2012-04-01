@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
+import java.io.Serializable;
 import java.util.Map;
 import java.util.concurrent.Executors;
 import org.slf4j.Logger;
@@ -35,7 +36,8 @@ import org.slf4j.LoggerFactory;
  *
  * @author Tsutomu YANO
  */
-public class StringContentConverter implements BlobContentConverter<String> {
+public class StringContentConverter implements BlobContentConverter<String>, Serializable {
+    private static final long serialVersionUID = 1L;
     private static final Logger LOGGER = LoggerFactory.getLogger(StringContentConverter.class);
     private static final int BUFFER_SIZE = 1024 * 1000; //1K * 1000 = 1M
 

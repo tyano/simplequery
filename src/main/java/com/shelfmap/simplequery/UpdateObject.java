@@ -20,6 +20,7 @@ package com.shelfmap.simplequery;
  * @author Tsutomu YANO
  */
 public class UpdateObject extends BaseCachedObject {
+    private static final long serialVersionUID = 1L;
 
     public UpdateObject(Object object) {
         super(object);

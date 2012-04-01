@@ -16,7 +16,6 @@
 
 package com.shelfmap.simplequery.expression.matcher;
 
-import com.amazonaws.services.simpledb.util.SimpleDBUtils;
 import static com.amazonaws.services.simpledb.util.SimpleDBUtils.quoteValue;
 import com.shelfmap.simplequery.domain.AttributeConverter;
 
@@ -25,6 +24,7 @@ import com.shelfmap.simplequery.domain.AttributeConverter;
  * @author Tsutomu YANO
  */
 public class BetweenMatcher<T> extends BaseMatcher<T> {
+    private static final long serialVersionUID = 1L;
     private T second;
 
     @SuppressWarnings("unchecked")

@@ -15,11 +15,13 @@
  */
 package com.shelfmap.simplequery.domain;
 
+import java.io.Serializable;
+
 /**
  *
  * @author Tsutomu YANO
  */
-public interface Domain<T> {
+public interface Domain<T> extends Serializable {
     Class<T> getDomainClass();
     String getDomainName();
 }

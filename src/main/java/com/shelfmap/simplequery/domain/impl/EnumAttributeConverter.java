@@ -15,8 +15,11 @@
  */
 package com.shelfmap.simplequery.domain.impl;
 
+import com.shelfmap.simplequery.ClassReference;
+import com.shelfmap.simplequery.SimpleClassReference;
 import com.shelfmap.simplequery.domain.AttributeConverter;
 import com.shelfmap.simplequery.expression.CanNotRestoreAttributeException;
+import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
@@ -24,11 +27,12 @@ import java.lang.reflect.Method;
  *
  * @author Tsutomu YANO
  */
-public class EnumAttributeConverter<T extends Enum<T>> implements AttributeConverter<T> {
-    private Class<T> enumClass;
+public class EnumAttributeConverter<T extends Enum<T>> implements AttributeConverter<T>, Serializable {
+    private static final long serialVersionUID = 1L;
+    private ClassReference enumClassRef;
 
     public EnumAttributeConverter(Class<T> enumClass) {
-        this.enumClass = enumClass;
+        this.enumClassRef = new SimpleClassReference(enumClass);
     }
 
     @Override
@@ -37,7 +41,11 @@ public class EnumAttributeConverter<T extends Enum<T>> implements AttributeConve
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public T restoreValue(String targetValue) throws CanNotRestoreAttributeException {
+
+        Class<T> enumClass = (Class<T>) enumClassRef.get();
+
         try {
             Method m = enumClass.getMethod("valueOf", String.class);
             if (enumClass.isAssignableFrom(m.getReturnType())) {

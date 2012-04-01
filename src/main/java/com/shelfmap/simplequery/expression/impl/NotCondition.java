@@ -21,12 +21,14 @@ import com.shelfmap.simplequery.domain.AttributeConverter;
 import com.shelfmap.simplequery.expression.Condition;
 import com.shelfmap.simplequery.expression.Operator;
 import com.shelfmap.simplequery.expression.matcher.Matcher;
+import java.io.Serializable;
 
 /**
  *
  * @author Tsutomu YANO
  */
-public class NotCondition implements Condition<Void>{
+public class NotCondition implements Condition<Void>, Serializable {
+    private static final long serialVersionUID = 1L;
 
     private Condition<?> condition;
     private Condition<?> parent;

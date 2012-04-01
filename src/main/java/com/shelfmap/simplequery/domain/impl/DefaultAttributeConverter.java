@@ -15,8 +15,11 @@
  */
 package com.shelfmap.simplequery.domain.impl;
 
+import com.shelfmap.simplequery.ClassReference;
+import com.shelfmap.simplequery.SimpleClassReference;
 import com.shelfmap.simplequery.domain.AttributeConverter;
 import com.shelfmap.simplequery.expression.CanNotRestoreAttributeException;
+import java.io.Serializable;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -29,17 +32,18 @@ import java.lang.reflect.Method;
  *
  * @author Tsutomu YANO
  */
-public class DefaultAttributeConverter<T> implements AttributeConverter<T> {
+public class DefaultAttributeConverter<T> implements AttributeConverter<T>, Serializable {
+    private static final long serialVersionUID = 1L;
 
-    private final Class<? extends T> clazz;
+    private final ClassReference classRef;
 
-    public DefaultAttributeConverter(Class<? extends T> clazz) {
-        this.clazz = clazz;
+    public DefaultAttributeConverter(Class<T> clazz) {
+        this.classRef = new SimpleClassReference(clazz);
     }
 
     @SuppressWarnings("unchecked")
     public DefaultAttributeConverter(T sampleValue) {
-        this.clazz = (Class<? extends T>) sampleValue.getClass();
+        this.classRef = new SimpleClassReference(sampleValue.getClass());
     }
 
     @Override
@@ -61,6 +65,9 @@ public class DefaultAttributeConverter<T> implements AttributeConverter<T> {
     @Override
     public T restoreValue(String targetValue) throws CanNotRestoreAttributeException {
         if(targetValue == null) return null;
+
+        @SuppressWarnings("unchecked")
+        Class<T> clazz = (Class<T>) classRef.get();
 
         if (clazz.isAssignableFrom(String.class)) {
             return clazz.cast(targetValue);

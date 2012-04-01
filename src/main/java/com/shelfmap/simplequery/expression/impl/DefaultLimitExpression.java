@@ -31,6 +31,7 @@ import static com.shelfmap.simplequery.util.Assertion.isNotNullAndReturn;
  * @author Tsutomu YANO
  */
 public class DefaultLimitExpression<T> extends BaseExpression<T> implements LimitExpression<T> {
+    private static final long serialVersionUID = 1L;
 
     private final int limitCount;
     private DomainExpression<T> domainExpression;

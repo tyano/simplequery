@@ -17,13 +17,15 @@ package com.shelfmap.simplequery.attribute.impl;
 
 import com.shelfmap.simplequery.attribute.ConditionAttribute;
 import com.shelfmap.simplequery.attribute.SelectAttribute;
+import java.io.Serializable;
 
 /**
  *
  * @author Tsutomu YANO
  */
-public class ItemNameAttribute implements SelectAttribute, ConditionAttribute {
+public class ItemNameAttribute implements SelectAttribute, ConditionAttribute, Serializable {
     public static final ItemNameAttribute INSTANCE = new ItemNameAttribute();
+    private static final long serialVersionUID = 1L;
     
     private ItemNameAttribute() {
         super();

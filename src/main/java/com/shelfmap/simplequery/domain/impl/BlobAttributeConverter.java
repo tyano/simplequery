@@ -15,46 +15,54 @@
  */
 package com.shelfmap.simplequery.domain.impl;
 
+import com.shelfmap.simplequery.ClassReference;
 import com.shelfmap.simplequery.Context;
+import com.shelfmap.simplequery.SimpleClassReference;
 import com.shelfmap.simplequery.domain.AttributeConverter;
 import com.shelfmap.simplequery.domain.BlobContentConverter;
 import com.shelfmap.simplequery.domain.BlobReference;
 import com.shelfmap.simplequery.domain.S3Resource;
 import com.shelfmap.simplequery.domain.S3ResourceInfo;
 import com.shelfmap.simplequery.expression.CanNotRestoreAttributeException;
+import java.io.Serializable;
 
 /**
  *
  * @param <T>
  * @author Tsutomu YANO
  */
-public class BlobAttributeConverter<T> implements AttributeConverter<BlobReference<T>> {
+public class BlobAttributeConverter<T> implements AttributeConverter<BlobReference<T>>, Serializable {
+    private static final long serialVersionUID = 1L;
 
     private Context context;
-    private Class<T> targetClass;
-    private Class<? extends BlobContentConverter<T>> contentConverterClass;
+    private ClassReference targetClassNameClassRef;
+    private ClassReference contentConverterClassRef;
 
+    @SuppressWarnings("unchecked")
     public BlobAttributeConverter(Context context, Class<T> targetClass, Class<? extends BlobContentConverter<T>> contentConverterClass) {
         super();
         this.context = context;
-        this.targetClass = targetClass;
-        this.contentConverterClass = contentConverterClass;
+        this.targetClassNameClassRef = new SimpleClassReference(targetClass);
+        this.contentConverterClassRef = new SimpleClassReference(contentConverterClass);
     }
 
+    @SuppressWarnings("unchecked")
     public Class<T> getTargetClass() {
-        return targetClass;
+        return (Class<T>) this.targetClassNameClassRef.get();
     }
 
     public void setTargetClass(Class<T> targetClass) {
-        this.targetClass = targetClass;
+        this.targetClassNameClassRef = new SimpleClassReference(targetClass);
     }
 
+    @SuppressWarnings("unchecked")
     public Class<? extends BlobContentConverter<T>> getContentConverterClass() {
-        return contentConverterClass;
+        return (Class<? extends BlobContentConverter<T>>) this.contentConverterClassRef.get();
     }
 
+    @SuppressWarnings("unchecked")
     public void setContentConverterClass(Class<? extends BlobContentConverter<T>> contentConverterClass) {
-        this.contentConverterClass = contentConverterClass;
+        this.contentConverterClassRef = new SimpleClassReference(contentConverterClass);
     }
 
 
@@ -80,11 +88,11 @@ public class BlobAttributeConverter<T> implements AttributeConverter<BlobReferen
 
         BlobContentConverter<T> contentConverter = null;
         try {
-            contentConverter = contentConverterClass.newInstance();
+            contentConverter = getContentConverterClass().newInstance();
         } catch (InstantiationException ex) {
-            throw new IllegalStateException("Could not instantiate the converter-class: " + this.contentConverterClass.getCanonicalName(), ex);
+            throw new IllegalStateException("Could not instantiate the converter-class: " + this.contentConverterClassRef, ex);
         } catch (IllegalAccessException ex) {
-            throw new IllegalStateException("Could not access the default constructor of converter-class: " + this.contentConverterClass.getCanonicalName(), ex);
+            throw new IllegalStateException("Could not access the default constructor of converter-class: " + this.contentConverterClassRef, ex);
         }
 
         return new DefaultBlobReference<T>(getContext(), new S3Resource(bucketName, key), getTargetClass(), contentConverter);

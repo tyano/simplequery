@@ -15,24 +15,28 @@
  */
 package com.shelfmap.simplequery.domain.impl;
 
+import com.shelfmap.simplequery.ClassReference;
 import com.shelfmap.simplequery.Context;
+import com.shelfmap.simplequery.SimpleClassReference;
 import com.shelfmap.simplequery.domain.AttributeConverter;
 import com.shelfmap.simplequery.domain.Domain;
 import com.shelfmap.simplequery.domain.DomainFactory;
 import com.shelfmap.simplequery.expression.CanNotRestoreAttributeException;
+import java.io.Serializable;
 
 /**
  *
  * @author Tsutomu YANO
  */
-public class DefaultToOneDomainReferenceAttributeConverter implements AttributeConverter<DefaultToOneDomainReference<?>> {
+public class DefaultToOneDomainReferenceAttributeConverter implements AttributeConverter<DefaultToOneDomainReference<?>>, Serializable {
+    private static final long serialVersionUID = 1L;
 
     private Context context;
-    private Class<?> targetClass;
+    private ClassReference targetClassRef;
 
     public DefaultToOneDomainReferenceAttributeConverter(Context context, Class<?> targetClass) {
         this.context = context;
-        this.targetClass = targetClass;
+        this.targetClassRef = new SimpleClassReference(targetClass);
     }
 
     @Override
@@ -42,6 +46,8 @@ public class DefaultToOneDomainReferenceAttributeConverter implements AttributeC
 
     @Override
     public DefaultToOneDomainReference<?> restoreValue(String targetValue) throws CanNotRestoreAttributeException {
+
+        Class<?> targetClass = this.targetClassRef.get();
         DomainFactory factory = context.getDomainFactory();
         Domain<?> targetDomain = factory.findDomain(targetClass);
         DefaultToOneDomainReference<?> reference = createDefaultToOneDomainReference(context, targetDomain);

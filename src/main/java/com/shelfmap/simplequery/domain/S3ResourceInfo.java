@@ -21,7 +21,7 @@ import java.io.Serializable;
  *
  * @author Tsutomu YANO
  */
-public interface S3ResourceInfo extends Serializable{
+public interface S3ResourceInfo extends Serializable {
     String getBucketName();
     String getKey();
     String getVersionId();

@@ -29,6 +29,7 @@ import static com.shelfmap.simplequery.util.Assertion.*;
  * @author Tsutomu YANO
  */
 public class DefaultOrderByExpression<T> extends BaseExpression<T> implements OrderByExpression<T> {
+    private static final long serialVersionUID = 1L;
     private final DomainExpression<T> domainExpression;
     private final WhereExpression<T> whereExpression;
     private final ConditionAttribute attribute;

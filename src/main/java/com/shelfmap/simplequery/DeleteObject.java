@@ -20,6 +20,7 @@ package com.shelfmap.simplequery;
  * @author Tsutomu YANO
  */
 public class DeleteObject extends BaseCachedObject {
+    private static final long serialVersionUID = 1L;
 
     public DeleteObject(Object object) {
         super(object);

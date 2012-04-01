@@ -18,6 +18,7 @@ package com.shelfmap.simplequery.attribute.impl;
 import com.amazonaws.services.simpledb.util.SimpleDBUtils;
 import com.shelfmap.simplequery.attribute.ConditionAttribute;
 import com.shelfmap.simplequery.attribute.SelectAttribute;
+import java.io.Serializable;
 
 /**
  * Simple implementation of QueryAttribute, which holds a name of the attribute
@@ -25,7 +26,8 @@ import com.shelfmap.simplequery.attribute.SelectAttribute;
  *
  * @author Tsutomu YANO
  */
-public class DefaultAttribute implements SelectAttribute, ConditionAttribute {
+public class DefaultAttribute implements SelectAttribute, ConditionAttribute, Serializable {
+    private static final long serialVersionUID = 1L;
 
     private String name;
 

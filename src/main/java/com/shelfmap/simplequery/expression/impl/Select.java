@@ -28,12 +28,14 @@ import com.shelfmap.simplequery.domain.Domain;
 import com.shelfmap.simplequery.domain.DomainFactory;
 import com.shelfmap.simplequery.expression.DomainExpression;
 import com.shelfmap.simplequery.expression.SelectQuery;
+import java.io.Serializable;
 
 /**
  *
  * @author Tsutomu YANO
  */
-public class Select implements SelectQuery {
+public class Select implements SelectQuery, Serializable {
+    private static final long serialVersionUID = 1L;
     private final Context context;
     private final List<SelectAttribute> attributes = new ArrayList<SelectAttribute>();
 

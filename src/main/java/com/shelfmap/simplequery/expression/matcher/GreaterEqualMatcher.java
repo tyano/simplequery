@@ -23,6 +23,7 @@ import com.shelfmap.simplequery.domain.AttributeConverter;
  * @author Tsutomu YANO
  */
 public class GreaterEqualMatcher<T> extends BaseMatcher<T> {
+    private static final long serialVersionUID = 1L;
 
     @SuppressWarnings("unchecked")
     public GreaterEqualMatcher(T value) {

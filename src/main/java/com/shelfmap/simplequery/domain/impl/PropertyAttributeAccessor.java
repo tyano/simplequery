@@ -26,6 +26,7 @@ import com.shelfmap.simplequery.util.Objects;
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
+import java.io.Serializable;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -37,7 +38,8 @@ import org.slf4j.LoggerFactory;
  * this implementation uses reflection for accessing an attribute of a domain object.
  * @author Tsutomu YANO
  */
-public class PropertyAttributeAccessor<T> implements AttributeAccessor<T> {
+public class PropertyAttributeAccessor<T> implements AttributeAccessor<T>, Serializable {
+    private static final long serialVersionUID = 1L;
     private static final Logger LOGGER = LoggerFactory.getLogger(PropertyAttributeAccessor.class);
     private final String propertyPath;
     private final Context context;

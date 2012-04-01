@@ -18,12 +18,14 @@ package com.shelfmap.simplequery.domain.impl;
 
 import com.shelfmap.simplequery.domain.AttributeConverter;
 import com.shelfmap.simplequery.expression.CanNotRestoreAttributeException;
+import java.io.Serializable;
 
 /**
  *
  * @author Tsutomu YANO
  */
-public class NullAttributeConverter implements AttributeConverter<Object> {
+public class NullAttributeConverter implements AttributeConverter<Object>, Serializable {
+    private static final long serialVersionUID = 1L;
     private static final NullAttributeConverter INSTANCE = new NullAttributeConverter();
 
     private NullAttributeConverter() {

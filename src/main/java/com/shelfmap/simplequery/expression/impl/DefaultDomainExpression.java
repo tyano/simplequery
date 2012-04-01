@@ -34,6 +34,8 @@ import static com.shelfmap.simplequery.util.Assertion.isNotNull;
  * @author Tsutomu YANO
  */
 public class DefaultDomainExpression<T> extends BaseExpression<T> implements DomainExpression<T>, Cloneable {
+    private static final long serialVersionUID = 1L;
+
     private SelectQuery selectObject;
 
     public DefaultDomainExpression(Context context, SelectQuery selectObject, Domain<T> domain) {

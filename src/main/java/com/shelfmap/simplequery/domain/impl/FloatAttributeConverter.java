@@ -19,12 +19,14 @@ import static com.shelfmap.simplequery.util.Assertion.isNotNull;
 import static com.amazonaws.services.simpledb.util.SimpleDBUtils.*;
 import com.shelfmap.simplequery.domain.AttributeConverter;
 import com.shelfmap.simplequery.expression.CanNotRestoreAttributeException;
+import java.io.Serializable;
 
 /**
  *
  * @author Tsutomu YANO
  */
-public class FloatAttributeConverter implements AttributeConverter<Float> {
+public class FloatAttributeConverter implements AttributeConverter<Float>, Serializable {
+    private static final long serialVersionUID = 1L;
 
     private final int maxDigitLeft;
     private final int maxDigitRight;

@@ -16,6 +16,7 @@
 package com.shelfmap.simplequery.attribute.impl;
 
 import com.shelfmap.simplequery.attribute.ConditionAttribute;
+import java.io.Serializable;
 import static java.lang.String.format;
 
 /**
@@ -24,7 +25,8 @@ import static java.lang.String.format;
  *
  * @author Tsutomu YANO
  */
-public class EveryAttribute implements ConditionAttribute {
+public class EveryAttribute implements ConditionAttribute, Serializable {
+    private static final long serialVersionUID = 1L;
 
     private final DefaultAttribute attribute;
 

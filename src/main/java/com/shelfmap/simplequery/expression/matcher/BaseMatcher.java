@@ -19,6 +19,7 @@ import com.amazonaws.services.simpledb.util.SimpleDBUtils;
 import com.shelfmap.simplequery.domain.AttributeConverter;
 import static com.shelfmap.simplequery.util.Assertion.*;
 import com.shelfmap.simplequery.domain.impl.DefaultAttributeConverter;
+import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Collection;
 
@@ -26,7 +27,8 @@ import java.util.Collection;
  *
  * @author Tsutomu YANO
  */
-public abstract class BaseMatcher<T> implements Matcher<T> {
+public abstract class BaseMatcher<T> implements Matcher<T>, Serializable {
+    private static final long serialVersionUID = 1L;
 
     private T[] values;
     private AttributeConverter<T> attributeConverter;

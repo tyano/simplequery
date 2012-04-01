@@ -16,13 +16,15 @@
 package com.shelfmap.simplequery.attribute.impl;
 
 import com.shelfmap.simplequery.attribute.SelectAttribute;
+import java.io.Serializable;
 
 /**
  *
  * @author Tsutomu YANO
  */
-public class AllAttribute implements SelectAttribute {
+public class AllAttribute implements SelectAttribute, Serializable {
     public static final AllAttribute INSTANCE = new AllAttribute();
+    private static final long serialVersionUID = 1L;
     
     private AllAttribute() {
         super();

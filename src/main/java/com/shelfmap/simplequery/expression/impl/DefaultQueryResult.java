@@ -25,10 +25,12 @@ import com.shelfmap.simplequery.expression.SimpleQueryException;
 import java.util.Iterator;
 
 /**
- *
+ * This class is not serializable, because SelectResult is not able to transfer throught Network.
+ * 
  * @author Tsutomu YANO
  */
 public class DefaultQueryResult<T> implements QueryResults<T> {
+    
     private final Context context;
     private final Expression<T> expression;
     private final SelectResult result;

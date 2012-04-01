@@ -34,6 +34,7 @@ import static com.shelfmap.simplequery.util.Assertion.isNotNull;
  * @author Tsutomu YANO
  */
 public class DefaultWhereExpression<T> extends BaseExpression<T> implements WhereExpression<T> {
+    private static final long serialVersionUID = 1L;
 
     private DomainExpression<T> domainExpression;
     private Condition<?> condition;

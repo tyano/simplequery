@@ -32,7 +32,8 @@ import org.slf4j.LoggerFactory;
  *
  * @author Tsutomu YANO
  */
-public class ImageContentConverter implements BlobContentConverter<BufferedImage> {
+public class ImageContentConverter implements BlobContentConverter<BufferedImage>, Serializable {
+    private static final long serialVersionUID = 1L;
     private static final Logger LOGGER = LoggerFactory.getLogger(ImageContentConverter.class);
     private static final int BUFFER_SIZE = 1024 * 500; //1K * 500 = 500K
 

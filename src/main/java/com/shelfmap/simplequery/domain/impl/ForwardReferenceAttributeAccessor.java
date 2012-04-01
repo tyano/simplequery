@@ -18,12 +18,14 @@ package com.shelfmap.simplequery.domain.impl;
 import com.shelfmap.simplequery.Context;
 import com.shelfmap.simplequery.domain.AttributeAccessor;
 import com.shelfmap.simplequery.domain.ForwardReference;
+import java.io.Serializable;
 
 /**
  *
  * @author Tsutomu YANO
  */
-public class ForwardReferenceAttributeAccessor implements AttributeAccessor<String> {
+public class ForwardReferenceAttributeAccessor implements AttributeAccessor<String>, Serializable {
+    private static final long serialVersionUID = 1L;
     private PropertyAttributeAccessor<ForwardReference> propertyAccessor;
     private String propertyPath;
 

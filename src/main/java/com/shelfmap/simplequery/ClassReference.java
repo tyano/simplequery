@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Tsutomu YANO.
+ * Copyright 2012 Tsutomu YANO.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,25 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.shelfmap.simplequery.attribute.impl;
+package com.shelfmap.simplequery;
 
-import com.shelfmap.simplequery.attribute.SelectAttribute;
 import java.io.Serializable;
 
 /**
  *
  * @author Tsutomu YANO
  */
-public class CountAttribute implements SelectAttribute, Serializable {
-    public static final CountAttribute INSTANCE = new CountAttribute();
-    private static final long serialVersionUID = 1L;
-  
-    private CountAttribute() {
-        super();
-    }
-
-    @Override
-    public String describe() {
-        return "count(*)";
-    }
+public interface ClassReference extends Serializable {
+    Class<?> get();
 }

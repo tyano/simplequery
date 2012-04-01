@@ -16,7 +16,6 @@
 
 package com.shelfmap.simplequery.expression.impl;
 
-import com.amazonaws.services.simpledb.AmazonSimpleDB;
 import com.amazonaws.services.simpledb.model.Item;
 import com.amazonaws.services.simpledb.model.SelectRequest;
 import com.amazonaws.services.simpledb.model.SelectResult;
@@ -26,6 +25,7 @@ import com.shelfmap.simplequery.attribute.impl.CountAttribute;
 import com.shelfmap.simplequery.domain.Domain;
 import com.shelfmap.simplequery.expression.*;
 import static com.shelfmap.simplequery.util.Assertion.isNotNull;
+import java.io.Serializable;
 import java.util.List;
 
 /**
@@ -33,10 +33,11 @@ import java.util.List;
  * @param <T> the type of the domain-class on which this expression has been created.
  * @author Tsutomu YANO
  */
-public abstract class BaseExpression<T> implements Expression<T> {
+public abstract class BaseExpression<T> implements Expression<T>, Serializable {
+    private static final long serialVersionUID = 1L;
+
     private final Context context;
     private final Domain<T> domain;
-    private final AmazonSimpleDB simpleDB;
 
     public BaseExpression(Context context, Domain<T> domain) {
         isNotNull("context", context);
@@ -44,7 +45,6 @@ public abstract class BaseExpression<T> implements Expression<T> {
         this.context = context;
         this.domain = domain;
 
-        this.simpleDB = context.getSimpleDB();
     }
 
     @Override
@@ -52,7 +52,7 @@ public abstract class BaseExpression<T> implements Expression<T> {
         createRemoteDomainIfNeed(getDomain());
         String expression = describe();
         SelectRequest selectReq = new SelectRequest(expression, consistent);
-        SelectResult result = simpleDB.select(selectReq);
+        SelectResult result = context.getSimpleDB().select(selectReq);
         List<Item> items = result.getItems();
         if(items.size() > 1) throw new MultipleResultsExistException("more than 1 results returned by the expression: " + expression);
         if(items.isEmpty()) return null;
@@ -69,7 +69,7 @@ public abstract class BaseExpression<T> implements Expression<T> {
     public QueryResults<T> getResults(boolean consistent) throws SimpleQueryException {
         createRemoteDomainIfNeed(getDomain());
         SelectRequest selectReq = new SelectRequest(describe(), consistent);
-        SelectResult result = simpleDB.select(selectReq);
+        SelectResult result = context.getSimpleDB().select(selectReq);
         return new DefaultQueryResult<T>(getContext(), getDomain(), this, result);
     }
 
@@ -78,7 +78,7 @@ public abstract class BaseExpression<T> implements Expression<T> {
         createRemoteDomainIfNeed(getDomain());
         Expression<T> rebuilt = rebuildWith(CountAttribute.INSTANCE);
         SelectRequest req = new SelectRequest(rebuilt.describe());
-        SelectResult selectResult = simpleDB.select(req);
+        SelectResult selectResult = context.getSimpleDB().select(req);
         List<Item> items = selectResult.getItems();
         if(items.isEmpty()) throw new SimpleQueryException("can not count records. expression was: " + rebuilt.describe());
 

@@ -15,12 +15,16 @@
  */
 package com.shelfmap.simplequery;
 
+import java.io.Serializable;
+
 /**
  *
  * @author Tsutomu YANO
  */
-public abstract class BaseCachedObject implements CachedObject {
-    Object object;
+public abstract class BaseCachedObject implements CachedObject, Serializable {
+    private static final long serialVersionUID = 1L;
+
+    private Object object;
 
     public BaseCachedObject(Object object) {
         this.object = object;

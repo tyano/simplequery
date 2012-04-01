@@ -16,21 +16,25 @@
 
 package com.shelfmap.simplequery.domain.impl;
 
+import com.shelfmap.simplequery.ClassReference;
+import com.shelfmap.simplequery.SimpleClassReference;
 import com.shelfmap.simplequery.domain.Domain;
 import com.shelfmap.simplequery.domain.DomainAttribute;
 import com.shelfmap.simplequery.domain.AttributeAccessor;
 import com.shelfmap.simplequery.domain.AttributeConverter;
 import static com.shelfmap.simplequery.util.Assertion.isNotNull;
+import java.io.Serializable;
 
 /**
  *
  * @author Tsutomu YANO
  */
-public class DefaultDomainAttribute<VT,CT> implements DomainAttribute<VT,CT> {
+public class DefaultDomainAttribute<VT,CT> implements DomainAttribute<VT,CT>, Serializable {
+    private static final long serialVersionUID = 1L;
     private final Domain<?> domain;
     private final String attributeName;
-    private final Class<VT> valueType;
-    private final Class<CT> containerType;
+    private final ClassReference valueTypeRef;
+    private final ClassReference containerTypeRef;
     private final AttributeConverter<VT> attributeConverter;
     private final AttributeAccessor<CT> attributeAccessor;
 
@@ -43,8 +47,8 @@ public class DefaultDomainAttribute<VT,CT> implements DomainAttribute<VT,CT> {
         isNotNull("attributeAccessor", attributeAccessor);
         this.domain = domain;
         this.attributeName = attributeName;
-        this.valueType = valueType;
-        this.containerType = containerType;
+        this.valueTypeRef = new SimpleClassReference(valueType);
+        this.containerTypeRef = new SimpleClassReference(containerType);
         this.attributeConverter = attributeConverter;
         this.attributeAccessor = attributeAccessor;
     }
@@ -55,8 +59,9 @@ public class DefaultDomainAttribute<VT,CT> implements DomainAttribute<VT,CT> {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public Class<VT> getValueType() {
-        return valueType;
+        return (Class<VT>) valueTypeRef.get();
     }
 
     @Override
@@ -75,7 +80,8 @@ public class DefaultDomainAttribute<VT,CT> implements DomainAttribute<VT,CT> {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public Class<CT> getContainerType() {
-        return containerType;
+        return (Class<CT>) containerTypeRef.get();
     }
 }

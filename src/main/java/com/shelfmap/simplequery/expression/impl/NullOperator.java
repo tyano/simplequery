@@ -17,12 +17,14 @@
 package com.shelfmap.simplequery.expression.impl;
 
 import com.shelfmap.simplequery.expression.Operator;
+import java.io.Serializable;
 
 /**
  *
  * @author Tsutomu YANO
  */
-public final class NullOperator implements Operator {
+public final class NullOperator implements Operator, Serializable {
+    private static final long serialVersionUID = 1L;
     public static final Operator INSTANCE = new NullOperator();
     
     private NullOperator() {

@@ -18,6 +18,7 @@ package com.shelfmap.simplequery.domain.impl;
 import com.amazonaws.services.simpledb.util.SimpleDBUtils;
 import com.shelfmap.simplequery.domain.AttributeConverter;
 import com.shelfmap.simplequery.expression.CanNotRestoreAttributeException;
+import java.io.Serializable;
 import java.text.ParseException;
 import java.util.Date;
 
@@ -25,7 +26,8 @@ import java.util.Date;
  *
  * @author Tsutomu YANO
  */
-public class DateAttributeConverter implements AttributeConverter<Date> {
+public class DateAttributeConverter implements AttributeConverter<Date>, Serializable {
+    private static final long serialVersionUID = 1L;
 
     @Override
     public String convertValue(Date targetValue) {

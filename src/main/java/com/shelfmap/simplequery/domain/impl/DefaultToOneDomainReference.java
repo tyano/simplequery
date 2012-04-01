@@ -22,13 +22,15 @@ import com.shelfmap.simplequery.expression.MultipleResultsExistException;
 import com.shelfmap.simplequery.expression.QueryResults;
 import com.shelfmap.simplequery.expression.SimpleQueryException;
 import static com.shelfmap.simplequery.expression.matcher.MatcherFactory.is;
+import java.io.Serializable;
 
 /**
  *
  * @param <T>
  * @author Tsutomu YANO
  */
-public class DefaultToOneDomainReference<T> implements ToOneDomainReference<T>, ForwardReference {
+public class DefaultToOneDomainReference<T> implements ToOneDomainReference<T>, ForwardReference, Serializable {
+    private static final long serialVersionUID = 1L;
 
     private final Context context;
     private final Domain<T> targetDomain;

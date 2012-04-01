@@ -15,6 +15,8 @@
  */
 package com.shelfmap.simplequery.domain.impl;
 
+import com.shelfmap.simplequery.ClassReference;
+import com.shelfmap.simplequery.SimpleClassReference;
 import com.shelfmap.simplequery.annotation.SimpleDbDomain;
 import com.shelfmap.simplequery.domain.Domain;
 import static com.shelfmap.simplequery.util.Assertion.isNotNull;
@@ -27,8 +29,9 @@ import java.util.Collection;
  * @author Tsutomu YANO
  */
 public class SimpleNamedDomain<T> implements Domain<T> {
+    private static final long serialVersionUID = 1L;
 
-    private final Class<T> domainClass;
+    private final ClassReference classRef;
     private final String domainName;
 
     public static <X> SimpleNamedDomain<X> of(final Class<X> domainClass) {
@@ -63,7 +66,7 @@ public class SimpleNamedDomain<T> implements Domain<T> {
         }
 
         this.domainName = value;
-        this.domainClass = domainClass;
+        this.classRef = new SimpleClassReference(domainClass);
     }
 
     @Override
@@ -72,12 +75,12 @@ public class SimpleNamedDomain<T> implements Domain<T> {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public Class<T> getDomainClass() {
-        return this.domainClass;
+        return (Class<T>) classRef.get();
     }
 
     @Override
-    @SuppressWarnings("AccessingNonPublicFieldOfAnotherObject")
     public boolean equals(Object obj) {
         if (obj == null) {
             return false;
@@ -87,7 +90,7 @@ public class SimpleNamedDomain<T> implements Domain<T> {
         }
         @SuppressWarnings("unchecked")
         final SimpleNamedDomain<T> other = (SimpleNamedDomain<T>) obj;
-        if (this.domainClass != other.domainClass && (this.domainClass == null || !this.domainClass.equals(other.domainClass))) {
+        if (this.classRef != other.classRef && (this.classRef == null || !this.classRef.equals(other.classRef))) {
             return false;
         }
         if ((this.domainName == null) ? (other.domainName != null) : !this.domainName.equals(other.domainName)) {
@@ -99,8 +102,13 @@ public class SimpleNamedDomain<T> implements Domain<T> {
     @Override
     public int hashCode() {
         int hash = 5;
-        hash = 71 * hash + (this.domainClass != null ? this.domainClass.hashCode() : 0);
-        hash = 71 * hash + (this.domainName != null ? this.domainName.hashCode() : 0);
+        hash = 59 * hash + (this.classRef != null ? this.classRef.hashCode() : 0);
+        hash = 59 * hash + (this.domainName != null ? this.domainName.hashCode() : 0);
         return hash;
+    }
+
+    @Override
+    public String toString() {
+        return "SimpleNamedDomain{" + "classRef=" + classRef + ", domainName=" + domainName + '}';
     }
 }

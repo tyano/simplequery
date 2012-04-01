@@ -20,12 +20,15 @@ import com.shelfmap.simplequery.attribute.ConditionAttribute;
 import com.shelfmap.simplequery.domain.*;
 import com.shelfmap.simplequery.expression.*;
 import static com.shelfmap.simplequery.expression.matcher.MatcherFactory.referTo;
+import java.io.Serializable;
 
 /**
  *
  * @author Tsutomu YANO
  */
-public abstract class AbstractReverseDomainReference<M,T> implements DomainReference<T>, ReverseReference {
+public abstract class AbstractReverseDomainReference<M,T> implements DomainReference<T>, ReverseReference, Serializable {
+    private static final long serialVersionUID = 1L;
+
     private final Context context;
     private final M masterObject;
     private final Domain<? extends T> targetDomain;

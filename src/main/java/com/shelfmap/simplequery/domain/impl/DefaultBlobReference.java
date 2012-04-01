@@ -24,7 +24,9 @@ import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.amazonaws.services.s3.model.S3Object;
 import com.amazonaws.services.s3.transfer.TransferManager;
 import com.amazonaws.services.s3.transfer.Upload;
+import com.shelfmap.simplequery.ClassReference;
 import com.shelfmap.simplequery.Context;
+import com.shelfmap.simplequery.SimpleClassReference;
 import com.shelfmap.simplequery.domain.*;
 import com.shelfmap.simplequery.util.IO;
 import java.io.*;
@@ -36,21 +38,20 @@ import org.slf4j.LoggerFactory;
  * @param <T>
  * @author Tsutomu YANO
  */
-public class DefaultBlobReference<T> implements BlobReference<T> {
-
-    private static final long serialVersionUID = 1L;
+public class DefaultBlobReference<T> implements BlobReference<T>, Serializable {
     private static final Logger LOGGER = LoggerFactory.getLogger(DefaultBlobReference.class);
+    private static final long serialVersionUID = 1L;
     private final S3ResourceInfo resourceInfo;
-    private final Class<T> targetClass;
+    private final ClassReference targetClassRef;
     private final BlobContentConverter<T> converter;
     private final Context context;
-    private Upload lastUpload;
 
-    private ObjectMetadata metadata;
+    private transient Upload lastUpload;
+    private transient ObjectMetadata metadata;
 
     public DefaultBlobReference(Context context, S3ResourceInfo resourceInfo, Class<T> targetClass, BlobContentConverter<T> converter) {
         this.resourceInfo = resourceInfo;
-        this.targetClass = targetClass;
+        this.targetClassRef = new SimpleClassReference(targetClass);
         this.converter = converter;
         this.context = context;
     }
@@ -137,8 +138,9 @@ public class DefaultBlobReference<T> implements BlobReference<T> {
         return this.resourceInfo;
     }
 
+    @SuppressWarnings("unchecked")
     public Class<T> getTargetClass() {
-        return targetClass;
+        return (Class<T>) targetClassRef.get();
     }
 
     @Override

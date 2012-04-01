@@ -22,12 +22,14 @@ import com.shelfmap.simplequery.domain.AttributeConverter;
 import com.shelfmap.simplequery.expression.Condition;
 import com.shelfmap.simplequery.expression.Operator;
 import com.shelfmap.simplequery.expression.matcher.Matcher;
+import java.io.Serializable;
 
 /**
  *
  * @author Tsutomu YANO
  */
-public final class NullCondition implements Condition<Object> {
+public final class NullCondition implements Condition<Object>, Serializable {
+    private static final long serialVersionUID = 1L;
     public static final NullCondition INSTANCE = new NullCondition();
 
     private NullCondition() {

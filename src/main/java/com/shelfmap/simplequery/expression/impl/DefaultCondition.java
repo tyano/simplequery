@@ -26,12 +26,14 @@ import com.shelfmap.simplequery.expression.Operator;
 import com.shelfmap.simplequery.expression.matcher.Matcher;
 
 import static com.shelfmap.simplequery.util.Assertion.isNotNull;
+import java.io.Serializable;
 
 /**
  *
  * @author Tsutomu YANO
  */
-public class DefaultCondition<T> implements Condition<T> {
+public class DefaultCondition<T> implements Condition<T>, Serializable {
+    private static final long serialVersionUID = 1L;
 
     private Condition<?> parent;
     private Operator operator;

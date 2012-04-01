@@ -15,21 +15,25 @@
  */
 package com.shelfmap.simplequery.domain.impl;
 
+import com.shelfmap.simplequery.ClassReference;
+import com.shelfmap.simplequery.SimpleClassReference;
 import com.shelfmap.simplequery.domain.AttributeKey;
+import java.io.Serializable;
 
 /**
  *
  * @author Tsutomu YANO
  */
-public class DefaultAttributeKey implements AttributeKey {
+public class DefaultAttributeKey implements AttributeKey, Serializable {
+    private static final long serialVersionUID = 1L;
     private final String attributeName;
-    private final Class<?> valueType;
-    private final Class<?> containerType;
+    private final ClassReference valueTypeRef;
+    private final ClassReference containerTypeRef;
 
     public DefaultAttributeKey(String attributeName, Class<?> valueType, Class<?> containerType) {
         this.attributeName = attributeName;
-        this.valueType = valueType;
-        this.containerType = containerType;
+        this.valueTypeRef = new SimpleClassReference(valueType);
+        this.containerTypeRef = new SimpleClassReference(containerType);
     }
 
     @Override
@@ -39,46 +43,22 @@ public class DefaultAttributeKey implements AttributeKey {
 
     @Override
     public Class<?> getValueType() {
-        return valueType;
+        return valueTypeRef.get();
     }
     
     @Override
     public Class<?> getContainerType() {
-        return containerType;
+        return containerTypeRef.get();
     }
 
-    @Override
-    public boolean equals(Object obj) {
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        final DefaultAttributeKey other = (DefaultAttributeKey) obj;
-        if ((this.attributeName == null) ? (other.attributeName != null) : !this.attributeName.equals(other.attributeName)) {
-            return false;
-        }
-        if (this.valueType != other.valueType && (this.valueType == null || !this.valueType.equals(other.valueType))) {
-            return false;
-        }
-        if (this.containerType != other.containerType && (this.containerType == null || !this.containerType.equals(other.containerType))) {
-            return false;
-        }
-        return true;
-    }
-
-    @Override
-    public int hashCode() {
-        int hash = 3;
-        hash = 53 * hash + (this.attributeName != null ? this.attributeName.hashCode() : 0);
-        hash = 53 * hash + (this.valueType != null ? this.valueType.hashCode() : 0);
-        hash = 53 * hash + (this.containerType != null ? this.containerType.hashCode() : 0);
-        return hash;
+    public DefaultAttributeKey(String attributeName, ClassReference valueTypeRef, ClassReference containerTypeRef) {
+        this.attributeName = attributeName;
+        this.valueTypeRef = valueTypeRef;
+        this.containerTypeRef = containerTypeRef;
     }
 
     @Override
     public String toString() {
-        return "DefaultAttributeKey{" + "attributeName=" + attributeName + ", valueType=" + valueType.getCanonicalName() + ", containerType=" + containerType.getCanonicalName() + "}";
+        return "DefaultAttributeKey{" + "attributeName=" + attributeName + ", valueTypeRef=" + valueTypeRef + ", containerTypeRef=" + containerTypeRef + '}';
     }
 }

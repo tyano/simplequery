@@ -18,6 +18,7 @@ package com.shelfmap.simplequery.expression.matcher;
 
 import com.shelfmap.simplequery.domain.AttributeConverter;
 import com.shelfmap.simplequery.domain.impl.DefaultAttributeConverter;
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.Collections;
 
@@ -25,7 +26,8 @@ import java.util.Collections;
  *
  * @author Tsutomu YANO
  */
-public class IsNotNullMatcher implements Matcher<Void> {
+public class IsNotNullMatcher implements Matcher<Void>, Serializable {
+    private static final long serialVersionUID = 1L;
     private final AttributeConverter<Void> attributeConverter = new DefaultAttributeConverter<Void>(Void.class);
     
     public IsNotNullMatcher() {

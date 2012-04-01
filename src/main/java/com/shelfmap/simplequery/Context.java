@@ -27,14 +27,13 @@ import com.shelfmap.simplequery.expression.SelectQuery;
 import com.shelfmap.simplequery.factory.DomainAttributeFactory;
 import com.shelfmap.simplequery.factory.DomainDescriptorFactory;
 import com.shelfmap.simplequery.factory.ItemConverterFactory;
-import java.io.Serializable;
 import java.util.LinkedHashSet;
 
 /**
  *
  * @author Tsutomu YANO
  */
-public interface Context extends Serializable, Iterable<CachedObject> {
+public interface Context extends Iterable<CachedObject> {
     ItemConverterFactory getItemConverterFactory();
     <T> DomainInstanceFactory<T> getDomainInstanceFactory(Domain<T> domain);
     DomainFactory getDomainFactory();

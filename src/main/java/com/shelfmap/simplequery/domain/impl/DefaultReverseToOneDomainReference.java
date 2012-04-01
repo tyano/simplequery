@@ -31,6 +31,7 @@ import java.util.List;
  * @author Tsutomu YANO
  */
 public class DefaultReverseToOneDomainReference<M,T> extends AbstractReverseDomainReference<M,T> implements ReverseToOneDomainReference<T> {
+    private static final long serialVersionUID = 1L;
 
     public DefaultReverseToOneDomainReference(Context context, M masterObject, Domain<? extends T> targetDomain, ConditionAttribute targetAttribute) {
         super(context, masterObject, targetDomain, targetAttribute);

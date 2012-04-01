@@ -28,6 +28,7 @@ import com.shelfmap.simplequery.expression.SimpleQueryException;
  * @author Tsutomu YANO
  */
 public class DefaultReverseToManyDomainReference<M,T> extends AbstractReverseDomainReference<M,T> implements ReverseToManyDomainReference<T> {
+    private static final long serialVersionUID = 1L;
     public DefaultReverseToManyDomainReference(Context context, M masterObject, Domain<T> targetDomain, ConditionAttribute targetAttribute) {
         super(context, masterObject, targetDomain, targetAttribute);
     }

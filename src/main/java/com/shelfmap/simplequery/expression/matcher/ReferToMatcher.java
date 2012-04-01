@@ -23,6 +23,7 @@ import com.shelfmap.simplequery.domain.AttributeConverter;
  * @author Tsutomu YANO
  */
 public class ReferToMatcher extends BaseMatcher<String> {
+    private static final long serialVersionUID = 1L;
     public ReferToMatcher(String... values) {
         super(values);
     }

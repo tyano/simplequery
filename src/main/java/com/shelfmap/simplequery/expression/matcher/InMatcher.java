@@ -24,6 +24,7 @@ import com.shelfmap.simplequery.domain.AttributeConverter;
  * @author Tsutomu YANO
  */
 public class InMatcher<T> extends BaseMatcher<T> {
+    private static final long serialVersionUID = 1L;
 
     public InMatcher(T... values) {
         super(values);

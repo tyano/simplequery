@@ -15,9 +15,12 @@
  */
 package com.shelfmap.simplequery.domain.impl;
 
+import com.shelfmap.simplequery.ClassReference;
+import com.shelfmap.simplequery.SimpleClassReference;
 import com.shelfmap.simplequery.domain.AttributeKey;
 import com.shelfmap.simplequery.domain.AttributeStore;
 import com.shelfmap.simplequery.domain.DomainAttribute;
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -27,17 +30,19 @@ import java.util.Set;
  *
  * @author Tsutomu YANO
  */
-@SuppressWarnings("unchecked")
-public class DefaultAttributeStore implements AttributeStore {
+@SuppressWarnings({"unchecked"})
+public class DefaultAttributeStore implements AttributeStore, Serializable {
+    private static final long serialVersionUID = 1L;
+    
     private final Map<AttributeKey, DomainAttribute<?,?>> attributeMap = new HashMap<AttributeKey, DomainAttribute<?,?>>();
-    private final Map<String, Class<?>> valueTypeMap = new HashMap<String, Class<?>>();
-    private final Map<String, Class<?>> containerTypeMap = new HashMap<String, Class<?>>();
+    private final Map<String, ClassReference> valueTypeMap = new HashMap<String, ClassReference>();
+    private final Map<String, ClassReference> containerTypeMap = new HashMap<String, ClassReference>();
     
     @Override
     public <VT,CT> DomainAttribute<VT, CT> putAttribute(String attributeName, Class<VT> valueType, Class<CT> containerType, DomainAttribute<VT,CT> value) {
         DomainAttribute<VT, CT> result = (DomainAttribute<VT, CT>) attributeMap.put(new DefaultAttributeKey(attributeName, valueType, containerType), value);
-        valueTypeMap.put(attributeName, valueType);
-        containerTypeMap.put(attributeName, containerType);
+        valueTypeMap.put(attributeName, new SimpleClassReference(valueType));
+        containerTypeMap.put(attributeName, new SimpleClassReference(containerType));
         return result;
     }
 
@@ -70,11 +75,13 @@ public class DefaultAttributeStore implements AttributeStore {
 
     @Override
     public Class<?> getValueType(String attributeName) {
-        return valueTypeMap.get(attributeName);
+        ClassReference classRef = valueTypeMap.get(attributeName);
+        return classRef == null ? null : classRef.get();
     }
 
     @Override
     public Class<?> getContainerType(String attributeName) {
-        return containerTypeMap.get(attributeName);
+        ClassReference classRef = containerTypeMap.get(attributeName);
+        return classRef == null ? null : classRef.get();
     }
 }

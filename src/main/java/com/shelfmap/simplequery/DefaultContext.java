@@ -36,6 +36,7 @@ import com.shelfmap.simplequery.factory.ItemConverterFactory;
 import com.shelfmap.simplequery.factory.impl.DefaultDomainAttributeFactory;
 import com.shelfmap.simplequery.factory.impl.DefaultDomainDescriptorFactory;
 import com.shelfmap.simplequery.factory.impl.DefaultItemConverterFactory;
+import java.io.Serializable;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.Lock;
@@ -56,7 +57,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  *
  * @author Tsutomu YANO
  */
-public class DefaultContext implements Context {
+public class DefaultContext implements Context, Serializable {
     private static final long serialVersionUID = 1L;
 
     //TODO hey! AWSCredentials must be serializable! or must be transient!
@@ -77,7 +78,7 @@ public class DefaultContext implements Context {
     private RemoteDomainBuilder remoteDomainBuilder;
     private final Lock remoteDomainBuilderLock = new ReentrantLock();
 
-    AtomicBoolean autoCreateRemoteDomain = new AtomicBoolean(true);
+    AtomicBoolean autoCreateRemoteDomain = new AtomicBoolean(false);
 
     public DefaultContext(AWSCredentials credentials) {
         this.credentials = credentials;

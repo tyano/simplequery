@@ -23,6 +23,7 @@ import com.shelfmap.simplequery.domain.AttributeConverter;
  * @author Tsutomu YANO
  */
 public class LikeMatcher<T> extends BaseMatcher<T> {
+    private static final long serialVersionUID = 1L;
 
     @SuppressWarnings("unchecked")
     public LikeMatcher(T value) {

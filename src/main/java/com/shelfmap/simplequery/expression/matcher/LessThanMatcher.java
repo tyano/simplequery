@@ -23,6 +23,7 @@ import com.shelfmap.simplequery.domain.AttributeConverter;
  * @author Tsutomu YANO
  */
 public class LessThanMatcher<T> extends BaseMatcher<T> {
+    private static final long serialVersionUID = 1L;
 
     @SuppressWarnings("unchecked")
     public LessThanMatcher(T value) {
